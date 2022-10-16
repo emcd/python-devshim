@@ -23,7 +23,7 @@
 
 from functools import partial as partial_function
 from shlex import split as split_command
-from subprocess import run
+from subprocess import run # nosec
 from types import SimpleNamespace
 
 
@@ -34,8 +34,7 @@ standard_execute_external = partial_function(
 def _configure( ):
     ''' Configure development support. '''
     from pathlib import Path
-    # TODO: Correct auxiliary path derivation after repository split.
-    auxiliary_path = Path( __file__ ).parent.parent.parent.parent
+    auxiliary_path = Path( __file__ ).parent.parent.parent
     from os import environ as current_process_environment
     from types import MappingProxyType as DictionaryProxy
     configuration_ = DictionaryProxy( dict(
@@ -50,9 +49,9 @@ configuration = _configure( )
 
 def _calculate_paths( ):
     paths_ = SimpleNamespace(
-        # TODO: Drop '.local' from auxiliary path after repository split.
-        auxiliary = configuration[ 'auxiliary_path' ] / '.local',
-        project = configuration[ 'project_path' ] )
+        auxiliary = configuration[ 'auxiliary_path' ],
+        project = configuration[ 'project_path' ],
+    )
     paths_.local = paths_.project / '.local'
     paths_.artifacts = _calculate_artifacts_paths( paths_ )
     paths_.caches = _calculate_caches_paths( paths_ )

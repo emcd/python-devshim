@@ -397,8 +397,6 @@ def _lint_pylint( context, targets, checks, version = None ):
         targets = (
             __.project_name,
             *__.paths.tests.prj.python3.rglob( '*.py' ),
-            # TODO: Remove this path after repository split.
-            *__.paths.sources.aux.python3.rglob( '*.py' ),
             __.paths.sources.prj.sphinx / 'conf.py',
             __.paths.project / 'setup.py',
         )

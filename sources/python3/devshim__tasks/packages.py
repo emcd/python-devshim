@@ -168,14 +168,17 @@ def indicate_current_python_packages( environment ):
     for line in __.standard_execute_external(
         __.split_command( 'pip freeze' ), env = environment
     ).stdout.strip( ).splitlines( ):
+        if line.startswith( '#' ): continue
         entry = __.SimpleNamespace( flags = [ ] )
-        if line.startswith( '-e' ):
+        if line.startswith( '-e git' ):
             entry.flags.append( 'editable' )
             # Replace '-e' with '{package_name}@'.
             requirement = ' '.join( (
                 line.rsplit( '=', maxsplit = 1 )[ -1 ] + '@',
                 line.split( ' ', maxsplit = 1 )[ 1 ]
             ) )
+        # TODO: Case: -e /home/me/src/python-devshim
+        elif line.startswith( '-e' ): continue
         else: requirement = line
         entry.requirement = Requirement( requirement )
         entries.append( entry )

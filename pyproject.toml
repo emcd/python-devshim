@@ -1,9 +1,9 @@
 [build-system]
 requires = [
-  'lockup',  # Package from PyPI is for development support.
+  'lockup',
   'packaging',
   'setuptools>=61.0.0',  # Has 'pyproject.toml' support!
-  'tomli',  # TODO: Use standard library 'tomllib' once Python 3.11 is baseline.
+  'tomli',  # TODO: Python 3.11: Use standard library 'tomllib'.
   'tomli-w',
   'wheel',
 ]
@@ -15,13 +15,13 @@ build-backend = 'setuptools.build_meta'
 # https://packaging.python.org/en/latest/specifications/core-metadata
 # https://packaging.python.org/en/latest/specifications/declaring-project-metadata
 dynamic = [ 'readme' ]
-name = 'lockup'
-version = '2.1a202210090133' # TODO: should be dynamic
-description = 'Immutable and concealed attributes for classes, modules, and namespaces.'
+name = 'devshim'
+version = '1.0a202210162200' # TODO: should be dynamic
+description = 'Non-intrusive, portable development support shim.'
 license = { text = 'Apache-2.0' }
-keywords = [ 'api', 'attribute', 'concealment', 'immutability', 'namespace' ]
+keywords = [ 'development', 'non-intrusive', 'portable', 'shim', 'tasks' ]
 classifiers = [ # https://pypi.org/classifiers
-  'Development Status :: 5 - Production/Stable',
+  'Development Status :: 3 - Alpha',
   'Intended Audience :: Developers',
   'License :: OSI Approved :: Apache Software License',
   'Programming Language :: Python :: 3 :: Only',
@@ -36,17 +36,17 @@ classifiers = [ # https://pypi.org/classifiers
 requires-python = '>= 3.7'
 [[project.authors]]
 name = 'Eric McDonald'
-email = 'python-lockup@googlegroups.com'
+email = 'emcd@users.noreply.github.com'
 [project.urls]
 # 'url' -> 'Homepage' and 'download-url' -> 'Download'
 #   https://github.com/pypi/warehouse/blob/a3d6221d4c692569e2290f6d75a75b4db747335b/tests/unit/packaging/test_models.py#L185-L327
 #   https://discuss.python.org/t/help-testing-experimental-features-in-setuptools/13821/16
-'Homepage' = 'https://github.com/emcd/python-lockup'
-'Documentation' = 'https://emcd.github.io/python-lockup'
-'Source Code' = 'https://github.com/emcd/python-lockup'
-'Download' = 'https://pypi.org/project/lockup/#files'
-'Issue Tracker' = 'https://github.com/emcd/python-lockup/issues'
-'Google Group' = 'https://groups.google.com/g/python-lockup'
+'Homepage' = 'https://github.com/emcd/python-devshim'
+'Documentation' = 'https://emcd.github.io/python-devshim'
+'Source Code' = 'https://github.com/emcd/python-devshim'
+#'Download' = 'https://pypi.org/project/devshim/#files'
+'Issue Tracker' = 'https://github.com/emcd/python-devshim/issues'
+#'Google Group' = 'https://groups.google.com/g/python-devshim'
 # https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
 # https://setuptools.pypa.io/en/latest/references/keywords.html
 [tool.setuptools.dynamic.readme]
@@ -80,7 +80,8 @@ output = '.local/artifacts/coverage-pytest/coverage.xml'
 cache_dir = '.local/caches/mypy'
 show_traceback = true
 show_error_codes = true
-#disable_error_code = [ 'misc' ]
+# TODO: Re-enable disabled error code.
+disable_error_code = [ 'assignment', 'import', 'misc', 'var-annotated' ]
 
 [tool.pylint.MASTER]
 ignore = []

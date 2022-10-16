@@ -31,7 +31,7 @@ class __( metaclass = _NamespaceClass ):
         name as os_class,
     )
     from shlex import split as split_command
-    from subprocess import CalledProcessError as ProcessInvocationError
+    from subprocess import CalledProcessError as ProcessInvocationError # nosec
 
     from .base import (
         pep508_identify_python,
