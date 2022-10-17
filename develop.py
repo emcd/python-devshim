@@ -95,7 +95,7 @@ def configure_auxiliary( project_path ):
         '.local', 'scm-modules', 'python-devshim' )
     packages_path = (
         auxiliary_path if auxiliary_path.is_dir( )
-        else project_path / 'sources' / 'python3' )
+        else project_path ) / 'sources' / 'python3'
     from sys import path as python_search_paths
     python_search_paths.insert( 0, str( packages_path ) )
     from os import environ as current_process_environment

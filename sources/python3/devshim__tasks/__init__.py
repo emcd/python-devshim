@@ -396,6 +396,7 @@ def _lint_pylint( context, targets, checks, version = None ):
     if not targets:
         targets = (
             __.project_name,
+            *__.paths.sources.aux.python3.rglob( '*.py' ),
             *__.paths.tests.prj.python3.rglob( '*.py' ),
             __.paths.sources.prj.sphinx / 'conf.py',
             __.paths.project / 'setup.py',
