@@ -153,6 +153,7 @@ testpaths = ['tests/python3', 'sources/python3', 'sources/sphinx']
 python_files = ['*.py']
 python_functions = ['test_[0-9][0-9][0-9]_*']
 cache_dir = '.local/caches/pytest'
+filterwarnings = ['ignore::DeprecationWarning']
 
 [tool.yapf]
 # https://github.com/google/yapf
