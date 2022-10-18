@@ -163,6 +163,9 @@ def install_python_packages( context, context_options, identifier = None ):
 
 def indicate_current_python_packages( environment ):
     ''' Returns currently-installed Python packages. '''
+    from re import compile as regex_compile
+    eggstractor = regex_compile(
+        r'''.*#egg=(?P<package_name>\w[\w\-]+\w)(?:&.*)?$''' )
     from packaging.requirements import Requirement
     entries = [ ]
     for line in __.standard_execute_external(
@@ -173,10 +176,11 @@ def indicate_current_python_packages( environment ):
         if line.startswith( '-e git' ):
             entry.flags.append( 'editable' )
             # Replace '-e' with '{package_name}@'.
+            name_match = eggstractor.match( line )
+            if not name_match: continue
             requirement = ' '.join( (
-                line.rsplit( '=', maxsplit = 1 )[ -1 ] + '@',
-                line.split( ' ', maxsplit = 1 )[ 1 ]
-            ) )
+                name_match.group( 'package_name' ) + '@',
+                line.split( ' ', maxsplit = 1 )[ 1 ] ) )
         # TODO: Case: -e /home/me/src/python-devshim
         elif line.startswith( '-e' ): continue
         else: requirement = line
