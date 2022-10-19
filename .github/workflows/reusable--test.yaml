@@ -1,0 +1,20 @@
+name: reusable--tests
+on: ['workflow_call']
+jobs:
+  test-standard-suite:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8', '3.9', '3.10', 'pypy3.7', 'pypy3.8', 'pypy3.9']
+    steps:
+      - name: Prepare
+        uses: emcd/python-devshim/.github/actions/python-venv@gh-actions
+        with:
+          python-version: '${{ matrix.python-version }}'
+      - name: Test
+        run: python3 develop.py test
+      - name: Preserve Coverage Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-results-${{ matrix.python-version }}
+          path: .local/caches/pytest/coverage.sqlite3.*
