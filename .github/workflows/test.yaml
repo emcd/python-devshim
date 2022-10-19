@@ -1,0 +1,25 @@
+name: tests
+on:
+  push:
+    branches: ['master', 'release-*']
+jobs:
+  test:
+    uses: emcd/python-devshim/.github/workflows/reusable--test.yaml@master
+  report-coverage:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare
+        uses: emcd/python-devshim/.github/actions/python-venv@master
+      - name: Restore Coverage Results
+        uses: actions/download-artifact@v3
+        with:
+          path: .local/caches/pytest
+      - name: Relocate Coverage Results
+        run: mv .local/caches/pytest/coverage-results-*/coverage.sqlite3.* .local/caches/pytest
+      - name: Report Coverage
+        run: python3 develop.py report-coverage
+#      - name: Upload Coverage Report
+#        uses: codecov/codecov-action@v2
+#        with:
+#          files: artifacts/coverage-pytest/coverage.xml
