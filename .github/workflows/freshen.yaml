@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prepare
-        uses: emcd/python-devhim/.github/actions/python-venv@master
+        uses: emcd/python-devshim/.github/actions/python-venv@master
         with:
           python-version: all
       - name: Load PGP Key
