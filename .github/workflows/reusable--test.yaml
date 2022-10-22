@@ -5,6 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        # TODO: Use 'fromJSON' to expand from stringified list.
+        #   https://docs.github.com/en/actions/learn-github-actions/expressions#example-returning-a-json-object
         python-version: ['3.7', '3.8', '3.9', '3.10', 'pypy3.7', 'pypy3.8', 'pypy3.9']
     steps:
       - name: Prepare
