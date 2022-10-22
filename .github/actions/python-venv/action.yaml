@@ -1,6 +1,9 @@
 name: python-venv
 description: 'Clones project, configures Python, and populates virtual environment.'
 inputs:
+  needs-clone:
+    description: 'Clone repository or is it already cloned?'
+    default: true
   python-version:
     description: 'Version of the Python interpreter.'
     required: true
@@ -8,46 +11,56 @@ inputs:
   python-configure-flags:
     description: 'Flags to pass to the configure script for Python builds.'
     required: false
+  use-versions-update:
+    description: 'Decache updated Python version specifiers?'
+    required: true
+    default: false
 runs:
   using: composite
   steps:
     - name: Clone Repository Code
+      if: "${{ true == inputs.needs-clone }}"
       uses: actions/checkout@v3
       with:
         submodules: recursive
-    - name: Install Asdf Core
+    - name: Install Asdf with Plugins
+      uses: ./.github/actions/asdf-vm
+    - name: Access Cache for Asdf Tool Versions (if requested)
+      if: "${{ true == inputs.use-versions-update }}"
+      uses: actions/cache@v3
+      with:
+        key: asdf-tool-versions
+        path: .tool-versions
+    - name: Select Python Version
       run: |
         set -eu
-        asdf_install_path="${HOME}/.asdf"
-        git clone --depth 1 --branch master https://github.com/asdf-vm/asdf.git "${asdf_install_path}"
-        echo "ASDF_DIR=${asdf_install_path}" >>${GITHUB_ENV}
-        echo "${asdf_install_path}/bin" >>${GITHUB_PATH}
-        echo "${asdf_install_path}/shims" >>${GITHUB_PATH}
-      shell: bash
-    - name: Install Asdf Python Plugin
-      run: |
-        set -eu
-        asdf plugin add python
-      shell: bash
-    - name: Select Python Version (if requested)
-      if: "${{ 'all' != inputs.python-version }}"
-      run: |
-        set -eu
-        python_version="$(asdf latest python ${{ inputs.python-version }})"
+        python_version="$(grep --extended-regexp '^python' .tool-versions | tr ' ' '\n' | grep --extended-regexp '^${{ inputs.python-version }}')"
+        #python_version="$(asdf latest python ${{ inputs.python-version }})"
         echo "ASDF_PYTHON_VERSION=${python_version}" >>${GITHUB_ENV}
       shell: bash
+    - name: Access Cache for Python and Virtual Environment
+      if: "${{ null == inputs.python-configure-flags }}"
+      id: python-cache
+      uses: actions/cache@v3
+      with:
+        key: python--${{ env.ASDF_PYTHON_VERSION }}--${{ runner.os }}--${{ hashFiles('.local/configuration/pypackages.fixtures.toml') }}
+        path: |
+          ~/.asdf/installs/python
+          .local/environments
     - name: Add Python Configure Flags (if requested)
       if: "${{ inputs.python-configure-flags }}"
       run: |
         set -eu
         echo 'PYTHON_CONFIGURE_OPTS=${{ inputs.python-configure-flags }}' >>${GITHUB_ENV}
       shell: bash
-    - name: Install Managed Versions
-      run: asdf install
+    - name: Install Python
+      if: "${{ steps.python-cache.outputs.cache-hit != 'true' }}"
+      run: asdf install python
       shell: bash
-    - name: Create Virtual Environments
+    - name: Create Virtual Environment
+      if: "${{ steps.python-cache.outputs.cache-hit != 'true' }}"
       run: |
         set -eu
-        python3 develop.py build-python-venv --version ALL
+        /usr/bin/python3 develop.py build-python-venv --version ${{ env.ASDF_PYTHON_VERSION }}
         asdf reshim python
       shell: bash

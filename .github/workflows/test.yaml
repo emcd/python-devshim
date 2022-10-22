@@ -4,13 +4,19 @@ on:
     branches: ['master', 'release-*']
 jobs:
   test:
-    uses: emcd/python-devshim/.github/workflows/reusable--test.yaml@master
+    uses: ./.github/workflows/reusable--test.yaml
   report-coverage:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - name: Prepare
-        uses: emcd/python-devshim/.github/actions/python-venv@master
+      - name: Clone Repository Code
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Prepare Python Virtual Environment
+        uses: ./.github/actions/python-venv
+        with:
+          needs-clone: false
       - name: Restore Coverage Results
         uses: actions/download-artifact@v3
         with:
