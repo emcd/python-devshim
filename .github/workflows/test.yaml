@@ -3,10 +3,18 @@ on:
   push:
     branches: ['master', 'release-*']
 jobs:
-  test:
-    uses: ./.github/workflows/reusable--test.yaml
+  initialize:
+    uses: ./.github/workflows/reusable--initializer.yaml
+  test-standard-suite:
+    needs: initialize
+    strategy:
+      matrix:
+        python-version: ${{ fromJSON(needs.initialize.outputs.python-versions-json) }}
+    uses: ./.github/workflows/reusable--tester.yaml
+    with:
+      python-version: '${{ matrix.python-version }}'
   report-coverage:
-    needs: test
+    needs: test-standard-suite
     runs-on: ubuntu-latest
     steps:
       - name: Clone Repository Code

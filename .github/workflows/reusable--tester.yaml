@@ -1,0 +1,23 @@
+name: reusable--tester
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        required: true
+        type: string
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare Python Virtual Environment
+        uses: emcd/python-devshim/.github/actions/python-venv@master
+        with:
+          python-version: '${{ inputs.python-version }}'
+      - name: Test
+        run: /usr/bin/python3 develop.py test
+        shell: bash
+      - name: Preserve Coverage Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-results-${{ inputs.python-version }}
+          path: .local/caches/pytest/coverage.sqlite3.*
