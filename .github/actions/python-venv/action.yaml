@@ -19,7 +19,7 @@ runs:
   using: composite
   steps:
     - name: Clone Repository Code
-      if: "${{ true == inputs.needs-clone }}"
+      if: "${{ 'true' == inputs.needs-clone }}"
       uses: actions/checkout@v3
       with:
         submodules: recursive
@@ -27,7 +27,7 @@ runs:
       #uses: ./.github/actions/asdf-vm
       uses: emcd/python-devshim/.github/actions/asdf-vm@master
     - name: Access Cache for Asdf Tool Versions (if requested)
-      if: "${{ true == inputs.use-versions-update }}"
+      if: "${{ 'true' == inputs.use-versions-update }}"
       uses: actions/cache@v3
       with:
         key: asdf-tool-versions
@@ -36,11 +36,10 @@ runs:
       run: |
         set -eu
         python_version="$(grep --extended-regexp '^python' .tool-versions | tr ' ' '\n' | grep --extended-regexp '^${{ inputs.python-version }}')"
-        #python_version="$(asdf latest python ${{ inputs.python-version }})"
         echo "ASDF_PYTHON_VERSION=${python_version}" >>${GITHUB_ENV}
       shell: bash
     - name: Access Cache for Python and Virtual Environment
-      if: "${{ null == inputs.python-configure-flags }}"
+      if: "${{ '' == inputs.python-configure-flags }}"
       id: python-cache
       uses: actions/cache@v3
       with:
@@ -55,11 +54,11 @@ runs:
         echo 'PYTHON_CONFIGURE_OPTS=${{ inputs.python-configure-flags }}' >>${GITHUB_ENV}
       shell: bash
     - name: Install Python
-      if: "${{ steps.python-cache.outputs.cache-hit != 'true' }}"
+      if: "${{ 'true' != steps.python-cache.outputs.cache-hit }}"
       run: asdf install python
       shell: bash
     - name: Create Virtual Environment
-      if: "${{ steps.python-cache.outputs.cache-hit != 'true' }}"
+      if: "${{ 'true' != steps.python-cache.outputs.cache-hit }}"
       run: |
         set -eu
         /usr/bin/python3 develop.py build-python-venv --version ${{ env.ASDF_PYTHON_VERSION }}
