@@ -5,14 +5,21 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        # TODO: Use 'fromJSON' to expand from stringified list.
+        #   https://docs.github.com/en/actions/learn-github-actions/expressions#example-returning-a-json-object
         python-version: ['3.7', '3.8', '3.9', '3.10', 'pypy3.7', 'pypy3.8', 'pypy3.9']
     steps:
-      - name: Prepare
-        uses: emcd/python-devshim/.github/actions/python-venv@master
+      - name: Clone Repository Code
+        uses: actions/checkout@v3
         with:
+          submodules: recursive
+      - name: Prepare Python Virtual Environment
+        uses: ./.github/actions/python-venv
+        with:
+          needs-clone: false
           python-version: '${{ matrix.python-version }}'
       - name: Test
-        run: python3 develop.py test
+        run: /usr/bin/python3 develop.py test
       - name: Preserve Coverage Results
         uses: actions/upload-artifact@v3
         with:

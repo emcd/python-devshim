@@ -1,0 +1,19 @@
+name: asdf-vm
+description: 'Configures Asdf version manager with plugins.'
+runs:
+  using: composite
+  steps:
+    - name: Install Asdf Core
+      run: |
+        set -eu
+        asdf_install_path="${HOME}/.asdf"
+        git clone --depth 1 --branch master https://github.com/asdf-vm/asdf.git "${asdf_install_path}"
+        echo "ASDF_DIR=${asdf_install_path}" >>${GITHUB_ENV}
+        echo "${asdf_install_path}/bin" >>${GITHUB_PATH}
+        echo "${asdf_install_path}/shims" >>${GITHUB_PATH}
+      shell: bash
+    - name: Install Asdf Python Plugin
+      run: |
+        set -eu
+        asdf plugin add python
+      shell: bash
