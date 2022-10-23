@@ -24,7 +24,8 @@ runs:
       with:
         submodules: recursive
     - name: Install Asdf with Plugins
-      uses: ./.github/actions/asdf-vm
+      #uses: ./.github/actions/asdf-vm
+      uses: emcd/python-devshim/.github/actions/asdf-vm@master
     - name: Access Cache for Asdf Tool Versions (if requested)
       if: "${{ true == inputs.use-versions-update }}"
       uses: actions/cache@v3
