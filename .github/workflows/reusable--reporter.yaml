@@ -1,0 +1,28 @@
+name: reusable--reporter
+on:
+  workflow_call:
+    inputs:
+      publish:
+        description: 'Publish the generated reports?'
+        default: false
+        required: false
+        type: boolean
+jobs:
+  report-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare Python Virtual Environment
+        uses: emcd/python-devshim/.github/actions/python-venv@master
+      - name: Restore Coverage Results
+        uses: actions/download-artifact@v3
+        with:
+          name: coverage-results-${{ github.run_id }}
+          path: .local/caches/pytest
+      - name: Report Coverage
+        run: python3 develop.py report-coverage
+        shell: bash
+      - name: Upload Coverage Report
+        if: inputs.publish
+        uses: codecov/codecov-action@v3
+        with:
+          files: artifacts/coverage-pytest/coverage.xml

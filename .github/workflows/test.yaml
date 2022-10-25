@@ -1,11 +1,13 @@
-name: tests
+name: tester
 on:
+  pull_request:
+    branches: ['*']
   push:
     branches: ['master', 'release-*']
 jobs:
   initialize:
     uses: ./.github/workflows/reusable--initializer.yaml
-  test-standard-suite:
+  test:
     needs: initialize
     strategy:
       matrix:
@@ -13,27 +15,6 @@ jobs:
     uses: ./.github/workflows/reusable--tester.yaml
     with:
       python-version: '${{ matrix.python-version }}'
-  report-coverage:
-    needs: test-standard-suite
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clone Repository Code
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Prepare Python Virtual Environment
-        uses: ./.github/actions/python-venv
-        with:
-          needs-clone: false
-      - name: Restore Coverage Results
-        uses: actions/download-artifact@v3
-        with:
-          path: .local/caches/pytest
-      - name: Relocate Coverage Results
-        run: mv .local/caches/pytest/coverage-results-*/coverage.sqlite3.* .local/caches/pytest
-      - name: Report Coverage
-        run: python3 develop.py report-coverage
-#      - name: Upload Coverage Report
-#        uses: codecov/codecov-action@v2
-#        with:
-#          files: artifacts/coverage-pytest/coverage.xml
+  report:
+    needs: test
+    uses: ./.github/workflows/reusable--reporter.yaml
