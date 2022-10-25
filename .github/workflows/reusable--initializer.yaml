@@ -2,6 +2,9 @@ name: reusable--initializer
 on:
   workflow_call:
     outputs:
+      devshim-ref-name:
+        description: 'Git branch or tag to use when calling actions in this repository.'
+        value: '${{ github.ref_name }}'
       python-versions-json:
         description: 'List of Python versions in JSON format.'
         value: '${{ jobs.define-constants.outputs.python-versions-json }}'

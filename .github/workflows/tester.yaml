@@ -14,6 +14,7 @@ jobs:
         python-version: ${{ fromJSON(needs.initialize.outputs.python-versions-json) }}
     uses: ./.github/workflows/reusable--tester.yaml
     with:
+      devshim-ref-name: '${{ needs.initialize.outputs.devshim-ref-name }}'
       python-version: '${{ matrix.python-version }}'
   report:
     needs: test

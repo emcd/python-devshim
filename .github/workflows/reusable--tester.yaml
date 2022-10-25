@@ -2,6 +2,10 @@ name: reusable--tester
 on:
   workflow_call:
     inputs:
+      devshim-ref-name:
+        default: master
+        required: true
+        type: string
       python-version:
         required: true
         type: string
@@ -10,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prepare Python Virtual Environment
-        uses: emcd/python-devshim/.github/actions/python-venv@master
+        uses: 'emcd/python-devshim/.github/actions/python-venv@${{ inputs.devshim-ref-name }}'
         with:
           python-version: '${{ inputs.python-version }}'
       - name: Test
