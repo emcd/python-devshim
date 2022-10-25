@@ -19,5 +19,5 @@ jobs:
       - name: Preserve Coverage Results
         uses: actions/upload-artifact@v3
         with:
-          name: coverage-results-${{ inputs.python-version }}
+          name: coverage-results-${{ github.run_id }}
           path: .local/caches/pytest/coverage.sqlite3.*

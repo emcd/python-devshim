@@ -18,6 +18,13 @@ Windows Development Support
 
 * Or, manage Pythons on all platforms via ``develop.py``.
 
+Installable Devshim Wrapper Script
+===============================================================================
+
+* Detects whether it is in a devshim-enabled directory tree.
+
+* May also be segue to providing devshim as a package.
+
 Remove Dependency on ``bump2version``
 ===============================================================================
 
