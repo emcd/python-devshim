@@ -17,15 +17,11 @@ jobs:
   freshen-tool-versions:
     runs-on: ubuntu-latest
     steps:
-      - name: Clone Repository Code
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
+      - name: Construct Foundation
+        uses: emcd/python-devshim/.github/actions/clone@master
       - name: Freshen Git Modules
         run: /usr/bin/python3 develop.py freshen-git-modules
         shell: bash
-      - name: Install Asdf with Plugins
-        uses: emcd/python-devshim/.github/actions/asdf-vm@master
       - name: Freshen Python Versions
         run: |
           set -eu
