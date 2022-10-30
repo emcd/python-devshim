@@ -515,10 +515,10 @@ digests = [
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "lockup"
-version = "2.0.0"
+version = "2.1.1"
 digests = [
-    "sha256:cdd4ab722b826bc10cceff887838e1a2b4f8d64132a6935524961ff0ac2fc9e8",
-    "sha256:c33673d740233bd4f7a09aea53c41cf34187439f93696aa015a41e9ddd8da9a7",
+    "sha256:2376308577c531455bbecef848a2e330b54ebe0e9e88c143bd160c63ebbb590b",
+    "sha256:85db8bff5d417cca28b81fa8d362974928f315541c18d8cfefee73728777ca16",
 ]
 
 [["cpython-3.10.8--linux--x86_64"]]
@@ -682,14 +682,6 @@ version = "2.20.0"
 digests = [
     "sha256:51a5ba7c480ae8072ecdb6933df22d2f812dc897d5fe848778116129a681aac7",
     "sha256:a978dac7bc9ec0bcee55c18a277d553b0f419d259dadb4b9418ff2d00eb43959",
-]
-
-[["cpython-3.10.8--linux--x86_64"]]
-name = "py"
-version = "1.11.0"
-digests = [
-    "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378",
-    "sha256:51c75c4126074b472f746a24399ad32f6053d1b34b68d2fa41e558e6f4a98719",
 ]
 
 [["cpython-3.10.8--linux--x86_64"]]
@@ -1824,10 +1816,10 @@ digests = [
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "lockup"
-version = "2.0.0"
+version = "2.1.1"
 digests = [
-    "sha256:cdd4ab722b826bc10cceff887838e1a2b4f8d64132a6935524961ff0ac2fc9e8",
-    "sha256:c33673d740233bd4f7a09aea53c41cf34187439f93696aa015a41e9ddd8da9a7",
+    "sha256:2376308577c531455bbecef848a2e330b54ebe0e9e88c143bd160c63ebbb590b",
+    "sha256:85db8bff5d417cca28b81fa8d362974928f315541c18d8cfefee73728777ca16",
 ]
 
 [["cpython-3.11.0--linux--x86_64"]]
@@ -3102,10 +3094,10 @@ digests = [
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "lockup"
-version = "2.0.0"
+version = "2.1.1"
 digests = [
-    "sha256:cdd4ab722b826bc10cceff887838e1a2b4f8d64132a6935524961ff0ac2fc9e8",
-    "sha256:c33673d740233bd4f7a09aea53c41cf34187439f93696aa015a41e9ddd8da9a7",
+    "sha256:2376308577c531455bbecef848a2e330b54ebe0e9e88c143bd160c63ebbb590b",
+    "sha256:85db8bff5d417cca28b81fa8d362974928f315541c18d8cfefee73728777ca16",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
@@ -3277,14 +3269,6 @@ version = "2.20.0"
 digests = [
     "sha256:51a5ba7c480ae8072ecdb6933df22d2f812dc897d5fe848778116129a681aac7",
     "sha256:a978dac7bc9ec0bcee55c18a277d553b0f419d259dadb4b9418ff2d00eb43959",
-]
-
-[["cpython-3.7.15--linux--x86_64"]]
-name = "py"
-version = "1.11.0"
-digests = [
-    "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378",
-    "sha256:51c75c4126074b472f746a24399ad32f6053d1b34b68d2fa41e558e6f4a98719",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
@@ -4465,10 +4449,10 @@ digests = [
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "lockup"
-version = "2.0.0"
+version = "2.1.1"
 digests = [
-    "sha256:cdd4ab722b826bc10cceff887838e1a2b4f8d64132a6935524961ff0ac2fc9e8",
-    "sha256:c33673d740233bd4f7a09aea53c41cf34187439f93696aa015a41e9ddd8da9a7",
+    "sha256:2376308577c531455bbecef848a2e330b54ebe0e9e88c143bd160c63ebbb590b",
+    "sha256:85db8bff5d417cca28b81fa8d362974928f315541c18d8cfefee73728777ca16",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
@@ -4640,14 +4624,6 @@ version = "2.20.0"
 digests = [
     "sha256:51a5ba7c480ae8072ecdb6933df22d2f812dc897d5fe848778116129a681aac7",
     "sha256:a978dac7bc9ec0bcee55c18a277d553b0f419d259dadb4b9418ff2d00eb43959",
-]
-
-[["cpython-3.8.15--linux--x86_64"]]
-name = "py"
-version = "1.11.0"
-digests = [
-    "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378",
-    "sha256:51c75c4126074b472f746a24399ad32f6053d1b34b68d2fa41e558e6f4a98719",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
@@ -5790,10 +5766,10 @@ digests = [
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "lockup"
-version = "2.0.0"
+version = "2.1.1"
 digests = [
-    "sha256:cdd4ab722b826bc10cceff887838e1a2b4f8d64132a6935524961ff0ac2fc9e8",
-    "sha256:c33673d740233bd4f7a09aea53c41cf34187439f93696aa015a41e9ddd8da9a7",
+    "sha256:2376308577c531455bbecef848a2e330b54ebe0e9e88c143bd160c63ebbb590b",
+    "sha256:85db8bff5d417cca28b81fa8d362974928f315541c18d8cfefee73728777ca16",
 ]
 
 [["cpython-3.9.15--linux--x86_64"]]
@@ -5957,14 +5933,6 @@ version = "2.20.0"
 digests = [
     "sha256:51a5ba7c480ae8072ecdb6933df22d2f812dc897d5fe848778116129a681aac7",
     "sha256:a978dac7bc9ec0bcee55c18a277d553b0f419d259dadb4b9418ff2d00eb43959",
-]
-
-[["cpython-3.9.15--linux--x86_64"]]
-name = "py"
-version = "1.11.0"
-digests = [
-    "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378",
-    "sha256:51c75c4126074b472f746a24399ad32f6053d1b34b68d2fa41e558e6f4a98719",
 ]
 
 [["cpython-3.9.15--linux--x86_64"]]
@@ -7083,10 +7051,10 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "lockup"
-version = "2.0.0"
+version = "2.1.1"
 digests = [
-    "sha256:cdd4ab722b826bc10cceff887838e1a2b4f8d64132a6935524961ff0ac2fc9e8",
-    "sha256:c33673d740233bd4f7a09aea53c41cf34187439f93696aa015a41e9ddd8da9a7",
+    "sha256:2376308577c531455bbecef848a2e330b54ebe0e9e88c143bd160c63ebbb590b",
+    "sha256:85db8bff5d417cca28b81fa8d362974928f315541c18d8cfefee73728777ca16",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -7212,14 +7180,6 @@ version = "2.20.0"
 digests = [
     "sha256:51a5ba7c480ae8072ecdb6933df22d2f812dc897d5fe848778116129a681aac7",
     "sha256:a978dac7bc9ec0bcee55c18a277d553b0f419d259dadb4b9418ff2d00eb43959",
-]
-
-[["pypy-3.7.13-7.3.9--linux--x86_64"]]
-name = "py"
-version = "1.11.0"
-digests = [
-    "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378",
-    "sha256:51c75c4126074b472f746a24399ad32f6053d1b34b68d2fa41e558e6f4a98719",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -8264,10 +8224,10 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "lockup"
-version = "2.0.0"
+version = "2.1.1"
 digests = [
-    "sha256:cdd4ab722b826bc10cceff887838e1a2b4f8d64132a6935524961ff0ac2fc9e8",
-    "sha256:c33673d740233bd4f7a09aea53c41cf34187439f93696aa015a41e9ddd8da9a7",
+    "sha256:2376308577c531455bbecef848a2e330b54ebe0e9e88c143bd160c63ebbb590b",
+    "sha256:85db8bff5d417cca28b81fa8d362974928f315541c18d8cfefee73728777ca16",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -8439,14 +8399,6 @@ version = "2.20.0"
 digests = [
     "sha256:51a5ba7c480ae8072ecdb6933df22d2f812dc897d5fe848778116129a681aac7",
     "sha256:a978dac7bc9ec0bcee55c18a277d553b0f419d259dadb4b9418ff2d00eb43959",
-]
-
-[["pypy-3.8.13-7.3.9--linux--x86_64"]]
-name = "py"
-version = "1.11.0"
-digests = [
-    "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378",
-    "sha256:51c75c4126074b472f746a24399ad32f6053d1b34b68d2fa41e558e6f4a98719",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -9569,10 +9521,10 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "lockup"
-version = "2.0.0"
+version = "2.1.1"
 digests = [
-    "sha256:cdd4ab722b826bc10cceff887838e1a2b4f8d64132a6935524961ff0ac2fc9e8",
-    "sha256:c33673d740233bd4f7a09aea53c41cf34187439f93696aa015a41e9ddd8da9a7",
+    "sha256:2376308577c531455bbecef848a2e330b54ebe0e9e88c143bd160c63ebbb590b",
+    "sha256:85db8bff5d417cca28b81fa8d362974928f315541c18d8cfefee73728777ca16",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
@@ -9736,14 +9688,6 @@ version = "2.20.0"
 digests = [
     "sha256:51a5ba7c480ae8072ecdb6933df22d2f812dc897d5fe848778116129a681aac7",
     "sha256:a978dac7bc9ec0bcee55c18a277d553b0f419d259dadb4b9418ff2d00eb43959",
-]
-
-[["pypy-3.9.12-7.3.9--linux--x86_64"]]
-name = "py"
-version = "1.11.0"
-digests = [
-    "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378",
-    "sha256:51c75c4126074b472f746a24399ad32f6053d1b34b68d2fa41e558e6f4a98719",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
