@@ -40,13 +40,13 @@ class __( metaclass = _NamespaceClass ):
 
     from invoke import Exit
 
-    from devshim__base import (
+    from devshim.base import standard_execute_external
+    from devshim.locations import paths
+    from devshim.packages import (
         extract_python_package_requirements,
-        identify_python,
         indicate_python_packages,
-        paths,
-        standard_execute_external,
     )
+    from devshim.platforms import identify_python
 
     from lockup import create_namespace, reclassify_module
 

@@ -18,16 +18,38 @@
 #============================================================================#
 
 
-''' Development support modules. '''
+''' Fundamental constants and utilities for development support. '''
 
 
-from . import (
-    base,
-    locations,
-    packages,
-    platforms,
-    project,
-)
+from functools import partial as _partial_function
+from subprocess import run as _run # nosec
 
 
-# TODO: Make modules immutable.
+standard_execute_external = _partial_function(
+    _run, check = True, capture_output = True, text = True )
+
+
+def ensure_directory( path ):
+    ''' Ensures existence of directory, creating if necessary. '''
+    path.mkdir( parents = True, exist_ok = True )
+    return path
+
+
+def _configure( ):
+    ''' Configure development support. '''
+    from pathlib import Path
+    auxiliary_path = Path( __file__ ).parent.parent.parent.parent
+    from os import environ as current_process_environment
+    from types import MappingProxyType as DictionaryProxy
+    configuration_ = DictionaryProxy( dict(
+        auxiliary_path = auxiliary_path,
+        project_path = Path( current_process_environment.get(
+            '_DEVSHIM_PROJECT_PATH', auxiliary_path ) )
+    ) )
+    return configuration_
+
+configuration = _configure( )
+
+
+def assert_sanity( ):
+    ''' Assert that operational environment is sane. '''

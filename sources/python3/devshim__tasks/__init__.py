@@ -71,17 +71,18 @@ class __( metaclass = _NamespaceClass ):
     )
     from .platforms import (
         freshen_python,
-        install_python_builder,
     )
     from .versions import (
         Version,
     )
-    from devshim__base import (
-        active_python_abi_label,
-        discover_project_version,
+    from devshim.locations import paths
+    from devshim.packages import (
         ensure_python_support_packages,
         indicate_python_packages,
-        paths,
+    )
+    from devshim.platforms import active_python_abi_label
+    from devshim.project import (
+        discover_project_version,
         project_name,
     )
     from devshim__shell_function import (
@@ -245,7 +246,8 @@ def freshen_asdf( context ):
     context.run( 'asdf update', pty = __.on_tty )
     context.run( 'asdf plugin update python', pty = __.on_tty )
     # TODO: Preserve this call after 'freshen_asdf' has been removed.
-    __.install_python_builder( )
+    from devshim.platforms import install_python_builder
+    install_python_builder( )
 
 
 @__.task( pre = ( freshen_asdf, ) )

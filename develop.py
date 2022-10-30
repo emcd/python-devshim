@@ -102,7 +102,7 @@ def configure_auxiliary( project_path ):
     current_process_environment.update( dict(
         _DEVSHIM_PROJECT_PATH = str( project_path )
     ) )
-    from devshim__base import assert_sanity
+    from devshim.base import assert_sanity
     assert_sanity( )
 
 

@@ -18,16 +18,25 @@
 #============================================================================#
 
 
-''' Development support modules. '''
+''' Management of project. '''
 
 
-from . import (
-    base,
-    locations,
-    packages,
-    platforms,
-    project,
-)
+def discover_project_version( ):
+    ''' Returns project version, as parsed from local configuration. '''
+    return discover_project_information( )[ 'version' ]
 
 
-# TODO: Make modules immutable.
+def discover_project_information( ):
+    ''' Discovers information about project from local configuration. '''
+    from tomli import load
+    from devshim.locations import paths
+    with paths.configuration.pyproject.open( 'rb' ) as file:
+        tables = load( file )
+    information = tables[ 'project' ]
+    information.update( tables[ 'tool' ][ 'setuptools' ] )
+    information.update( tables[ 'tool' ][ 'SELF' ] )
+    return information
+
+# TODO: Add hook for this to an on-demand cache object.
+#       Compute only on '__getattr__' for it.
+project_name = discover_project_information( )[ 'name' ]

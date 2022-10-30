@@ -40,10 +40,8 @@ class __( metaclass = _NamespaceClass ):
         generate_pip_requirements_text,
         on_tty,
     )
-    from devshim__base import (
-        paths,
-        standard_execute_external,
-    )
+    from devshim.base import standard_execute_external
+    from devshim.locations import paths
 
     from lockup import reclassify_module
 

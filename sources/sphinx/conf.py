@@ -26,11 +26,11 @@ def _install_prerequisite_packages( ):
     # (Better than maintaining a separate 'requirements.txt'.)
     from os import environ as current_process_environment
     from shlex import split as split_command
-    from devshim__base import (
+    from devshim.base import standard_execute_external
+    from devshim.locations import paths
+    from devshim.packages import (
         extract_python_package_requirements,
         indicate_python_packages,
-        paths,
-        standard_execute_external,
     )
     if 'True' != current_process_environment.get( 'READTHEDOCS', 'False' ):
         return
@@ -57,7 +57,7 @@ def _calculate_copyright_notice( information, author_ ):
     else: year_range = str( first_year )
     return f"{year_range}, {author_}"
 
-from devshim__base import discover_project_information
+from devshim.project import discover_project_information
 _information = discover_project_information( )
 project = _information[ 'name' ]
 release = _information[ 'version' ]

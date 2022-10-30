@@ -35,9 +35,6 @@ class __( metaclass = _NamespaceClass ):
         install_python_packages,
         record_python_packages_fixtures,
     )
-    from devshim__base import (
-        ensure_directory,
-    )
 
     from lockup import reclassify_module
 
@@ -46,8 +43,8 @@ def build_python_venv( context, version, overwrite = False ):
     ''' Creates virtual environment for requested Python version. '''
     __.render_boxed_title( f"Build: Python Virtual Environment ({version})" )
     python_path = __.detect_vmgr_python_path( version )
-    venv_path = __.ensure_directory( __.derive_venv_path(
-        version, python_path ) )
+    from devshim.base import ensure_directory
+    venv_path = ensure_directory( __.derive_venv_path( version, python_path ) )
     venv_options = [ ]
     if overwrite: venv_options.append( '--clear' )
     venv_options_str = ' '.join( venv_options )

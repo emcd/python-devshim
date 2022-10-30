@@ -26,10 +26,6 @@ class __( metaclass = _NamespaceClass ):
 
     import re
 
-    from os import (
-        environ as active_process_environment,
-        name as os_class,
-    )
     from shlex import split as split_command
     from subprocess import CalledProcessError as ProcessInvocationError # nosec
 
@@ -37,29 +33,9 @@ class __( metaclass = _NamespaceClass ):
         pep508_identify_python,
         render_boxed_title,
     )
-    from devshim__base import (
-        paths,
-        standard_execute_external,
-    )
+    from devshim.base import standard_execute_external
 
     from lockup import reclassify_module
-
-
-def install_python_builder( ):
-    ''' Install Python builder utility for platform, if one exists. '''
-    if 'posix' == __.os_class: install_python_builder_posix( )
-
-
-def install_python_builder_posix( ):
-    ''' Installs 'python-build' utility. '''
-    environment = __.active_process_environment.copy( )
-    environment.update( dict(
-        PREFIX = __.paths.caches.utilities.python_build,
-    ) )
-    __.standard_execute_external(
-        str( __.paths.scm_modules.aux.joinpath(
-            'pyenv', 'plugins', 'python-build', 'install.sh' ) ),
-        env = environment )
 
 
 def freshen_python( context, original_version ):

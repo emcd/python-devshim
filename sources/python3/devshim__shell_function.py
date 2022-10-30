@@ -28,7 +28,7 @@ class __( metaclass = _NamespaceClass ):
 
     from lockup import reclassify_module
 
-    from devshim__base import paths
+    from devshim.locations import paths
 
 
 def generate_cli_functions( shell_name, function_name, with_completions ):

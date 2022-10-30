@@ -18,156 +18,7 @@
 #============================================================================#
 
 
-''' Constants and utilities for project maintenance tasks. '''
-
-
-from functools import partial as partial_function
-from shlex import split as split_command
-from subprocess import run # nosec
-from types import SimpleNamespace
-
-
-standard_execute_external = partial_function(
-    run, check = True, capture_output = True, text = True )
-
-
-def _configure( ):
-    ''' Configure development support. '''
-    from pathlib import Path
-    auxiliary_path = Path( __file__ ).parent.parent.parent
-    from os import environ as current_process_environment
-    from types import MappingProxyType as DictionaryProxy
-    configuration_ = DictionaryProxy( dict(
-        auxiliary_path = auxiliary_path,
-        project_path = Path( current_process_environment.get(
-            '_DEVSHIM_PROJECT_PATH', auxiliary_path ) )
-    ) )
-    return configuration_
-
-configuration = _configure( )
-
-
-def _calculate_paths( ):
-    paths_ = SimpleNamespace(
-        auxiliary = configuration[ 'auxiliary_path' ],
-        project = configuration[ 'project_path' ],
-    )
-    paths_.local = paths_.project / '.local'
-    paths_.artifacts = _calculate_artifacts_paths( paths_ )
-    paths_.caches = _calculate_caches_paths( paths_ )
-    paths_.configuration = _calculate_configuration_paths( paths_ )
-    paths_.environments = paths_.local / 'environments'
-    paths_.scm_modules = _calculate_scm_modules_paths( paths_ )
-    paths_.state = paths_.local / 'state'
-    paths_.scripts = _calculate_scripts_paths( paths_ )
-    paths_.sources = _calculate_sources_paths( paths_ )
-    paths_.tests = _calculate_tests_paths( paths_ )
-    return paths_
-
-
-def _calculate_artifacts_paths( paths_ ):
-    artifacts_path = paths_.local / 'artifacts'
-    html_path = artifacts_path / 'html'
-    return SimpleNamespace(
-        SELF = artifacts_path,
-        sdists = artifacts_path / 'sdists',
-        sphinx_html = html_path / 'sphinx',
-        sphinx_linkcheck = artifacts_path / 'sphinx-linkcheck',
-        wheels = artifacts_path / 'wheels',
-    )
-
-
-def _calculate_caches_paths( paths_ ):
-    caches_path = paths_.local / 'caches'
-    packages_path = caches_path / 'packages'
-    platforms_path = caches_path / 'platforms'
-    utilities_path = caches_path / 'utilities'
-    return SimpleNamespace(
-        SELF = caches_path,
-        hypothesis = caches_path / 'hypothesis',
-        packages = SimpleNamespace(
-            python3 = packages_path / 'python3',
-        ),
-        platforms = SimpleNamespace(
-            python3 = platforms_path / 'python3',
-        ),
-        setuptools = caches_path / 'setuptools',
-        sphinx = caches_path / 'sphinx',
-        utilities = SimpleNamespace(
-            python_build = utilities_path / 'python-build',
-        ),
-    )
-
-
-def _calculate_configuration_paths( paths_ ):
-    configuration_path = paths_.local / 'configuration'
-    return SimpleNamespace(
-        asdf = paths_.project / '.tool-versions',
-        bumpversion = configuration_path / 'bumpversion.cfg',
-        pre_commit = configuration_path / 'pre-commit.yaml',
-        pypackages = configuration_path / 'pypackages.toml',
-        pypackages_fixtures = configuration_path / 'pypackages.fixtures.toml',
-        pyproject = paths_.project / 'pyproject.toml',
-    )
-
-
-def _calculate_scm_modules_paths( paths_ ):
-    return SimpleNamespace(
-        aux = paths_.auxiliary / 'scm-modules',
-        prj = paths_.local / 'scm-modules',
-    )
-
-
-def _calculate_scripts_paths( paths_ ):
-    auxiliary_path = paths_.auxiliary / 'scripts'
-    project_path = paths_.project / 'scripts'
-    return SimpleNamespace(
-        aux = SimpleNamespace(
-            python3 = auxiliary_path / 'python3',
-        ),
-        prj = SimpleNamespace(
-            python3 = project_path / 'python3',
-        ),
-    )
-
-
-def _calculate_sources_paths( paths_ ):
-    auxiliary_path = paths_.auxiliary / 'sources'
-    project_path = paths_.project / 'sources'
-    return SimpleNamespace(
-        aux = SimpleNamespace(
-            python3 = auxiliary_path / 'python3',
-        ),
-        prj = SimpleNamespace(
-            python3 = project_path / 'python3',
-            sphinx = project_path / 'sphinx',
-        ),
-    )
-
-
-def _calculate_tests_paths( paths_ ):
-    auxiliary_path = paths_.auxiliary / 'tests'
-    project_path = paths_.project / 'tests'
-    return SimpleNamespace(
-        aux = SimpleNamespace(
-            python3 = auxiliary_path / 'python3',
-        ),
-        prj = SimpleNamespace(
-            python3 = project_path / 'python3',
-        ),
-    )
-
-
-paths = _calculate_paths( )
-
-
-def identify_active_python( mode ):
-    ''' Reports compatibility identifier for active Python. '''
-    from devshim__python_identity import dispatch_table
-    return dispatch_table[ mode ]( )
-
-
-active_python_abi_label = identify_active_python( 'bdist-compatibility' )
+''' Development support for packages. '''
 
 
 def ensure_python_support_packages( ):
@@ -178,6 +29,7 @@ def ensure_python_support_packages( ):
     from tomli import load
     base_requirements = extract_python_package_requirements(
         indicate_python_packages( )[ 0 ], 'development.base' )
+    from devshim.locations import paths
     with paths.configuration.pyproject.open( 'rb' ) as file:
         construction_requirements = (
             load( file )[ 'build-system' ][ 'requires' ] )
@@ -185,7 +37,7 @@ def ensure_python_support_packages( ):
         ( *base_requirements, *construction_requirements ) ) )
 
 
-def extract_python_package_requirements( specifications, domain = None ):
+def extract_python_package_requirements( specifications, domain = None ): # pylint: disable=too-many-branches
     ''' Extracts Python packages requirements from specifications.
 
         If the ``domain`` argument is given, then only requirements from that
@@ -235,12 +87,16 @@ def _extract_python_package_requirement( specification ):
 def _ensure_python_packages( requirements ):
     ''' Ensures availability of packages to active Python. '''
     from os import environ as cpe
+    # TODO: Change this to an on-demand cache access.
+    from devshim.platforms import active_python_abi_label
     # Ignore if in an appropriate virtual environment.
     if active_python_abi_label == cpe.get( 'OUR_VENV_NAME' ): return
     # If 'pip' module is not available, then assume PEP 517 build in progress,
     # which should have already ensured packages from 'build-requires'.
     try: import pip # pylint: disable=unused-import
     except ImportError: return
+    from devshim.base import ensure_directory
+    from devshim.locations import paths
     cache_path = ensure_directory(
         paths.caches.packages.python3 / active_python_abi_label )
     cache_path_ = str( cache_path )
@@ -259,6 +115,8 @@ def _ensure_python_packages( requirements ):
         requirement for requirement in requirements
         if requirement_to_name( requirement ) not in in_cache_packages )
     if installable_requirements:
+        from shlex import split as split_command
+        from devshim.base import standard_execute_external
         standard_execute_external(
             ( *split_command( 'pip install --upgrade --target' ),
               cache_path_, *installable_requirements ) )
@@ -271,6 +129,7 @@ def indicate_python_packages( identifier = None ):
         Second return value is list of dependency fixtures for the given
         platform identifier. Will be empty if none is given. '''
     from tomli import load
+    from devshim.locations import paths
     fixtures_path = paths.configuration.pypackages_fixtures
     if identifier and fixtures_path.exists( ):
         with fixtures_path.open( 'rb' ) as file:
@@ -281,39 +140,6 @@ def indicate_python_packages( identifier = None ):
     return specifications, fixtures
 
 
-def ensure_directory( path ):
-    ''' Ensures existence of directory, creating if necessary. '''
-    path.mkdir( parents = True, exist_ok = True )
-    return path
-
-
+# TODO: Add hook for this to an on-demand cache object.
+#       Compute only on '__getattr__' for it.
 ensure_python_support_packages( )
-
-
-def assert_sanity( ):
-    ''' Assert that operational environment is sane. '''
-
-
-def identify_python( mode, python_path ):
-    ''' Reports compatibility identifier for Python at given path. '''
-    detector_path = paths.scripts.aux.python3 / 'identify-python.py'
-    return standard_execute_external(
-        ( python_path, detector_path, '--mode', mode ) ).stdout.strip( )
-
-
-def discover_project_version( ):
-    ''' Returns project version, as parsed from local configuration. '''
-    return discover_project_information( )[ 'version' ]
-
-
-def discover_project_information( ):
-    ''' Discovers information about project from local configuration. '''
-    from tomli import load
-    with paths.configuration.pyproject.open( 'rb' ) as file:
-        tables = load( file )
-    information = tables[ 'project' ]
-    information.update( tables[ 'tool' ][ 'setuptools' ] )
-    information.update( tables[ 'tool' ][ 'SELF' ] )
-    return information
-
-project_name = discover_project_information( )[ 'name' ]
