@@ -1,0 +1,19 @@
+name: clone
+description: 'Clones project, fixes submodule refs if necessary, and sets up Asdf.'
+runs:
+  using: composite
+  steps:
+    - name: Clone Repository Code
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
+    - name: Fetch Submodule Refs (if necessary)
+      if: "${{ github.action_repository != github.repository }}"
+      run: |
+        # Hack around shallow clone by 'actions/checkout@v3' that excludes non-default branches.
+        set -eu
+        git submodule foreach 'git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"'
+        git submodule foreach 'git fetch origin'
+      shell: bash
+    - name: Install Asdf with Plugins
+      uses: emcd/python-devshim/.github/actions/asdf-vm@master
