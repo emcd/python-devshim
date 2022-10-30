@@ -35,12 +35,12 @@ jobs:
           done
           sed --in-place --regexp-extended "s/^python.*\$/python ${versions[*]}/" .tool-versions
         shell: bash
-      - name: Access Cache for Asdf Tool Versions
-        uses: actions/cache@v3
+      - name: Store Tool Versions
+        uses: actions/upload-artifact@v3
         with:
-          key: asdf-tool-versions--${{ hashFiles('.tool-versions') }}
+          name: asdf-tool-versions
           path: .tool-versions
-          restore-keys: asdf-tool-versions
+
 
   update-python-packages:
     needs: freshen-tool-versions
@@ -50,7 +50,8 @@ jobs:
         python-version: ${{ fromJSON(inputs.python-versions-json) }}
     steps:
       - name: Prepare Python Virtual Environment
-        uses: emcd/python-devshim/.github/actions/python-venv@master
+        uses: emcd/python-devshim/.github/actions/python-venv@gh-actions
+        #uses: emcd/python-devshim/.github/actions/python-venv@master
         with:
           python-version: '${{ matrix.python-version }}'
           use-versions-update: true
