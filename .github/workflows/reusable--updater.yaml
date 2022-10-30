@@ -17,15 +17,11 @@ jobs:
   freshen-tool-versions:
     runs-on: ubuntu-latest
     steps:
-      - name: Clone Repository Code
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
+      - name: Construct Foundation
+        uses: emcd/python-devshim/.github/actions/clone@gh-actions
       - name: Freshen Git Modules
         run: /usr/bin/python3 develop.py freshen-git-modules
         shell: bash
-      - name: Install Asdf with Plugins
-        uses: emcd/python-devshim/.github/actions/asdf-vm@master
       - name: Freshen Python Versions
         run: |
           set -eu
@@ -50,7 +46,7 @@ jobs:
         python-version: ${{ fromJSON(inputs.python-versions-json) }}
     steps:
       - name: Prepare Python Virtual Environment
-        uses: emcd/python-devshim/.github/actions/python-venv@master
+        uses: emcd/python-devshim/.github/actions/python-venv@gh-actions
         with:
           python-version: '${{ matrix.python-version }}'
           use-versions-update: true
@@ -75,7 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prepare Python Virtual Environment
-        uses: emcd/python-devshim/.github/actions/python-venv@master
+        uses: emcd/python-devshim/.github/actions/python-venv@gh-actions
       - name: Freshen Git Modules
         run: /usr/bin/python3 develop.py freshen-git-modules
         shell: bash
