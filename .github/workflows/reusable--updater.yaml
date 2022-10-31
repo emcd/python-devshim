@@ -72,17 +72,14 @@ jobs:
     steps:
       - name: Prepare Python Virtual Environment
         uses: emcd/python-devshim/.github/actions/python-venv@master
+        with:
+          use-versions-update: true
       - name: Freshen Git Modules
         run: /usr/bin/python3 develop.py freshen-git-modules
         shell: bash
       - name: Freshen Git Hooks
         run: /usr/bin/python3 develop.py freshen-git-hooks
         shell: bash
-      - name: Access Cache for Asdf Tool Versions
-        uses: actions/cache@v3
-        with:
-          key: asdf-tool-versions
-          path: .tool-versions
       - name: Restore Updates
         uses: actions/download-artifact@v3
         with:
