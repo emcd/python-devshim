@@ -23,7 +23,7 @@
 def main( ):
     _setup_python_search_paths( )
     from argparse import ArgumentParser
-    from devshim__python_identity import dispatch_table
+    from devshim.platforms.identity import dispatch_table
     cli_parser = ArgumentParser( )
     cli_parser.add_argument( '--mode',
         default = 'bdist-compatibility', metavar = 'MODE',

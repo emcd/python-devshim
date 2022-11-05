@@ -53,3 +53,4 @@ configuration = _configure( )
 
 def assert_sanity( ):
     ''' Assert that operational environment is sane. '''
+    # TODO: Implement.

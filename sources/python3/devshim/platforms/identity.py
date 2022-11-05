@@ -24,13 +24,13 @@
     or PEP 508 environment identifier for package installation manifests. '''
 
 
-import platform
-import sys
+import platform as _platform
+import sys as _sys
 
 
-cpu_architecture = platform.machine( )
-implementation_name = sys.implementation.name
-system_type = platform.system( ).lower( )
+cpu_architecture = _platform.machine( )
+implementation_name = _sys.implementation.name
+system_type = _platform.system( ).lower( )
 
 
 def calculate_bdist_compatibility_identifier( ):
@@ -47,7 +47,7 @@ def calculate_python_abi_identifier( ):
     ''' Python implementation name, version, and extra ABI differentiators. '''
     return '-'.join( (
         implementation_name,
-        format_version( sys.version_info, 2 ),
+        format_version( _sys.version_info, 2 ),
         *calculate_python_abi_extras( ) ) )
 
 
@@ -55,21 +55,21 @@ def calculate_python_abi_extras( ):
     ''' Special builds and variant implementation version. '''
     python_abi_extras = [ ]
     if 'cpython' == implementation_name:
-        if hasattr( sys, 'getobjects' ):
+        if hasattr( _sys, 'getobjects' ):
             python_abi_extras.append( 'trace_refs' )
     elif 'pypy' == implementation_name:
         python_abi_extras.append(
-            format_version( sys.pypy_version_info, 2 ) ) # pylint: disable=no-member
+            format_version( _sys.pypy_version_info, 2 ) ) # pylint: disable=no-member
     elif 'pyston' == implementation_name:
         python_abi_extras.append(
-            format_version( sys.pyston_version_info, 2 ) ) # pylint: disable=no-member
+            format_version( _sys.pyston_version_info, 2 ) ) # pylint: disable=no-member
     return python_abi_extras
 
 
 def calculate_system_abi_identifier( ):
     ''' System library linkage and virtual machine information. '''
     if system_type not in ( 'java', 'windows', ):
-        return '-'.join( platform.libc_ver( ) )
+        return '-'.join( _platform.libc_ver( ) )
     # TODO: Implement: java
     # TODO: Implement: windows
     raise NotImplementedError
@@ -91,16 +91,16 @@ def calculate_pep508_python_identifier( ):
     ''' Python implementation name and version and general version. '''
     return '-'.join( filter( None, (
         implementation_name,
-        format_version( sys.version_info ),
+        format_version( _sys.version_info ),
         calculate_pep508_implementation_version( ) ) ) )
 
 
 def calculate_pep508_implementation_version( ):
     ''' Variant implementation version. '''
     if 'pypy' == implementation_name:
-        return format_version( sys.pypy_version_info ) # pylint: disable=no-member
+        return format_version( _sys.pypy_version_info ) # pylint: disable=no-member
     if 'pyston' == implementation_name:
-        return format_version( sys.pyston_version_info ) # pylint: disable=no-member
+        return format_version( _sys.pyston_version_info ) # pylint: disable=no-member
     return ''
 
 

@@ -18,11 +18,20 @@
 #============================================================================#
 
 
-''' Constants and utilities for locations. '''
+''' Constants and utilities for locations.
 
+    A cache of locations are precalculated during module import.
+    This is a very rapid set of calculations and will not affect performance.
 
-# TODO: Read fs structure from a JSON file.
-#       YAML would be ideal but Python stdlib has no innate support.
+    Locations are modeled in Python code rather than a data language
+    or DSL, so that a separate file does not need to be loaded during
+    early startup and because the Python code is more flexible than
+    data languages (JSON, TOML, YAML, etc...) and nearly as compact.
+    A JSON model was produced at one point and, while it saved some
+    space, it did not justify the complexity of reading it and mapping
+    it (with variable interpolations) into a hierarchical Python data
+    structure, such as this module provides. YAML would be slightly more
+    compact but it is not supported in the Python standard library. '''
 
 
 # TODO? Early importation of immutable namespace class.
@@ -141,6 +150,5 @@ def _calculate_tests_paths( paths_ ):
     )
 
 
-# TODO: Add hook for this to an on-demand cache object.
-#       Compute only on '__getattr__' for it.
+#: Precalculated cache of filesystem locations.
 paths = _calculate_paths( )

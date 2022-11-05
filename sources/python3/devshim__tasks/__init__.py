@@ -31,15 +31,11 @@ class __( metaclass = _NamespaceClass ):
 
     import re
 
-    from contextlib import ExitStack as CMStack
     from itertools import chain
     from pathlib import Path
-    from tempfile import TemporaryDirectory
-    from time import sleep
     from urllib.error import URLError as UrlError
-    from urllib.parse import urlparse
-    from urllib.request import urlopen
-    from venv import create as create_venv
+    from urllib.parse import urlparse as parse_url
+    from urllib.request import urlopen as access_url
 
     from invoke import Exit, Failure, call, task
     from lockup import reclassify_module
@@ -57,9 +53,7 @@ class __( metaclass = _NamespaceClass ):
         test_package_executable,
         unlink_recursively,
     )
-    from .environments import (
-        build_python_venv,
-    )
+    from .environments import build_python_venv
     from .packages import (
         calculate_python_packages_fixtures,
         delete_python_packages_fixtures,
@@ -69,24 +63,12 @@ class __( metaclass = _NamespaceClass ):
         record_python_packages_fixtures,
         retrieve_pypi_release_information,
     )
-    from .platforms import (
-        freshen_python,
-    )
-    from .versions import (
-        Version,
-    )
+    from .platforms import freshen_python
+    from .versions import Version
     from devshim.locations import paths
-    from devshim.packages import (
-        ensure_python_support_packages,
-        indicate_python_packages,
-    )
-    from devshim.platforms import active_python_abi_label
     from devshim.project import (
         discover_project_version,
         project_name,
-    )
-    from devshim__shell_function import (
-        generate_cli_functions,
     )
 
     # https://www.sphinx-doc.org/en/master/man/sphinx-build.html
@@ -101,7 +83,8 @@ def ease(
     with_completions = False
 ):
     ''' Prints shell functions for easy invocation of development shim. '''
-    print( __.generate_cli_functions(
+    from devshim.user_interface import generate_cli_functions
+    print( generate_cli_functions(
         shell_name, function_name, with_completions ) )
 
 
@@ -172,7 +155,8 @@ def clean_tool_caches( context, include_development_support = False ): # pylint:
     anchors = __.paths.caches.SELF.glob( '*' )
     ignorable_paths = set( __.paths.caches.SELF.glob( '*/.gitignore' ) )
     if not include_development_support:
-        ds_path = __.paths.caches.packages.python3 / __.active_python_abi_label
+        from devshim.platforms import active_python_abi_label
+        ds_path = __.paths.caches.packages.python3 / active_python_abi_label
         ignorable_paths.add( __.paths.caches.packages.python3 )
         ignorable_paths.add( ds_path )
         ignorable_paths.update( ds_path.rglob( '*' ) )
@@ -187,7 +171,9 @@ def clean_tool_caches( context, include_development_support = False ): # pylint:
         path.unlink( )
     while dirs_stack: dirs_stack.pop( ).rmdir( )
     # Regnerate development support packages cache, if necessary.
-    if include_development_support: __.ensure_python_support_packages( )
+    if include_development_support:
+        from devshim.packages import ensure_python_support_packages
+        ensure_python_support_packages( )
 
 
 @__.task
@@ -205,7 +191,8 @@ def _clean_python_packages( context, version = None ):
         'Clean: Unused Python Packages', supplement = version )
     context_options = __.derive_venv_context_options( version = version )
     identifier = __.pep508_identify_python( version = version )
-    _, fixtures = __.indicate_python_packages( identifier = identifier )
+    from devshim.packages import indicate_python_packages
+    _, fixtures = indicate_python_packages( identifier = identifier )
     requested = frozenset( fixture[ 'name' ] for fixture in fixtures )
     installed = frozenset(
         entry.requirement.name
@@ -647,9 +634,12 @@ def check_pip_install( context, index_url = '', version = None ):
     ''' Checks import of current package after installation via Pip. '''
     version = version or __.discover_project_version( )
     __.render_boxed_title( f"Verify: Python Package Installation ({version})" )
-    with __.TemporaryDirectory( ) as venv_path:
+    from tempfile import TemporaryDirectory
+    from time import sleep
+    from venv import create as create_venv
+    with TemporaryDirectory( ) as venv_path:
         venv_path = __.Path( venv_path )
-        __.create_venv( venv_path, clear = True, with_pip = True )
+        create_venv( venv_path, clear = True, with_pip = True )
         index_url_option = ''
         if index_url: index_url_option = f"--index-url {index_url}"
         context_options = __.derive_venv_context_options( venv_path )
@@ -662,7 +652,7 @@ def check_pip_install( context, index_url = '', version = None ):
                     pty = __.on_tty, **context_options )
             except __.Failure:
                 if attempts_count_max == attempts_count: raise
-                __.sleep( 2 ** attempts_count )
+                sleep( 2 ** attempts_count )
             else: break
         python_import_command = (
             f"import {__.project_name}; "
@@ -689,26 +679,29 @@ def check_pypi_integrity( context, version = None, index_url = '' ):
         check_pypi_package( context, url )
 
 
+# TODO: Move to 'devshim.packages' and separate retry logic from fetch logic.
 def check_pypi_package( context, package_url ):
     ''' Verifies signature on package. '''
     __.assert_gpg_tty( )
-    package_filename = __.urlparse( package_url ).path.split( '/' )[ -1 ]
-    with __.TemporaryDirectory( ) as cache_path_raw:
+    package_filename = __.parse_url( package_url ).path.split( '/' )[ -1 ]
+    from tempfile import TemporaryDirectory
+    from time import sleep
+    with TemporaryDirectory( ) as cache_path_raw:
         cache_path = __.Path( cache_path_raw )
         package_path = cache_path / package_filename
         signature_path = cache_path / f"{package_filename}.asc"
         attempts_count_max = 2
         for attempts_count in range( attempts_count_max + 1 ):
             try:
-                with __.urlopen( package_url ) as http_reader:
+                with __.access_url( package_url ) as http_reader:
                     with package_path.open( 'wb' ) as file:
                         file.write( http_reader.read( ) )
-                with __.urlopen( f"{package_url}.asc" ) as http_reader:
+                with __.access_url( f"{package_url}.asc" ) as http_reader:
                     with signature_path.open( 'wb' ) as file:
                         file.write( http_reader.read( ) )
             except __.UrlError:
                 if attempts_count_max == attempts_count: raise
-                __.sleep( 2 ** attempts_count )
+                sleep( 2 ** attempts_count )
             else: break
         context.run( f"gpg --verify {signature_path}" )
 
@@ -783,7 +776,8 @@ def upload_github_pages( context ):
     html_path = __.paths.artifacts.sphinx_html.relative_to( __.paths.project )
     nojekyll_path = html_path / '.nojekyll'
     target_branch = 'documentation'
-    with __.CMStack( ) as cm_stack:
+    from contextlib import ExitStack as CMStack
+    with CMStack( ) as cm_stack:
         # Work from project root, since 'git subtree' requires relative paths.
         cm_stack.enter_context( context.cd( __.paths.project ) )
         saved_branch = context.run(

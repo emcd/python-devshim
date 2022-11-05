@@ -30,10 +30,10 @@ def install_python_builder( ):
 def install_python_builder_posix( ):
     ''' Installs 'python-build' utility. '''
     from os import environ as active_process_environment
-    from .base import standard_execute_external
-    from .locations import paths
     environment = active_process_environment.copy( )
+    from ..locations import paths
     environment.update( dict( PREFIX = paths.caches.utilities.python_build, ) )
+    from ..base import standard_execute_external
     standard_execute_external(
         str( paths.scm_modules.aux.joinpath(
             'pyenv', 'plugins', 'python-build', 'install.sh' ) ),
@@ -42,19 +42,18 @@ def install_python_builder_posix( ):
 
 def identify_active_python( mode ):
     ''' Reports compatibility identifier for active Python. '''
-    from devshim__python_identity import dispatch_table
+    from .identity import dispatch_table
     return dispatch_table[ mode ]( )
 
 
-# TODO: Add hook for this to an on-demand cache object.
-#       Compute only on '__getattr__' for it.
+#: ABI label for executing Python.
 active_python_abi_label = identify_active_python( 'bdist-compatibility' )
 
 
 def identify_python( mode, python_path ):
     ''' Reports compatibility identifier for Python at given path. '''
-    from devshim.locations import paths
+    from ..locations import paths
     detector_path = paths.scripts.aux.python3 / 'identify-python.py'
-    from devshim.base import standard_execute_external
+    from ..base import standard_execute_external
     return standard_execute_external(
         ( python_path, detector_path, '--mode', mode ) ).stdout.strip( )

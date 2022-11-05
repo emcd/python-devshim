@@ -1,0 +1,76 @@
+{
+    "format-version": 1,
+    "locations": {
+        "auxiliary": "$auxiliary_path",
+        "project": "$project_path",
+        "local": "{project}/.local",
+        "artifacts": {
+            "{SELF}": "{local}/artifacts",
+            "sdists": "sdists",
+            "sphinx_html": "html/sphinx",
+            "sphinx_linkcheck": "sphinx-linkcheck",
+            "wheels": "wheels"
+        },
+        "caches": {
+            "{SELF}": "{local}/caches",
+            "hypothesis": "hypothesis",
+            "packages": {
+                "python3": "python3"
+            },
+            "platforms": {
+                "python3": "python3"
+            },
+            "setuptools": "setuptools",
+            "sphinx": "sphinx",
+            "utilities": {
+                "python_build": "python-build"
+            }
+        },
+        "configuration": {
+            "{SELF}": "{local}/configuration",
+            "asdf": "{project}/.tool-versions",
+            "bumpversion": "bumpversion.cfg",
+            "pre_commit": "pre-commit.yaml",
+            "pypackages": "pypackages.toml",
+            "pypackages_fixtures": "pypackages.fixtures.toml",
+            "pyproject": "{project}/pyproject.toml"
+        },
+        "environments": "{local}/environments",
+        "scm_modules": {
+            "aux": "{auxiliary}/scm-modules",
+            "prj": "{project}/scm-modules"
+        },
+        "state": "{local}/state",
+        "scripts": {
+            "aux": {
+                "{SELF}": "{auxiliary}/scripts",
+                "python3": "python3"
+            },
+            "prj": {
+                "{SELF}": "{project}/scripts",
+                "python3": "python3"
+            }
+        },
+        "sources": {
+            "aux": {
+                "{SELF}": "{auxiliary}/sources",
+                "python3": "python3"
+            },
+            "prj": {
+                "{SELF}": "{project}/sources",
+                "python3": "python3",
+                "sphinx": "sphinx"
+            }
+        },
+        "tests": {
+            "aux": {
+                "{SELF}": "{auxiliary}/tests",
+                "python3": "python3"
+            },
+            "prj": {
+                "{SELF}": "{project}/tests",
+                "python3": "python3"
+            }
+        }
+    }
+}
