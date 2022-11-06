@@ -4,7 +4,6 @@ requires = [
   'packaging',
   'setuptools>=61.0.0',  # Has 'pyproject.toml' support!
   'tomli',  # TODO: Python 3.11: Use standard library 'tomllib'.
-  'tomli-w',
   'wheel',
 ]
 # Explicit build backend, in case we use frontend other than Pip or Pip default changes.

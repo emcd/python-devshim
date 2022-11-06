@@ -21,6 +21,12 @@
 ''' Provides shell functions to facilitate use of development shim. '''
 
 
+from devshim.packages import (
+    ensure_python_packages as _ensure_python_packages,
+)
+_ensure_python_packages( domain = 'development.user-interface' )
+
+
 from lockup import NamespaceClass as _NamespaceClass
 class __( metaclass = _NamespaceClass ):
 

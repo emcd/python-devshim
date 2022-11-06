@@ -25,25 +25,15 @@ def _install_prerequisite_packages( ):
     # Hack to install documentation requirements for ReadTheDocs builder.
     # (Better than maintaining a separate 'requirements.txt'.)
     from os import environ as current_process_environment
-    from shlex import split as split_command
-    from devshim.base import standard_execute_external
     from devshim.locations import paths
-    from devshim.packages import (
-        extract_python_package_requirements,
-        indicate_python_packages,
-    )
     if 'True' != current_process_environment.get( 'READTHEDOCS', 'False' ):
         return
-    requirements = extract_python_package_requirements(
-        indicate_python_packages( )[ 0 ], 'development.documentation' )
-    # TODO: Handle constraints on package names in requirements.
-    manifest = tuple(
-        package_name for package_name in requirements
-        if 'sphinx' != package_name )
-    standard_execute_external(
-        ( *split_command( 'pip install --upgrade' ), *manifest ) )
+    from devshim.packages import ensure_python_packages
+    ensure_python_packages(
+        domain = 'development.documentation', excludes = ( 'sphinx', ) )
     from sys import path as python_search_paths
     python_search_paths.insert( 0, str( paths.sources.prj.python3 ) )
+
 _install_prerequisite_packages( )
 
 

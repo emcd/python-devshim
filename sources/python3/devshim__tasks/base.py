@@ -21,6 +21,9 @@
 ''' Constants and utilities for project maintenance tasks. '''
 
 
+from devshim import user_interface as _ui # pylint: disable=unused-import
+
+
 from lockup import NamespaceClass as _NamespaceClass
 class __( metaclass = _NamespaceClass ):
 

@@ -116,6 +116,7 @@ def _die( exit_code, message ):
 def main( ):
     ''' Entrypoint for development activity. '''
     configure( )
+    import devshim.user_interface
     from invoke import Collection, Program
     import devshim__tasks
     program = Program( namespace = Collection.from_module( devshim__tasks ) )
