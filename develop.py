@@ -59,6 +59,8 @@ def configure( ):
 
 def ensure_scm_modules( project_path ):
     ''' Ensures SCM modules have been cloned. '''
+    # TODO: Use '.local/scm-modules' only.
+    #       Top-level project should not care about 'devshim' SCM modules.
     for modules_path in (
         project_path / '.local' / 'scm-modules',
         project_path / 'scm-modules',
@@ -66,10 +68,9 @@ def ensure_scm_modules( project_path ):
         if not modules_path.is_dir( ): continue
         for module_path in modules_path.iterdir( ):
             if not module_path.is_dir( ): continue
-            if not len( tuple( module_path.iterdir( ) ) ):
+            if 0 < len( tuple( module_path.iterdir( ) ) ):
                 _attempt_clone_scm_modules( project_path )
                 return
-        else: return
 
 
 def _attempt_clone_scm_modules( project_path ):
@@ -116,7 +117,7 @@ def _die( exit_code, message ):
 def main( ):
     ''' Entrypoint for development activity. '''
     configure( )
-    import devshim.user_interface
+    import devshim.user_interface # pylint: disable=unused-import
     from invoke import Collection, Program
     import devshim__tasks
     program = Program( namespace = Collection.from_module( devshim__tasks ) )

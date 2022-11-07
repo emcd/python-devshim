@@ -78,7 +78,7 @@ class Version:
             f".{patch}" if 'f' == stage else '',
             f"{stage}{patch}" if stage in ( 'a', 'rc' ) else '' ) ) )
 
-    def as_bumped( self, piece ): # pylint: disable=too-many-branches
+    def as_bumped( self, piece ):
         ''' Returns a derivative of the version,
             altered according to current state and desired modification. '''
         Version_ = type( self )

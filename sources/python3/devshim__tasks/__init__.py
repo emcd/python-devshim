@@ -384,11 +384,11 @@ def _lint_pylint( context, targets, checks, version = None ):
     reports_str = '--reports=no --score=no' if targets or checks else ''
     if not targets:
         targets = (
-            __.project_name,
-            *__.paths.sources.aux.python3.rglob( '*.py' ),
+            *__.paths.sources.prj.python3.rglob( '*.py' ),
             *__.paths.tests.prj.python3.rglob( '*.py' ),
-            __.paths.sources.prj.sphinx / 'conf.py',
+            __.paths.project / 'develop.py',
             __.paths.project / 'setup.py',
+            __.paths.sources.prj.sphinx / 'conf.py',
         )
     targets_str = ' '.join( map( str, targets ) )
     checks_str = (

@@ -23,6 +23,8 @@
 
 from re import compile as _regex_compile
 
+from .base import expire as _expire
+
 
 def ensure_python_packages( domain = '*', excludes = ( ) ):
     ''' Ensures availability of packages from domain in cache. '''
@@ -30,8 +32,9 @@ def ensure_python_packages( domain = '*', excludes = ( ) ):
         indicate_python_packages( )[ 0 ], domain )
     from collections.abc import Sequence as AbstractSequence
     if not isinstance( excludes, AbstractSequence ):
-        # TODO: Log error and raise SystemExit.
-        raise RuntimeError( "Python package exclusions not a sequence." )
+        _expire(
+            'invalid state',
+            f"Python package exclusions not a sequence: {excludes!r}" )
     requirements = tuple(
         requirement for requirement in requirements
         if _pip_requirement_to_name( requirement ) not in excludes )
@@ -44,10 +47,8 @@ def extract_python_package_requirements( specifications, domain = '*' ):
         If the ``domain`` argument is given, then only requirements from that
         domain are extracted. Otherwise, the requirements across all domains
         are extracted. '''
-    if 1 != specifications.get( 'format-version', 1 ):
-        # TODO: Log error and raise SystemExit.
-        raise RuntimeError(
-            f"Invalid Python packages manifest format version" )
+    from .base import scribe
+    _validate_pypackages_format_version( specifications )
     from itertools import chain
     domains = _canonicalize_pypackages_domain( domain )
     requirements = [ ]
@@ -56,21 +57,33 @@ def extract_python_package_requirements( specifications, domain = '*' ):
             requirements.extend( map(
                 _extract_python_package_requirement,
                 specifications.get( domain, [ ] ) ) )
-        else:
-            apex_domain, *subdomains = domain_.split( '.' )
-            apex_specifications = specifications.get( apex_domain, { } )
-            subdomain_components_count = len( subdomains )
-            if 0 == subdomain_components_count:
-                requirements.extend( map(
-                    _extract_python_package_requirement,
-                    chain.from_iterable( apex_specifications.values( ) ) ) )
-            elif 1 == subdomain_components_count:
-                subdomain = subdomains[ 0 ]
-                # TODO: Error if subdomain does not exist.
-                requirements.extend( map(
-                    _extract_python_package_requirement,
-                    apex_specifications.get( subdomain, [ ] ) ) )
+            continue
+        apex_domain, *subdomain_components = domain_.split( '.' )
+        apex_specifications = specifications.get( apex_domain, { } )
+        subdomain_components_count = len( subdomain_components )
+        if 0 == subdomain_components_count:
+            requirements.extend( map(
+                _extract_python_package_requirement,
+                chain.from_iterable( apex_specifications.values( ) ) ) )
+        elif 1 == subdomain_components_count:
+            subdomain = subdomain_components[ 0 ]
+            if subdomain not in apex_specifications:
+                scribe.warning(
+                    f"Python packages domain {domain_!r} does not exist." )
+            requirements.extend( map(
+                _extract_python_package_requirement,
+                apex_specifications.get( subdomain, [ ] ) ) )
     return tuple( requirements )
+
+
+def _validate_pypackages_format_version( specifications ):
+    ''' Validates 'pypackages.toml' file format version and returns it. '''
+    version = specifications.get( 'format-version', 1 )
+    if 1 != version:
+        _expire(
+            'invalid data',
+            f"Invalid Python packages manifest format version: {version!r}" )
+    return version
 
 
 def _extract_python_package_requirement( specification ):
@@ -80,8 +93,10 @@ def _extract_python_package_requirement( specification ):
     if isinstance( specification, Dictionary ):
         # TODO: Validate that requirement entry exists.
         return specification[ 'requirement' ]
-    # TODO: Raise error about invalid state if this is reached.
-    raise RuntimeError
+    _expire(
+        'invalid state',
+        "Invalid package specification type {class_!r}.".format(
+            class_ = type( specification ) ) )
 
 
 def _canonicalize_pypackages_domain( domain ):
@@ -95,12 +110,11 @@ def _canonicalize_pypackages_domain( domain ):
     } )
     if '*' == domain: return valid_apex_domains
     if isinstance( domain, str ):
-        apex_domain, *subdomains = domain.split( '.' )
+        apex_domain, *subdomain_components = domain.split( '.' )
         components_maximum = valid_apex_domains.get( apex_domain, -1 )
-        if components_maximum >= len( subdomains ):
+        if components_maximum >= len( subdomain_components ):
             return { domain: components_maximum }
-    # TODO: Log error and raise SystemExit.
-    raise RuntimeError( f"Invalid domain: {domain}" )
+    _expire( 'invalid state', f"Invalid domain: {domain!r}" )
 
 
 def indicate_python_packages( identifier = None ):
@@ -134,6 +148,8 @@ def _ensure_essential_python_packages( ):
 
 def _ensure_python_packages( requirements ):
     ''' Ensures availability of packages to active Python. '''
+    # TODO: If in appropriate virtual environment,
+    #       then assume packages are installed.
     # If 'pip' module is not available, then assume PEP 517 build in progress,
     # which should have already ensured packages from 'build-requires'.
     try: import pip # pylint: disable=unused-import
