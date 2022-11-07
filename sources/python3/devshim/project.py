@@ -21,6 +21,11 @@
 ''' Management of project. '''
 
 
+def discover_project_name( ):
+    ''' Returns project name, as parsed from local configuration. '''
+    return discover_project_information( )[ 'name' ]
+
+
 def discover_project_version( ):
     ''' Returns project version, as parsed from local configuration. '''
     return discover_project_information( )[ 'version' ]
@@ -36,7 +41,3 @@ def discover_project_information( ):
     information.update( tables[ 'tool' ][ 'setuptools' ] )
     information.update( tables[ 'tool' ][ 'SELF' ] )
     return information
-
-# TODO: Add hook for this to an on-demand cache object.
-#       Compute only on '__getattr__' for it.
-project_name = discover_project_information( )[ 'name' ]

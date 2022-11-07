@@ -102,7 +102,7 @@ def _generate_installation_requirements( ):
         indicate_python_packages,
     )
     return extract_python_package_requirements(
-        indicate_python_packages( )[ 0 ], 'installation' )
+        indicate_python_packages( )[ 0 ], domain = 'installation' )
 
 
 # https://docs.python.org/3/distutils/setupscript.html#writing-the-setup-script

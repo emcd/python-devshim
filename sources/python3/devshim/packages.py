@@ -49,14 +49,14 @@ def extract_python_package_requirements( specifications, domain = '*' ):
         are extracted. '''
     from .base import scribe
     _validate_pypackages_format_version( specifications )
-    from itertools import chain
     domains = _canonicalize_pypackages_domain( domain )
+    from itertools import chain
     requirements = [ ]
     for domain_, subdomain_components_maximum in domains.items( ):
         if 0 == subdomain_components_maximum:
             requirements.extend( map(
                 _extract_python_package_requirement,
-                specifications.get( domain, [ ] ) ) )
+                specifications.get( domain_, [ ] ) ) )
             continue
         apex_domain, *subdomain_components = domain_.split( '.' )
         apex_specifications = specifications.get( apex_domain, { } )
@@ -109,11 +109,17 @@ def _canonicalize_pypackages_domain( domain ):
         'optional-installation': 1,
     } )
     if '*' == domain: return valid_apex_domains
+    from collections.abc import Sequence
     if isinstance( domain, str ):
         apex_domain, *subdomain_components = domain.split( '.' )
         components_maximum = valid_apex_domains.get( apex_domain, -1 )
         if components_maximum >= len( subdomain_components ):
             return { domain: components_maximum }
+    elif isinstance( domain, Sequence ):
+        domains = { }
+        for domain_ in domain:
+            domains.update( _canonicalize_pypackages_domain( domain_ ) )
+        return domains
     _expire( 'invalid state', f"Invalid domain: {domain!r}" )
 
 
@@ -143,13 +149,15 @@ def _ensure_essential_python_packages( ):
     ''' Ensures availability of essential packages in cache. '''
     # Ensure Tomli so that 'pyproject.toml' and 'pypackages.toml' can be read.
     # TODO: Python 3.11: Remove this explicit dependency.
-    _ensure_python_packages( ( 'tomli', ) )
+    _ensure_python_packages( ( 'tomli', ), conceal_execution = True )
 
 
-def _ensure_python_packages( requirements ):
+def _ensure_python_packages( requirements, conceal_execution = False ):
     ''' Ensures availability of packages to active Python. '''
-    # TODO: If in appropriate virtual environment,
-    #       then assume packages are installed.
+    # If in allegedly Devshim-created virtual environment,
+    # then assume necessary packages are installed.
+    from os import environ as current_process_environment
+    if 'OUR_VENV_NAME' in current_process_environment: return
     # If 'pip' module is not available, then assume PEP 517 build in progress,
     # which should have already ensured packages from 'build-requires'.
     try: import pip # pylint: disable=unused-import
@@ -176,14 +184,11 @@ def _ensure_python_packages( requirements ):
         from devshim.base import standard_execute_external
         standard_execute_external(
             ( *split_command( 'pip install --upgrade --target' ),
-              cache_path_, *installable_requirements ) )
+              cache_path_, *installable_requirements ),
+            capture_output = conceal_execution )
 
 
 _pip_requirement_name_regex = _regex_compile( r'''^([\w\-]+)(.*)$''' )
 def _pip_requirement_to_name( requirement ):
     return _pip_requirement_name_regex.match(
         requirement ).group( 1 ).replace( '-', '_' )
-
-
-ensure_python_packages( domain = 'construction' )
-ensure_python_packages( domain = 'development.base' )

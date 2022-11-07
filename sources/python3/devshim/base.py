@@ -21,12 +21,18 @@
 ''' Fundamental constants and utilities for development support. '''
 
 import typing as _typ
-from functools import partial as _partial_function
-from subprocess import run as _run # nosec
 
 
-standard_execute_external = _partial_function(
-    _run, check = True, capture_output = True, text = True )
+def standard_execute_external( command_specification, **nomargs ):
+    ''' Executes command specification in subprocess.
+
+        By default, raises exception on non-zero exit code. '''
+    # TODO: Merge 'stderr' to 'stdout' in CI environments.
+    options = dict( capture_output = True, text = True )
+    options.update( nomargs )
+    from subprocess import run # nosec
+    # nosemgrep: scm-modules.semgrep-rules.python.lang.security.audit.dangerous-subprocess-use-audit
+    return run( command_specification, check = True, **options )
 
 
 def _enumerate_exit_codes( ):

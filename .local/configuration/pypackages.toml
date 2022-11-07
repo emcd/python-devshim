@@ -16,9 +16,6 @@ publication = [
   'twine',
 ]
 
-[[development.base]]
-requirement = 'tomli-w'
-
 [[development.format]]
 requirement = 'yapf >= 0.32'
 comments = [
@@ -79,3 +76,6 @@ comments = [
 
 [[development.user-interface]]
 requirement = 'shellingham'
+
+[[development.user-interface]]
+requirement = 'tomli-w'

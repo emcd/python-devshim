@@ -67,10 +67,11 @@ class __( metaclass = _NamespaceClass ):
     from .versions import Version
     from devshim.locations import paths
     from devshim.project import (
+        discover_project_name,
         discover_project_version,
-        project_name,
     )
 
+    project_name = discover_project_name( )
     # https://www.sphinx-doc.org/en/master/man/sphinx-build.html
     sphinx_options = f"-j auto -d {paths.caches.sphinx} -n -T"
 

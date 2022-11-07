@@ -55,6 +55,9 @@ def configure( ):
     project_path = Path( __file__ ).parent
     ensure_scm_modules( project_path )
     configure_auxiliary( project_path )
+    from devshim.packages import ensure_python_packages
+    ensure_python_packages(
+        domain = ( 'construction', 'development.user-interface', ) )
 
 
 def ensure_scm_modules( project_path ):
@@ -76,7 +79,6 @@ def ensure_scm_modules( project_path ):
 def _attempt_clone_scm_modules( project_path ):
     ''' Attempts to clone SCM modules. '''
     from shutil import which
-    # TODO: Handle alternative Git implementations.
     git_path = which( 'git' )
     if None is git_path:
         _die(
@@ -117,7 +119,6 @@ def _die( exit_code, message ):
 def main( ):
     ''' Entrypoint for development activity. '''
     configure( )
-    import devshim.user_interface # pylint: disable=unused-import
     from invoke import Collection, Program
     import devshim__tasks
     program = Program( namespace = Collection.from_module( devshim__tasks ) )
