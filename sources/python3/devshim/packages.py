@@ -28,6 +28,7 @@ from .base import expire as _expire
 
 def ensure_python_packages( domain = '*', excludes = ( ) ):
     ''' Ensures availability of packages from domain in cache. '''
+    _ensure_essential_python_packages( )
     requirements = extract_python_package_requirements(
         indicate_python_packages( )[ 0 ], domain )
     from collections.abc import Sequence as AbstractSequence
@@ -37,7 +38,7 @@ def ensure_python_packages( domain = '*', excludes = ( ) ):
             f"Python package exclusions not a sequence: {excludes!r}" )
     requirements = tuple(
         requirement for requirement in requirements
-        if _pip_requirement_to_name( requirement ) not in excludes )
+        if _pep508_requirement_to_name( requirement ) not in excludes )
     _ensure_python_packages( requirements )
 
 
@@ -129,9 +130,9 @@ def indicate_python_packages( identifier = None ):
         First return value is contents of packages specifications file.
         Second return value is list of dependency fixtures for the given
         platform identifier. Will be empty if none is given. '''
-    _ensure_essential_python_packages( )
+    assert_python_packages( ( 'tomli', ) )
     from tomli import load
-    from devshim.locations import paths
+    from .locations import paths
     fixtures_path = paths.configuration.pypackages_fixtures
     if identifier and fixtures_path.exists( ):
         with fixtures_path.open( 'rb' ) as file:
@@ -145,50 +146,79 @@ def indicate_python_packages( identifier = None ):
     return specifications, fixtures
 
 
+def assert_python_packages( requirements ):
+    ''' Asserts availability of packages to active Python. '''
+    # If in virtual environment that we allegedly created,
+    # then assume necessary packages are installed.
+    from .environments import in_our_python_environment
+    if in_our_python_environment: return
+    cache = _ensure_python_packages_cache( )
+    installable_requirements = _filter_available_python_packages(
+        requirements, cache = cache )
+    if not installable_requirements: return
+    from .base import expire
+    names = ', '.join(
+        map( _pep508_requirement_to_name, installable_requirements ) )
+    expire( 'invalid state',
+            f"Packages absent from local cache: {names!r}" )
+
+
 def _ensure_essential_python_packages( ):
     ''' Ensures availability of essential packages in cache. '''
     # Ensure Tomli so that 'pyproject.toml' and 'pypackages.toml' can be read.
     # TODO: Python 3.11: Remove this explicit dependency.
-    _ensure_python_packages( ( 'tomli', ), conceal_execution = True )
+    _ensure_python_packages( ( 'tomli', ) )
 
 
-def _ensure_python_packages( requirements, conceal_execution = False ):
+def _ensure_python_packages( requirements ):
     ''' Ensures availability of packages to active Python. '''
-    # If in allegedly Devshim-created virtual environment,
+    # If in virtual environment that we allegedly created,
     # then assume necessary packages are installed.
-    from os import environ as current_process_environment
-    if 'OUR_VENV_NAME' in current_process_environment: return
+    from .environments import in_our_python_environment
+    if in_our_python_environment: return
     # If 'pip' module is not available, then assume PEP 517 build in progress,
     # which should have already ensured packages from 'build-requires'.
     try: import pip # pylint: disable=unused-import
     except ImportError: return
+    cache = _ensure_python_packages_cache( )
+    installable_requirements = _filter_available_python_packages(
+        requirements, cache = cache )
+    if installable_requirements:
+        from shlex import split as split_command
+        from .base import standard_execute_external
+        standard_execute_external(
+            ( *split_command( 'pip install --upgrade --target' ),
+              cache, *installable_requirements ),
+            capture_output = False )
+
+
+def _filter_available_python_packages( requirements, cache = None ):
+    ''' Only accepts Pip requirements for packages not in cache. '''
+    if not cache: cache = _ensure_python_packages_cache( )
+    # TODO? Use 'pip freeze --path' output instead.
+    present_packages = frozenset(
+        path.name for path in cache.glob( '*' )
+        if path.suffix not in ( '.dist-info', ) )
+    return tuple(
+        requirement for requirement in requirements
+        if _pep508_requirement_to_name( requirement ) not in present_packages )
+
+
+def _ensure_python_packages_cache( ):
+    ''' Ensures availability of packages cache for active Python. '''
     from devshim.base import ensure_directory
     from devshim.locations import paths
     from devshim.platforms import active_python_abi_label
-    cache_path = ensure_directory(
+    cache = ensure_directory(
         paths.caches.packages.python3 / active_python_abi_label )
-    cache_path_ = str( cache_path )
+    cache_ = str( cache )
     from sys import path as python_search_paths
-    if cache_path_ not in python_search_paths:
-        python_search_paths.insert( 0, cache_path_ )
-    # Ignore packages which are already cached.
-    # TODO? Use 'pip freeze --path' output instead.
-    in_cache_packages = frozenset(
-        path.name for path in cache_path.glob( '*' )
-        if path.suffix not in ( '.dist-info', ) )
-    installable_requirements = tuple(
-        requirement for requirement in requirements
-        if _pip_requirement_to_name( requirement ) not in in_cache_packages )
-    if installable_requirements:
-        from shlex import split as split_command
-        from devshim.base import standard_execute_external
-        standard_execute_external(
-            ( *split_command( 'pip install --upgrade --target' ),
-              cache_path_, *installable_requirements ),
-            capture_output = conceal_execution )
+    if cache_ not in python_search_paths:
+        python_search_paths.insert( 0, cache_ )
+    return cache
 
 
-_pip_requirement_name_regex = _regex_compile( r'''^([\w\-]+)(.*)$''' )
-def _pip_requirement_to_name( requirement ):
-    return _pip_requirement_name_regex.match(
+_pep508_requirement_name_regex = _regex_compile( r'''^([\w\-]+)(.*)$''' )
+def _pep508_requirement_to_name( requirement ):
+    return _pep508_requirement_name_regex.match(
         requirement ).group( 1 ).replace( '-', '_' )
