@@ -55,13 +55,8 @@ class __( metaclass = _NamespaceClass ):
     )
     from .environments import build_python_venv
     from .packages import (
-        calculate_python_packages_fixtures,
-        delete_python_packages_fixtures,
         execute_pip_with_requirements,
-        indicate_current_python_packages,
         install_python_packages,
-        record_python_packages_fixtures,
-        retrieve_pypi_release_information,
     )
     from .platforms import freshen_python
     from .versions import Version
@@ -192,13 +187,16 @@ def _clean_python_packages( context, version = None ):
         'Clean: Unused Python Packages', supplement = version )
     context_options = __.derive_venv_context_options( version = version )
     identifier = __.pep508_identify_python( version = version )
-    from devshim.packages import indicate_python_packages
+    from devshim.packages import (
+        indicate_current_python_packages,
+        indicate_python_packages,
+    )
     _, fixtures = indicate_python_packages( identifier = identifier )
     requested = frozenset( fixture[ 'name' ] for fixture in fixtures )
     installed = frozenset(
         entry.requirement.name
         for entry
-        in __.indicate_current_python_packages( context_options[ 'env' ] ) )
+        in indicate_current_python_packages( context_options[ 'env' ] ) )
     requirements_text = '\n'.join(
         installed - requested - { __.project_name } )
     if not requirements_text: return
@@ -261,7 +259,8 @@ def freshen_python( context, version = None ):
     context.run( "asdf local python {versions}".format(
         versions = ' '.join( successor_versions ) ), pty = True )
     # Erase packages fixtures for versions which are no longer extant.
-    __.delete_python_packages_fixtures( obsolete_identifiers )
+    from devshim.packages import delete_python_packages_fixtures
+    delete_python_packages_fixtures( obsolete_identifiers )
 
 
 @__.task
@@ -280,9 +279,12 @@ def _freshen_python_packages( context, version = None ):
     context_options = __.derive_venv_context_options( version = version )
     identifier = __.pep508_identify_python( version = version )
     __.install_python_packages( context, context_options )
-    fixtures = __.calculate_python_packages_fixtures(
-        context_options[ 'env' ] )
-    __.record_python_packages_fixtures( identifier, fixtures )
+    from devshim.packages import (
+        calculate_python_packages_fixtures,
+        record_python_packages_fixtures,
+    )
+    fixtures = calculate_python_packages_fixtures( context_options[ 'env' ] )
+    record_python_packages_fixtures( identifier, fixtures )
     check_security_issues( context, version = version )
     test( context, version = version )
 
@@ -336,7 +338,9 @@ def lint_bandit( context, version = None ):
 def _lint_bandit( context, version = None ):
     __.render_boxed_title( 'Lint: Bandit', supplement = version )
     context.run(
-        f"bandit --recursive --verbose {__.paths.sources.prj.python3}",
+        "bandit --recursive --verbose "
+        f"--configfile {__.paths.configuration.pyproject} "
+        f"{__.paths.sources.prj.python3}",
         pty = True, **__.derive_venv_context_options( version = version ) )
 
 
@@ -671,7 +675,8 @@ def check_pypi_integrity( context, version = None, index_url = '' ):
         This task requires Internet access and may take some time. '''
     version = version or __.discover_project_version( )
     __.render_boxed_title( f"Verify: Python Package Integrity ({version})" )
-    release_info = __.retrieve_pypi_release_information(
+    from devshim.packages import retrieve_pypi_release_information
+    release_info = retrieve_pypi_release_information(
         __.project_name, version, index_url = index_url )
     for package_info in release_info:
         url = package_info[ 'url' ]

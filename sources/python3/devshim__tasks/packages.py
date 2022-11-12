@@ -24,109 +24,18 @@
 from lockup import NamespaceClass as _NamespaceClass
 class __( metaclass = _NamespaceClass ):
 
-    from json import load as load_json
     from shlex import (
-        split as split_command,
         quote as shell_quote,
     )
     from tempfile import NamedTemporaryFile
-    from time import sleep
-    from types import SimpleNamespace
-    from urllib.error import URLError as UrlError
-    from urllib.request import ( Request as HttpRequest, urlopen, )
 
     from .base import (
         eprint, epprint,
         generate_pip_requirements_text,
         on_tty,
     )
-    from devshim.base import standard_execute_external
-    from devshim.locations import paths
 
     from lockup import reclassify_module
-
-
-def calculate_python_packages_fixtures( environment ):
-    ''' Calculates Python package fixtures, such as digests or URLs. '''
-    fixtures = [ ]
-    for entry in indicate_current_python_packages( environment ):
-        requirement = entry.requirement
-        fixture = dict( name = requirement.name )
-        if 'editable' in entry.flags: continue
-        if requirement.url: fixture.update( dict( url = requirement.url, ) )
-        else:
-            package_version = next( iter( requirement.specifier ) ).version
-            fixture.update( dict(
-                version = package_version,
-                digests = tuple( map(
-                    lambda s: f"sha256:{s}",
-                    aggregate_pypi_release_digests(
-                        requirement.name, package_version )
-                ) )
-            ) )
-        fixtures.append( fixture )
-    return fixtures
-
-
-def record_python_packages_fixtures( identifier, fixtures ):
-    ''' Records table of Python packages fixtures. '''
-    from operator import itemgetter
-    from tomli import load
-    from tomli_w import dump
-    fixtures_path = __.paths.configuration.pypackages_fixtures
-    if fixtures_path.exists( ):
-        with fixtures_path.open( 'rb' ) as file: document = load( file )
-    else: document = { }
-    document[ identifier ] = fixtures
-    # Minimize delta sizes for SCM commits by preserving order.
-    # I.e., a micro version bump should not reshuffle a large block of data.
-    document = dict( sorted( document.items( ), key = itemgetter( 0 ) ) )
-    with fixtures_path.open( 'wb' ) as file: dump( document, file )
-
-
-def delete_python_packages_fixtures( identifiers ):
-    ''' Deletes tables of Python packages fixtures. '''
-    from tomli import load
-    from tomli_w import dump
-    fixtures_path = __.paths.configuration.pypackages_fixtures
-    if not fixtures_path.exists( ): return
-    with fixtures_path.open( 'rb' ) as file: document = load( file )
-    for identifier in identifiers:
-        if identifier not in document: continue
-        document.pop( identifier )
-    with fixtures_path.open( 'wb' ) as file: dump( document, file )
-
-
-pypi_release_digests_cache = { }
-def aggregate_pypi_release_digests( name, version, index_url = '' ):
-    ''' Aggregates hashes for release on PyPI. '''
-    cache_index = ( index_url, name, version )
-    digests = pypi_release_digests_cache.get( cache_index )
-    if digests: return digests
-    release_info = retrieve_pypi_release_information(
-        name, version, index_url = index_url )
-    digests = [
-        package_info[ 'digests' ][ 'sha256' ]
-        for package_info in release_info ]
-    pypi_release_digests_cache[ cache_index ] = digests
-    return digests
-
-
-def retrieve_pypi_release_information( name, version, index_url = '' ): # pylint: disable=inconsistent-return-statements
-    ''' Retrieves information about specific release on PyPI. '''
-    index_url = index_url or 'https://pypi.org'
-    # https://warehouse.pypa.io/api-reference/json.html#release
-    request = __.HttpRequest(
-        f"{index_url}/pypi/{name}/json",
-        headers = { 'Accept': 'application/json', } )
-    attempts_count_max = 2
-    for attempts_count in range( attempts_count_max + 1 ):
-        try:
-            with __.urlopen( request ) as http_reader:
-                return __.load_json( http_reader )[ 'releases' ][ version ]
-        except ( KeyError, __.UrlError, ):
-            if attempts_count_max == attempts_count: raise
-            __.sleep( 2 ** attempts_count )
 
 
 def install_python_packages( context, context_options, identifier = None ):
@@ -157,34 +66,6 @@ def install_python_packages( context, context_options, identifier = None ):
     # https://github.com/pypa/pip/issues/4995
     context.run(
         'pip install --editable .', pty = __.on_tty, **context_options )
-
-
-def indicate_current_python_packages( environment ):
-    ''' Returns currently-installed Python packages. '''
-    from re import compile as regex_compile
-    eggstractor = regex_compile(
-        r'''.*#egg=(?P<package_name>\w[\w\-]+\w)(?:&.*)?$''' )
-    from packaging.requirements import Requirement
-    entries = [ ]
-    for line in __.standard_execute_external(
-        __.split_command( 'pip freeze' ), env = environment
-    ).stdout.strip( ).splitlines( ):
-        if line.startswith( '#' ): continue
-        entry = __.SimpleNamespace( flags = [ ] )
-        if line.startswith( '-e git' ):
-            entry.flags.append( 'editable' )
-            # Replace '-e' with '{package_name}@'.
-            name_match = eggstractor.match( line )
-            if not name_match: continue
-            requirement = ' '.join( (
-                name_match.group( 'package_name' ) + '@',
-                line.split( ' ', maxsplit = 1 )[ 1 ] ) )
-        # TODO: Case: -e /home/me/src/python-devshim
-        elif line.startswith( '-e' ): continue
-        else: requirement = line
-        entry.requirement = Requirement( requirement )
-        entries.append( entry )
-    return entries
 
 
 def execute_pip_with_requirements(

@@ -30,11 +30,7 @@ class __( metaclass = _NamespaceClass ):
         pep508_identify_python,
         render_boxed_title,
     )
-    from .packages import (
-        calculate_python_packages_fixtures,
-        install_python_packages,
-        record_python_packages_fixtures,
-    )
+    from .packages import install_python_packages
 
     from lockup import reclassify_module
 
@@ -52,10 +48,13 @@ def build_python_venv( context, version, overwrite = False ):
         f"{python_path} -m venv {venv_options_str} {venv_path}", pty = True )
     context_options = __.derive_venv_context_options( venv_path )
     __.install_python_packages( context, context_options )
-    fixtures = __.calculate_python_packages_fixtures(
-        context_options[ 'env' ] )
+    from devshim.packages import (
+        calculate_python_packages_fixtures,
+        record_python_packages_fixtures,
+    )
+    fixtures = calculate_python_packages_fixtures( context_options[ 'env' ] )
     identifier = __.pep508_identify_python( version = version )
-    __.record_python_packages_fixtures( identifier, fixtures )
+    record_python_packages_fixtures( identifier, fixtures )
 
 
 __.reclassify_module( __name__ )

@@ -23,7 +23,12 @@ comments = [
 ]
 
 [[development.lint]]
-requirement = 'bandit'
+requirement = 'bandit[toml] @ git+https://github.com/PyCQA/bandit.git@d9fe642e01866e460454641bcd14b9de9d2b1478'
+comments = [
+  ''' Bandit 1.7.4, released 2022-03-03, relies on 'toml' rather than 'tomli'.
+      The 'toml' package does not support the latest TOML standard
+      and breaks on our 'pyproject.toml'. ''',
+]
 
 [[development.lint]]
 requirement = 'mypy; implementation_name != "pypy" or python_version >= "3.8"'

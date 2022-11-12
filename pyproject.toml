@@ -60,6 +60,11 @@ where = [ 'sources/python3' ]
 [tool.SELF]
 year-of-origin = 2021
 
+[tool.bandit]
+skips = [
+  'B310', # urllib_urlopen
+]
+
 [tool.coverage.run]
 branch = true
 command_line = '-m pytest'
