@@ -50,6 +50,12 @@ def identify_active_python( mode ):
 active_python_abi_label = identify_active_python( 'bdist-compatibility' )
 
 
+def pep508_identify_python( version = None ):
+    ''' Calculates PEP 508 identifier for Python version. '''
+    python_path = detect_vmgr_python_path( version = version )
+    return identify_python( 'pep508-environment', python_path = python_path )
+
+
 def identify_python( mode, python_path ):
     ''' Reports compatibility identifier for Python at given path. '''
     from ..locations import paths
@@ -57,3 +63,38 @@ def identify_python( mode, python_path ):
     from ..base import standard_execute_external
     return standard_execute_external(
         ( python_path, detector_path, '--mode', mode ) ).stdout.strip( )
+
+
+def detect_vmgr_python_path( version = None ):
+    ''' Detects Python path using handle from version manager. '''
+    version = version or detect_vmgr_python_version( )
+    from pathlib import Path
+    from shlex import split as split_command
+    from ..base import standard_execute_external
+    installation_path = Path( standard_execute_external(
+        ( *split_command( 'asdf where python' ), version ) ).stdout.strip( ) )
+    return installation_path / 'bin' / 'python'
+
+
+def detect_vmgr_python_version( ):
+    ''' Detects Python handle selected by version manager. '''
+    # TODO: If in venv, then get active Python version.
+    return next( iter( indicate_python_versions_support( ) ) )
+
+
+def calculate_python_versions( version ):
+    ''' Given a Python version specifier, calculate all relevant versions. '''
+    if 'ALL' == version: return indicate_python_versions_support( )
+    return ( version, )
+
+
+def indicate_python_versions_support( ):
+    ''' Returns supported Python versions. '''
+    from os import environ as current_process_environment
+    version = current_process_environment.get( 'ASDF_PYTHON_VERSION' )
+    if None is not version: return ( version, )
+    from re import MULTILINE, compile as regex_compile
+    regex = regex_compile( r'''^python\s+(.*)$''', MULTILINE )
+    from ..locations import paths
+    with paths.configuration.asdf.open( ) as file:
+        return regex.match( file.read( ) )[ 1 ].split( )

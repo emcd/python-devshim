@@ -28,7 +28,47 @@ class __( metaclass = _NamespaceClass ):
 
     from lockup import reclassify_module
 
-    from devshim.locations import paths
+
+def render_boxed_title( title, supplement = None ):
+    ''' Renders box around title to diagnostic stream. '''
+    if None is supplement: specific_title = title
+    else: specific_title = f"{title} ({supplement})"
+    from .base import eprint
+    eprint( format_boxed_title( specific_title ) )
+
+
+def format_boxed_title( title ):
+    ''' Formats box around title as string. '''
+    from os import environ as current_process_environment
+    columns_count = int( current_process_environment.get( 'COLUMNS', 79 ) )
+    icolumns_count = columns_count - 2
+    content_template = (
+        '\N{BOX DRAWINGS DOUBLE VERTICAL}{fill}'
+        '\N{BOX DRAWINGS DOUBLE VERTICAL}' )
+    return '\n'.join( (
+        '',
+        '\N{BOX DRAWINGS DOUBLE DOWN AND RIGHT}{fill}'
+        '\N{BOX DRAWINGS DOUBLE DOWN AND LEFT}'.format(
+            fill = '\N{BOX DRAWINGS DOUBLE HORIZONTAL}' * icolumns_count ),
+        content_template.format( fill = ' ' * icolumns_count ),
+        content_template.format( fill = title.center( icolumns_count ) ),
+        content_template.format( fill = ' ' * icolumns_count ),
+        '\N{BOX DRAWINGS DOUBLE UP AND RIGHT}{fill}'
+        '\N{BOX DRAWINGS DOUBLE UP AND LEFT}'.format(
+            fill = '\N{BOX DRAWINGS DOUBLE HORIZONTAL}' * icolumns_count ),
+        '', ) )
+
+
+def assert_gpg_tty( ):
+    ''' Ensures the the 'GPG_TTY' environment variable is set. '''
+    from os import environ as current_process_environment
+    if 'GPG_TTY' in current_process_environment: return
+    # TODO: Check for cached passphrase as an alternative.
+    # TODO: Use 'expire' instead of raising 'invoke.Exit'.
+    from invoke import Exit
+    raise Exit(
+        "ERROR: Environment variable 'GPG_TTY' is not set. "
+        "Task cannot prompt for GPG secret key passphrase." )
 
 
 def generate_cli_functions( shell_name, function_name, with_completions ):
@@ -43,10 +83,11 @@ def generate_cli_functions( shell_name, function_name, with_completions ):
             shell_name = _provide_default_shell_name( )
     from inspect import cleandoc
     from sys import executable as active_python_path
+    from .locations import paths
     invocation_code = cleandoc(
         invocation_code_table[ shell_name ].format(
             python_path = active_python_path,
-            shim_path = ( __.paths.project / 'develop.py' ).resolve( ),
+            shim_path = ( paths.project / 'develop.py' ).resolve( ),
             function_name = function_name ) )
     if with_completions and shell_name in completion_code_table:
         completion_code = cleandoc(

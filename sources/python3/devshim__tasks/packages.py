@@ -21,30 +21,15 @@
 ''' Project package management. '''
 
 
-from lockup import NamespaceClass as _NamespaceClass
-class __( metaclass = _NamespaceClass ):
-
-    from shlex import (
-        quote as shell_quote,
-    )
-    from tempfile import NamedTemporaryFile
-
-    from .base import (
-        eprint, epprint,
-        generate_pip_requirements_text,
-        on_tty,
-    )
-
-    from lockup import reclassify_module
-
-
 def install_python_packages( context, context_options, identifier = None ):
     ''' Installs required Python packages into virtual environment. '''
-    raw, frozen, unpublished = __.generate_pip_requirements_text(
+    from devshim.base import on_tty
+    from devshim.packages import generate_pip_requirements_text
+    raw, frozen, unpublished = generate_pip_requirements_text(
         identifier = identifier )
     context.run(
         'pip install --upgrade setuptools pip wheel',
-        pty = __.on_tty, **context_options )
+        pty = on_tty, **context_options )
     if not identifier or not frozen:
         pip_options = [ ]
         if not identifier:
@@ -64,8 +49,7 @@ def install_python_packages( context, context_options, identifier = None ):
     # Pip cannot currently mix editable and digest-bound requirements,
     # so we must install editable packages separately. (As of 2022-02-06.)
     # https://github.com/pypa/pip/issues/4995
-    context.run(
-        'pip install --editable .', pty = __.on_tty, **context_options )
+    context.run( 'pip install --editable .', pty = on_tty, **context_options )
 
 
 def execute_pip_with_requirements(
@@ -73,18 +57,22 @@ def execute_pip_with_requirements(
 ):
     ''' Executes a Pip command with requirements. '''
     pip_options = pip_options or ( )
+    from devshim.base import on_tty
     # Unfortunately, Pip does not support reading requirements from stdin,
     # as of 2022-01-02. To workaround, we need to write and then read
     # a temporary file. More details: https://github.com/pypa/pip/issues/7822
-    with __.NamedTemporaryFile( mode = 'w+' ) as requirements_file:
+    from shlex import quote as shell_quote
+    from tempfile import NamedTemporaryFile
+    with NamedTemporaryFile( mode = 'w+' ) as requirements_file:
         requirements_file.write( requirements )
         requirements_file.flush( )
         context.run(
             "pip {command} {options} --requirement {requirements_file}".format(
                 command = command,
                 options = ' '.join( pip_options ),
-                requirements_file = __.shell_quote( requirements_file.name ) ),
-            pty = __.on_tty, **context_options )
+                requirements_file = shell_quote( requirements_file.name ) ),
+            pty = on_tty, **context_options )
 
 
-__.reclassify_module( __name__ )
+from lockup import reclassify_module as _reclassify_module
+_reclassify_module( __name__ )

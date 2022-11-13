@@ -23,6 +23,36 @@
 import typing as _typ
 
 
+def _select_narrative_functions( ):
+    ''' Selects which functions to use for diagnostic output. '''
+    from os import environ as current_process_environment
+    from pprint import pprint
+    # If running in a Github Workflow,
+    # then use 'stdout' for properly interleaved output.
+    if 'CI' in current_process_environment: return print, pprint
+    from functools import partial as partial_function
+    from sys import stderr
+    return (
+        partial_function( print, file = stderr ),
+        partial_function( pprint, stream = stderr ),
+    )
+
+eprint, epprint = _select_narrative_functions( )
+
+
+def _detect_tty( ):
+    ''' Detects if current process attached to a TTY.
+
+        Boolean result can be used to decide whether to suppress the use of
+        ANSI SGR codes for some programs, for example. '''
+    from sys import stderr
+    # TODO: Check other streams, particularly if streams are merged.
+    return stderr.isatty( )
+
+#: Is current process attached to a TTY?
+on_tty = _detect_tty( )
+
+
 def standard_execute_external( command_specification, **nomargs ):
     ''' Executes command specification in subprocess.
 
@@ -75,12 +105,6 @@ def expire( exit_name, message ) -> _typ.NoReturn:
     if 0 == exit_code: scribe.info( message )
     else: scribe.critical( message, stack_info = True, stacklevel = 2 )
     raise SystemExit( exit_code )
-
-
-def ensure_directory( path ):
-    ''' Ensures existence of directory, creating if necessary. '''
-    path.mkdir( parents = True, exist_ok = True )
-    return path
 
 
 def _configure( ):

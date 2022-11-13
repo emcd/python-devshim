@@ -26,6 +26,29 @@ from re import compile as _regex_compile
 from .base import expire as _expire
 
 
+def generate_pip_requirements_text( identifier = None ):
+    ''' Generates Pip requirements lists from local configuration. '''
+    # https://pip.pypa.io/en/stable/reference/requirements-file-format/
+    # https://pip.pypa.io/en/stable/topics/repeatable-installs/
+    specifications, fixtures = indicate_python_packages(
+        identifier = identifier )
+    # Pip cannot currently mix frozen and unfrozen requirements,
+    # so we must split them out. (As of 2022-02-06.)
+    # https://github.com/pypa/pip/issues/6469
+    raw, frozen, unpublished = [ ], [ ], [ ]
+    from lockup import create_namespace
+    for fixture in map( lambda d: create_namespace( **d ), fixtures ):
+        name = fixture.name
+        if hasattr( fixture, 'url' ):
+            unpublished.append( f"{name}@ {fixture.url}" )
+        elif hasattr( fixture, 'digests' ):
+            options = ' \\\n    '.join(
+                f"--hash {digest}" for digest in fixture.digests )
+            frozen.append( f"{name}=={fixture.version} \\\n    {options}" )
+    raw.extend( extract_python_package_requirements( specifications ) )
+    return '\n'.join( raw ), '\n'.join( frozen ), '\n'.join( unpublished )
+
+
 def ensure_python_packages( domain = '*', excludes = ( ) ):
     ''' Ensures availability of packages from domain in cache. '''
     _ensure_essential_python_packages( )
@@ -206,7 +229,7 @@ def _filter_available_python_packages( requirements, cache = None ):
 
 def _ensure_python_packages_cache( ):
     ''' Ensures availability of packages cache for active Python. '''
-    from devshim.base import ensure_directory
+    from devshim.fs_utilities import ensure_directory
     from devshim.locations import paths
     from devshim.platforms import active_python_abi_label
     cache = ensure_directory(

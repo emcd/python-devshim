@@ -22,7 +22,7 @@
     `Invoke Documentation <http://docs.pyinvoke.org/en/stable/index.html>`_ '''
 
 
-from .base import assert_sanity as _assert_sanity
+from devshim.base import assert_sanity as _assert_sanity
 _assert_sanity( )
 
 
@@ -40,19 +40,6 @@ class __( metaclass = _NamespaceClass ):
     from invoke import Exit, Failure, call, task
     from lockup import reclassify_module
 
-    from .base import (
-        assert_gpg_tty,
-        calculate_python_versions,
-        derive_venv_context_options,
-        detect_vmgr_python_version,
-        eprint, epprint,
-        indicate_python_versions_support,
-        on_tty,
-        pep508_identify_python,
-        render_boxed_title,
-        test_package_executable,
-        unlink_recursively,
-    )
     from .environments import build_python_venv
     from .packages import (
         execute_pip_with_requirements,
@@ -60,10 +47,20 @@ class __( metaclass = _NamespaceClass ):
     )
     from .platforms import freshen_python
     from .versions import Version
+    from devshim.base import on_tty
+    from devshim.environments import (
+        derive_venv_context_options,
+        test_package_executable,
+    )
     from devshim.locations import paths
+    from devshim.platforms import calculate_python_versions
     from devshim.project import (
         discover_project_name,
         discover_project_version,
+    )
+    from devshim.user_interface import (
+        assert_gpg_tty,
+        render_boxed_title,
     )
 
     project_name = discover_project_name( )
@@ -133,6 +130,7 @@ def bootstrap( context ): # pylint: disable=unused-argument
 def clean_pycaches( context ): # pylint: disable=unused-argument
     ''' Removes all caches of compiled CPython bytecode. '''
     __.render_boxed_title( 'Clean: Python Caches' )
+    from devshim.fs_utilities import unlink_recursively
     anchors = (
         __.paths.sources.aux.python3,
         __.paths.sources.prj.python3,
@@ -141,7 +139,7 @@ def clean_pycaches( context ): # pylint: disable=unused-argument
     )
     for path in __.chain.from_iterable( map(
         lambda anchor: anchor.rglob( '__pycache__' ), anchors
-    ) ): __.unlink_recursively( path )
+    ) ): unlink_recursively( path )
 
 
 @__.task
@@ -186,7 +184,8 @@ def _clean_python_packages( context, version = None ):
     __.render_boxed_title(
         'Clean: Unused Python Packages', supplement = version )
     context_options = __.derive_venv_context_options( version = version )
-    identifier = __.pep508_identify_python( version = version )
+    from devshim.platforms import pep508_identify_python
+    identifier = pep508_identify_python( version = version )
     from devshim.packages import (
         indicate_current_python_packages,
         indicate_python_packages,
@@ -243,9 +242,13 @@ def freshen_python( context, version = None ):
         If version is 'ALL', then all supported Pythons are targeted.
 
         This task requires Internet access and may take some time. '''
-    original_versions = __.indicate_python_versions_support( )
+    from devshim.platforms import (
+        detect_vmgr_python_version,
+        indicate_python_versions_support,
+    )
+    original_versions = indicate_python_versions_support( )
     if 'ALL' == version: versions = original_versions
-    else: versions = ( version or __.detect_vmgr_python_version( ), )
+    else: versions = ( version or detect_vmgr_python_version( ), )
     obsolete_identifiers = set( )
     version_replacements = { }
     for version_ in versions:
@@ -277,7 +280,8 @@ def _freshen_python_packages( context, version = None ):
     __.render_boxed_title(
         'Freshen: Python Package Versions', supplement = version )
     context_options = __.derive_venv_context_options( version = version )
-    identifier = __.pep508_identify_python( version = version )
+    from devshim.platforms import pep508_identify_python
+    identifier = pep508_identify_python( version = version )
     __.install_python_packages( context, context_options )
     from devshim.packages import (
         calculate_python_packages_fixtures,
@@ -534,7 +538,8 @@ def _get_wheel_path( ):
 def make_html( context ):
     ''' Generates documentation as HTML artifacts. '''
     __.render_boxed_title( 'Artifact: Documentation' )
-    __.unlink_recursively( __.paths.artifacts.sphinx_html )
+    from devshim.fs_utilities import unlink_recursively
+    unlink_recursively( __.paths.artifacts.sphinx_html )
     context.run(
         f"sphinx-build -b html {__.sphinx_options} "
         f"{__.paths.sources.prj.sphinx} {__.paths.artifacts.sphinx_html}",
