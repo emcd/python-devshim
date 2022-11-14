@@ -46,13 +46,13 @@ class __( metaclass = _NamespaceClass ):
         install_python_packages,
     )
     from .platforms import freshen_python
-    from .versions import Version
     from devshim.base import on_tty
     from devshim.environments import (
         derive_venv_context_options,
         test_package_executable,
     )
     from devshim.locations import paths
+    from devshim.packages import Version
     from devshim.platforms import calculate_python_versions
     from devshim.project import (
         discover_project_name,

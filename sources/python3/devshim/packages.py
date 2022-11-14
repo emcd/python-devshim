@@ -364,3 +364,79 @@ _pep508_requirement_name_regex = _regex_compile( r'''^([\w\-]+)(.*)$''' )
 def _pep508_requirement_to_name( requirement ):
     return _pep508_requirement_name_regex.match(
         requirement ).group( 1 ).replace( '-', '_' )
+
+
+class Version:
+    ''' Version manager.
+
+        Compatible with the version scheme laid forth in
+        `PEP 440 <https://www.python.org/dev/peps/pep-0440/#version-scheme>`_.
+
+        Core Format: ``{{major}}.{{minor}}``
+        Release amendments extend the core format by appending
+        ``.{{amendment}}``.
+        Development prereleases extend the core format by appending
+        ``a{{timestamp:yyyymmddHHMM}}``.
+        Release candidates extend the core format by appending
+        ``rc{{candidate}}``, where ``candidate`` starts at ``1`` and increases
+        by one upon each increment. '''
+
+    @classmethod
+    def from_string( kind, version ):
+        ''' Constructs a version object by parsing it from a string. '''
+        from re import match
+        matched = match(
+            r"(?P<major>\d+)\.(?P<minor>\d+)"
+            r"(?:\.(?P<patch>\d+)"
+            r"|(?P<stage>a|rc)(?:"
+            r"(?:(?<=a)(?P<ts>\d{12}))|(?:(?<=rc)(?P<rc>\d+))"
+            r"))", version )
+        stage = matched.group( 'stage' ) or 'f'
+        patch = (
+            matched.group( 'ts' ) if 'a' == stage
+            else (
+                matched.group( 'rc' ) if 'rc' == stage
+                else matched.group( 'patch' ) ) )
+        return kind(
+            stage, matched.group( 'major' ), matched.group( 'minor' ), patch )
+
+    def __init__( self, stage, major, minor, patch ):
+        if stage not in ( 'a', 'rc', 'f' ):
+            # TODO: Use 'expire' instead of 'invoke.Exit'.
+            from invoke import Exit
+            raise Exit( f"Bad stage: {stage}" )
+        self.stage = stage
+        self.major = int( major )
+        self.minor = int( minor )
+        self.patch = int( patch )
+
+    def __str__( self ):
+        stage, patch = self.stage, self.patch
+        return ''.join( filter( None, (
+            f"{self.major}", f".{self.minor}",
+            f".{patch}" if 'f' == stage else '',
+            f"{stage}{patch}" if stage in ( 'a', 'rc' ) else '' ) ) )
+
+    def as_bumped( self, piece ):
+        ''' Returns a derivative of the version,
+            altered according to current state and desired modification. '''
+        # TODO: Use 'expire' instead of 'invoke.Exit'.
+        from invoke import Exit
+        Version_ = type( self )
+        stage, major, minor, patch = (
+            self.stage, self.major, self.minor, self.patch )
+        if 'stage' == piece:
+            if 'a' == stage: return Version_( 'rc', major, minor, 1 )
+            if 'rc' == stage: return Version_( 'f', major, minor, 0 )
+            raise Exit( 'Cannot bump last stage.' )
+        from datetime import datetime as DateTime
+        timestamp = DateTime.utcnow( ).strftime( '%Y%m%d%H%M' )
+        if 'patch' == piece:
+            if 'a' == stage:
+                return Version_( 'a', major, minor, timestamp )
+            return Version_( stage, major, minor, patch + 1 )
+        if 'major' == piece:
+            return Version_( 'a', major + 1, 0, timestamp )
+        if 'minor' == piece:
+            return Version_( 'a', major, minor + 1, timestamp )
+        raise Exit( f"Unknown kind of piece: {piece}" )
