@@ -83,8 +83,9 @@ def standard_execute_external( command_specification, **nomargs ):
     options = dict( capture_output = True, text = True )
     from subprocess import STDOUT, run # nosec B404
     from sys import stdout
-    if stdout is narration_target: options[ 'stderr' ] = STDOUT
     options.update( nomargs )
+    if not options[ 'capture_output' ] and stdout is narration_target:
+        options[ 'stderr' ] = STDOUT
     if { 'stdout', 'stderr' } & options.keys( ):
         options.pop( 'capture_output' )
     options.pop( 'check', None )
