@@ -23,24 +23,21 @@
 import typing as _typ
 
 
-def _select_narrative_functions( ):
-    ''' Selects which functions to use for diagnostic output. '''
+def _detect_ci_environment( ):
+    ''' Returns name of current continuous integration environment.
+
+        If none is detected, returns empty string.
+
+        This is not inteded to be used to Volkswagen test results. '''
     from os import environ as current_process_environment
-    from pprint import pprint
-    # If running in a Github Workflow,
-    # then use 'stdout' for properly interleaved output.
-    if 'CI' in current_process_environment: return print, pprint
-    from functools import partial as partial_function
-    from sys import stderr
-    return (
-        partial_function( print, file = stderr ),
-        partial_function( pprint, stream = stderr ),
-    )
+    if 'CI' in current_process_environment: return 'Github Actions'
+    return ''
 
-eprint, epprint = _select_narrative_functions( )
+#: Detected CI environment. Empty string if none detected.
+ci_environment = _detect_ci_environment( )
 
 
-def _detect_tty( ):
+def _probe_tty( ):
     ''' Detects if current process attached to a TTY.
 
         Boolean result can be used to decide whether to suppress the use of
@@ -50,19 +47,54 @@ def _detect_tty( ):
     return stderr.isatty( )
 
 #: Is current process attached to a TTY?
-on_tty = _detect_tty( )
+on_tty = _probe_tty( )
+
+
+def _select_narration_target( ):
+    ''' Selects which stream is target for narration and diagnostics. '''
+    from sys import stdout, stderr
+    # If in CI environment with a buffered pseudo-TTY,
+    # then use 'stdout' for properly interleaved output.
+    if ci_environment in ( 'Github Actions', ): return stdout
+    return stderr
+
+#: Target stream for narration and diagnostics.
+narration_target = _select_narration_target( )
+
+
+def _select_narrative_functions( ):
+    ''' Selects which functions to use for narration and diagnostics. '''
+    from pprint import pprint
+    from sys import stderr
+    if stderr is not narration_target: return print, pprint
+    from functools import partial as partial_function
+    return (
+        partial_function( print, file = stderr ),
+        partial_function( pprint, stream = stderr ),
+    )
+
+eprint, epprint = _select_narrative_functions( )
 
 
 def standard_execute_external( command_specification, **nomargs ):
     ''' Executes command specification in subprocess.
 
-        By default, raises exception on non-zero exit code. '''
-    # TODO: Merge 'stderr' to 'stdout' in CI environments.
+        Raises exception on non-zero exit code. '''
     options = dict( capture_output = True, text = True )
+    from subprocess import STDOUT, run # nosec B404
+    from sys import stdout
+    if stdout is narration_target: options[ 'stderr' ] = STDOUT
     options.update( nomargs )
-    from subprocess import run # nosec
+    if { 'stdout', 'stderr' } & options.keys( ):
+        options.pop( 'capture_output' )
+    options.pop( 'check', None )
+    if isinstance( command_specification, str ):
+        from shlex import split as split_command
+        command_specification = split_command( command_specification )
+    # TODO? Handle pseudo-TTY requests with 'ptyprocess.PtyProcess'.
+    # TODO? Intercept 'subprocess.SubprocessError'.
     # nosemgrep: scm-modules.semgrep-rules.python.lang.security.audit.dangerous-subprocess-use-audit
-    return run( command_specification, check = True, **options )
+    return run( command_specification, check = True, **options ) # nosec B603
 
 
 def _enumerate_exit_codes( ):
@@ -102,6 +134,7 @@ def expire( exit_name, message ) -> _typ.NoReturn:
         scribe.warning( f"Invalid exit code name {exit_name!r}." )
         exit_code = _exit_codes[ 'general failure' ]
     else: exit_code = _exit_codes[ exit_name ]
+    message = str( message )
     if 0 == exit_code: scribe.info( message )
     else: scribe.critical( message, stack_info = True, stacklevel = 2 )
     raise SystemExit( exit_code )
