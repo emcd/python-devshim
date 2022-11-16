@@ -45,7 +45,6 @@ class __( metaclass = _NamespaceClass ):
         execute_pip_with_requirements,
         install_python_packages,
     )
-    from .platforms import freshen_python
     from devshim.base import on_tty
     from devshim.environments import (
         derive_venv_context_options,
@@ -252,7 +251,7 @@ def freshen_python( context, version = None ):
     obsolete_identifiers = set( )
     version_replacements = { }
     for version_ in versions:
-        replacement, identifier = __.freshen_python( context, version_ )
+        replacement, identifier = _freshen_python( version_ )
         version_replacements.update( replacement )
         if None is not identifier: obsolete_identifiers.add( identifier )
     # Can only update record of local versions after they are installed.
@@ -264,6 +263,14 @@ def freshen_python( context, version = None ):
     # Erase packages fixtures for versions which are no longer extant.
     from devshim.packages import delete_python_packages_fixtures
     delete_python_packages_fixtures( obsolete_identifiers )
+
+
+def _freshen_python( version ):
+    ''' Updates supported Python minor version to latest patch. '''
+    from devshim.user_interface import render_boxed_title
+    render_boxed_title( 'Freshen: Python Version', supplement = version )
+    from devshim.platforms import freshen_python as freshen_python_
+    return freshen_python_( version )
 
 
 @__.task

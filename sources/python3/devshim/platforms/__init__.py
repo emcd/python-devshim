@@ -21,6 +21,48 @@
 ''' Management of development platforms. '''
 
 
+def freshen_python( original_version ):
+    ''' Updates supported Python minor version to latest patch.
+
+        This task requires Internet access and may take some time. '''
+    minor_version = _derive_python_minor_version( original_version )
+    successor_version = _derive_python_complete_version( minor_version )
+    from subprocess import SubprocessError # nosec B404
+    try:
+        original_identifier = pep508_identify_python(
+            version = original_version )
+    # Version may not be installed.
+    except SubprocessError: original_identifier = None
+    from ..base import standard_execute_external
+    standard_execute_external(
+        f"asdf install python {successor_version}", capture_output = False )
+    # Do not erase packages fixtures for extant versions.
+    successor_identifier = pep508_identify_python(
+        version = successor_version )
+    if original_identifier == successor_identifier: original_identifier = None
+    return { original_version: successor_version }, original_identifier
+
+
+def _derive_python_complete_version( minor_version ):
+    ''' Given a minor version, return the corresponding complete version. '''
+    from shlex import split as split_command
+    from ..base import standard_execute_external
+    return standard_execute_external(
+        ( *split_command( 'asdf latest python' ), minor_version )
+    ).stdout.strip( )
+
+
+def _derive_python_minor_version( version ):
+    ''' Given a full version, return the corresponding minor version. '''
+    from re import compile as regex_compile
+    minors_regex = regex_compile(
+        r'''^(?P<prefix>\w+(?:\d+\.\d+)?-)?(?P<minor>\d+\.\d+)\..*$''' )
+    groups = minors_regex.match( version ).groupdict( )
+    return "{prefix}{minor}".format(
+        prefix = groups.get( 'prefix' ) or '',
+        minor = groups[ 'minor' ] )
+
+
 def install_python_builder( ):
     ''' Install Python builder utility for platform, if one exists. '''
     from os import name as os_class
