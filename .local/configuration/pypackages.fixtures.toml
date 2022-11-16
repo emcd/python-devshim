@@ -995,10 +995,10 @@ digests = [
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "sphinx-copybutton"
-version = "0.5.0"
+version = "0.5.1"
 digests = [
-    "sha256:9684dec7434bd73f0eea58dda93f9bb879d24bff2d8b187b1f2ec08dfe7b5f48",
-    "sha256:a0c059daadd03c27ba750da534a92a63e7a36a7736dcf684f26ee346199787f6",
+    "sha256:0842851b5955087a7ec7fc870b622cb168618ad408dee42692e9a5c97d071da8",
+    "sha256:366251e28a6f6041514bfb5439425210418d6c750e98d3a695b73e56866a677a",
 ]
 
 [["cpython-3.10.8--linux--x86_64"]]
@@ -2260,10 +2260,10 @@ digests = [
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "sphinx-copybutton"
-version = "0.5.0"
+version = "0.5.1"
 digests = [
-    "sha256:9684dec7434bd73f0eea58dda93f9bb879d24bff2d8b187b1f2ec08dfe7b5f48",
-    "sha256:a0c059daadd03c27ba750da534a92a63e7a36a7736dcf684f26ee346199787f6",
+    "sha256:0842851b5955087a7ec7fc870b622cb168618ad408dee42692e9a5c97d071da8",
+    "sha256:366251e28a6f6041514bfb5439425210418d6c750e98d3a695b73e56866a677a",
 ]
 
 [["cpython-3.11.0--linux--x86_64"]]
@@ -3588,10 +3588,10 @@ digests = [
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "sphinx-copybutton"
-version = "0.5.0"
+version = "0.5.1"
 digests = [
-    "sha256:9684dec7434bd73f0eea58dda93f9bb879d24bff2d8b187b1f2ec08dfe7b5f48",
-    "sha256:a0c059daadd03c27ba750da534a92a63e7a36a7736dcf684f26ee346199787f6",
+    "sha256:0842851b5955087a7ec7fc870b622cb168618ad408dee42692e9a5c97d071da8",
+    "sha256:366251e28a6f6041514bfb5439425210418d6c750e98d3a695b73e56866a677a",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
@@ -4946,10 +4946,10 @@ digests = [
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "sphinx-copybutton"
-version = "0.5.0"
+version = "0.5.1"
 digests = [
-    "sha256:9684dec7434bd73f0eea58dda93f9bb879d24bff2d8b187b1f2ec08dfe7b5f48",
-    "sha256:a0c059daadd03c27ba750da534a92a63e7a36a7736dcf684f26ee346199787f6",
+    "sha256:0842851b5955087a7ec7fc870b622cb168618ad408dee42692e9a5c97d071da8",
+    "sha256:366251e28a6f6041514bfb5439425210418d6c750e98d3a695b73e56866a677a",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
@@ -6258,10 +6258,10 @@ digests = [
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "sphinx-copybutton"
-version = "0.5.0"
+version = "0.5.1"
 digests = [
-    "sha256:9684dec7434bd73f0eea58dda93f9bb879d24bff2d8b187b1f2ec08dfe7b5f48",
-    "sha256:a0c059daadd03c27ba750da534a92a63e7a36a7736dcf684f26ee346199787f6",
+    "sha256:0842851b5955087a7ec7fc870b622cb168618ad408dee42692e9a5c97d071da8",
+    "sha256:366251e28a6f6041514bfb5439425210418d6c750e98d3a695b73e56866a677a",
 ]
 
 [["cpython-3.9.15--linux--x86_64"]]
@@ -7457,10 +7457,10 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "sphinx-copybutton"
-version = "0.5.0"
+version = "0.5.1"
 digests = [
-    "sha256:9684dec7434bd73f0eea58dda93f9bb879d24bff2d8b187b1f2ec08dfe7b5f48",
-    "sha256:a0c059daadd03c27ba750da534a92a63e7a36a7736dcf684f26ee346199787f6",
+    "sha256:0842851b5955087a7ec7fc870b622cb168618ad408dee42692e9a5c97d071da8",
+    "sha256:366251e28a6f6041514bfb5439425210418d6c750e98d3a695b73e56866a677a",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -8687,10 +8687,10 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "sphinx-copybutton"
-version = "0.5.0"
+version = "0.5.1"
 digests = [
-    "sha256:9684dec7434bd73f0eea58dda93f9bb879d24bff2d8b187b1f2ec08dfe7b5f48",
-    "sha256:a0c059daadd03c27ba750da534a92a63e7a36a7736dcf684f26ee346199787f6",
+    "sha256:0842851b5955087a7ec7fc870b622cb168618ad408dee42692e9a5c97d071da8",
+    "sha256:366251e28a6f6041514bfb5439425210418d6c750e98d3a695b73e56866a677a",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -9979,10 +9979,10 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "sphinx-copybutton"
-version = "0.5.0"
+version = "0.5.1"
 digests = [
-    "sha256:9684dec7434bd73f0eea58dda93f9bb879d24bff2d8b187b1f2ec08dfe7b5f48",
-    "sha256:a0c059daadd03c27ba750da534a92a63e7a36a7736dcf684f26ee346199787f6",
+    "sha256:0842851b5955087a7ec7fc870b622cb168618ad408dee42692e9a5c97d071da8",
+    "sha256:366251e28a6f6041514bfb5439425210418d6c750e98d3a695b73e56866a677a",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
