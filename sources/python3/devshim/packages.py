@@ -21,9 +21,66 @@
 ''' Development support for packages. '''
 
 
+# Latent Dependencies:
+#   packages -> environments -> packages
+# pylint: disable=cyclic-import
+
+
 from re import compile as _regex_compile
 
 from .base import expire as _expire
+
+
+def install_python_packages( context_options, identifier = None ):
+    ''' Installs required Python packages into virtual environment. '''
+    from .base import standard_execute_external
+    raw, frozen, unpublished = generate_pip_requirements_text(
+        identifier = identifier )
+    standard_execute_external(
+        'pip install --upgrade setuptools pip wheel',
+        capture_output = False, env = context_options[ 'env' ] )
+    if not identifier or not frozen:
+        pip_options = [ ]
+        if not identifier:
+            pip_options.append( '--upgrade' )
+            pip_options.append( '--upgrade-strategy eager' )
+        execute_pip_with_requirements(
+            context_options, 'install', raw, pip_options = pip_options )
+    else:
+        pip_options = [ '--require-hashes' ]
+        execute_pip_with_requirements(
+            context_options, 'install', frozen, pip_options = pip_options )
+    if unpublished:
+        execute_pip_with_requirements(
+            context_options, 'install', unpublished )
+    # Pip cannot currently mix editable and digest-bound requirements,
+    # so we must install editable packages separately. (As of 2022-02-06.)
+    # https://github.com/pypa/pip/issues/4995
+    standard_execute_external(
+        'pip install --editable .',
+        capture_output = False, env = context_options[ 'env' ] )
+
+
+def execute_pip_with_requirements(
+    context_options, command, requirements, pip_options = None
+):
+    ''' Executes a Pip command with requirements. '''
+    pip_options = pip_options or ( )
+    from .base import standard_execute_external
+    # Unfortunately, Pip does not support reading requirements from stdin,
+    # as of 2022-01-02. To workaround, we need to write and then read
+    # a temporary file. More details: https://github.com/pypa/pip/issues/7822
+    from shlex import quote as shell_quote
+    from tempfile import NamedTemporaryFile
+    with NamedTemporaryFile( mode = 'w+' ) as requirements_file:
+        requirements_file.write( requirements )
+        requirements_file.flush( )
+        standard_execute_external(
+            "pip {command} {options} --requirement {requirements_file}".format(
+                command = command,
+                options = ' '.join( pip_options ),
+                requirements_file = shell_quote( requirements_file.name ) ),
+            capture_output = False, env = context_options[ 'env' ] )
 
 
 def generate_pip_requirements_text( identifier = None ):

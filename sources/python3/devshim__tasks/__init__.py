@@ -40,11 +40,6 @@ class __( metaclass = _NamespaceClass ):
     from invoke import Exit, Failure, call, task
     from lockup import reclassify_module
 
-    from .environments import build_python_venv
-    from .packages import (
-        execute_pip_with_requirements,
-        install_python_packages,
-    )
     from devshim.base import on_tty
     from devshim.environments import (
         derive_venv_context_options,
@@ -112,7 +107,15 @@ def build_python_venv( context, version, overwrite = False ):
         If version is 'ALL', then all supported versions are targeted. '''
     for version_ in __.calculate_python_versions( version ):
         _install_python( context, version_ )
-        __.build_python_venv( context, version_, overwrite = overwrite )
+        _build_python_venv( version_, overwrite = overwrite )
+
+
+def _build_python_venv( version, overwrite = False ):
+    ''' Creates virtual environment for requested Python version. '''
+    from devshim.user_interface import render_boxed_title
+    render_boxed_title( f"Build: Python Virtual Environment ({version})" )
+    from devshim.environments import build_python_venv as build_python_venv_
+    build_python_venv_( version, overwrite = overwrite )
 
 
 @__.task(
@@ -170,15 +173,15 @@ def clean_tool_caches( context, include_development_support = False ): # pylint:
 
 
 @__.task
-def clean_python_packages( context, version = None ):
+def clean_python_packages( context, version = None ): # pylint: disable=unused-argument
     ''' Removes unused Python packages.
 
         If version is 'ALL', then all virtual environments are targeted. '''
     for version_ in __.calculate_python_versions( version ):
-        _clean_python_packages( context, version = version_ )
+        _clean_python_packages( version = version_ )
 
 
-def _clean_python_packages( context, version = None ):
+def _clean_python_packages( version = None ):
     ''' Removes unused Python packages in virtual environment. '''
     __.render_boxed_title(
         'Clean: Unused Python Packages', supplement = version )
@@ -186,6 +189,7 @@ def _clean_python_packages( context, version = None ):
     from devshim.platforms import pep508_identify_python
     identifier = pep508_identify_python( version = version )
     from devshim.packages import (
+        execute_pip_with_requirements,
         indicate_current_python_packages,
         indicate_python_packages,
     )
@@ -198,8 +202,8 @@ def _clean_python_packages( context, version = None ):
     requirements_text = '\n'.join(
         installed - requested - { __.project_name } )
     if not requirements_text: return
-    __.execute_pip_with_requirements(
-        context, context_options, 'uninstall', requirements_text,
+    execute_pip_with_requirements(
+        context_options, 'uninstall', requirements_text,
         pip_options = ( '--yes', ) )
 
 
@@ -289,11 +293,12 @@ def _freshen_python_packages( context, version = None ):
     context_options = __.derive_venv_context_options( version = version )
     from devshim.platforms import pep508_identify_python
     identifier = pep508_identify_python( version = version )
-    __.install_python_packages( context, context_options )
     from devshim.packages import (
         calculate_python_packages_fixtures,
+        install_python_packages,
         record_python_packages_fixtures,
     )
+    install_python_packages( context_options )
     fixtures = calculate_python_packages_fixtures( context_options[ 'env' ] )
     record_python_packages_fixtures( identifier, fixtures )
     check_security_issues( context, version = version )

@@ -21,12 +21,47 @@
 ''' Development support for virtual environments. '''
 
 
+# Latent Dependencies:
+#   environments -> packages -> environments
+# pylint: disable=cyclic-import
+
+
 def _probe_our_python_environment( ):
     ''' Is execution within Python environment created by this package? '''
     from os import environ as current_process_environment
     return 'OUR_VENV_NAME' in current_process_environment
 
 in_our_python_environment = _probe_our_python_environment( )
+
+
+def build_python_venv( version, overwrite = False ):
+    ''' Creates virtual environment for requested Python version. '''
+    from .platforms import detect_vmgr_python_path
+    python_path = detect_vmgr_python_path( version )
+    from .fs_utilities import ensure_directory
+    venv_path = ensure_directory( derive_venv_path( version, python_path ) )
+    venv_options = [ ]
+    if overwrite: venv_options.append( '--clear' )
+    venv_options_str = ' '.join( venv_options )
+    from .base import standard_execute_external
+    standard_execute_external(
+        f"{python_path} -m venv {venv_options_str} {venv_path}",
+        capture_output = False )
+    _install_packages_into_venv( version, venv_path )
+
+
+def _install_packages_into_venv( version, venv_path ):
+    context_options = derive_venv_context_options( venv_path )
+    from .packages import (
+        calculate_python_packages_fixtures,
+        install_python_packages,
+        record_python_packages_fixtures,
+    )
+    install_python_packages( context_options )
+    fixtures = calculate_python_packages_fixtures( context_options[ 'env' ] )
+    from .platforms import pep508_identify_python
+    identifier = pep508_identify_python( version = version )
+    record_python_packages_fixtures( identifier, fixtures )
 
 
 def test_package_executable(
