@@ -17,12 +17,10 @@
 #                                                                            #
 #============================================================================#
 
-''' Project maintenance tasks.
-
-    `Invoke Documentation <http://docs.pyinvoke.org/en/stable/index.html>`_ '''
+''' Project maintenance tasks. '''
 
 
-from devshim.base import assert_sanity as _assert_sanity
+from .base import assert_sanity as _assert_sanity
 _assert_sanity( )
 
 
@@ -40,19 +38,19 @@ class __( metaclass = _NamespaceClass ):
     from invoke import Exit, Failure, call, task
     from lockup import reclassify_module
 
-    from devshim.base import on_tty
-    from devshim.environments import (
+    from .base import on_tty
+    from .environments import (
         derive_venv_context_options,
         test_package_executable,
     )
-    from devshim.locations import paths
-    from devshim.packages import Version
-    from devshim.platforms import calculate_python_versions
-    from devshim.project import (
+    from .locations import paths
+    from .packages import Version
+    from .platforms import calculate_python_versions
+    from .project import (
         discover_project_name,
         discover_project_version,
     )
-    from devshim.user_interface import (
+    from .user_interface import (
         assert_gpg_tty,
         render_boxed_title,
     )
@@ -70,7 +68,7 @@ def ease(
     with_completions = False
 ):
     ''' Prints shell functions for easy invocation of development shim. '''
-    from devshim.user_interface import generate_cli_functions
+    from .user_interface import generate_cli_functions
     print( generate_cli_functions(
         shell_name, function_name, with_completions ) )
 
@@ -112,9 +110,9 @@ def build_python_venv( context, version, overwrite = False ):
 
 def _build_python_venv( version, overwrite = False ):
     ''' Creates virtual environment for requested Python version. '''
-    from devshim.user_interface import render_boxed_title
+    from .user_interface import render_boxed_title
     render_boxed_title( f"Build: Python Virtual Environment ({version})" )
-    from devshim.environments import build_python_venv as build_python_venv_
+    from .environments import build_python_venv as build_python_venv_
     build_python_venv_( version, overwrite = overwrite )
 
 
@@ -132,7 +130,7 @@ def bootstrap( context ): # pylint: disable=unused-argument
 def clean_pycaches( context ): # pylint: disable=unused-argument
     ''' Removes all caches of compiled CPython bytecode. '''
     __.render_boxed_title( 'Clean: Python Caches' )
-    from devshim.fs_utilities import unlink_recursively
+    from .fs_utilities import unlink_recursively
     anchors = (
         __.paths.sources.aux.python3,
         __.paths.sources.prj.python3,
@@ -151,7 +149,7 @@ def clean_tool_caches( context, include_development_support = False ): # pylint:
     anchors = __.paths.caches.SELF.glob( '*' )
     ignorable_paths = set( __.paths.caches.SELF.glob( '*/.gitignore' ) )
     if not include_development_support:
-        from devshim.platforms import active_python_abi_label
+        from .platforms import active_python_abi_label
         ds_path = __.paths.caches.packages.python3 / active_python_abi_label
         ignorable_paths.add( __.paths.caches.packages.python3 )
         ignorable_paths.add( ds_path )
@@ -168,8 +166,8 @@ def clean_tool_caches( context, include_development_support = False ): # pylint:
     while dirs_stack: dirs_stack.pop( ).rmdir( )
     # Regnerate development support packages cache, if necessary.
     if include_development_support:
-        from devshim.packages import ensure_python_support_packages
-        ensure_python_support_packages( )
+        from .packages import ensure_python_packages
+        ensure_python_packages( domain = 'development' )
 
 
 @__.task
@@ -186,9 +184,9 @@ def _clean_python_packages( version = None ):
     __.render_boxed_title(
         'Clean: Unused Python Packages', supplement = version )
     context_options = __.derive_venv_context_options( version = version )
-    from devshim.platforms import pep508_identify_python
+    from .platforms import pep508_identify_python
     identifier = pep508_identify_python( version = version )
-    from devshim.packages import (
+    from .packages import (
         execute_pip_with_requirements,
         indicate_current_python_packages,
         indicate_python_packages,
@@ -234,7 +232,7 @@ def freshen_asdf( context ):
     context.run( 'asdf update', pty = __.on_tty )
     context.run( 'asdf plugin update python', pty = __.on_tty )
     # TODO: Preserve this call after 'freshen_asdf' has been removed.
-    from devshim.platforms import install_python_builder
+    from .platforms import install_python_builder
     install_python_builder( )
 
 
@@ -245,7 +243,7 @@ def freshen_python( context, version = None ):
         If version is 'ALL', then all supported Pythons are targeted.
 
         This task requires Internet access and may take some time. '''
-    from devshim.platforms import (
+    from .platforms import (
         detect_vmgr_python_version,
         indicate_python_versions_support,
     )
@@ -265,15 +263,15 @@ def freshen_python( context, version = None ):
     context.run( "asdf local python {versions}".format(
         versions = ' '.join( successor_versions ) ), pty = True )
     # Erase packages fixtures for versions which are no longer extant.
-    from devshim.packages import delete_python_packages_fixtures
+    from .packages import delete_python_packages_fixtures
     delete_python_packages_fixtures( obsolete_identifiers )
 
 
 def _freshen_python( version ):
     ''' Updates supported Python minor version to latest patch. '''
-    from devshim.user_interface import render_boxed_title
+    from .user_interface import render_boxed_title
     render_boxed_title( 'Freshen: Python Version', supplement = version )
-    from devshim.platforms import freshen_python as freshen_python_
+    from .platforms import freshen_python as freshen_python_
     return freshen_python_( version )
 
 
@@ -291,9 +289,9 @@ def _freshen_python_packages( context, version = None ):
     __.render_boxed_title(
         'Freshen: Python Package Versions', supplement = version )
     context_options = __.derive_venv_context_options( version = version )
-    from devshim.platforms import pep508_identify_python
+    from .platforms import pep508_identify_python
     identifier = pep508_identify_python( version = version )
-    from devshim.packages import (
+    from .packages import (
         calculate_python_packages_fixtures,
         install_python_packages,
         record_python_packages_fixtures,
@@ -550,7 +548,7 @@ def _get_wheel_path( ):
 def make_html( context ):
     ''' Generates documentation as HTML artifacts. '''
     __.render_boxed_title( 'Artifact: Documentation' )
-    from devshim.fs_utilities import unlink_recursively
+    from .fs_utilities import unlink_recursively
     unlink_recursively( __.paths.artifacts.sphinx_html )
     context.run(
         f"sphinx-build -b html {__.sphinx_options} "
@@ -692,7 +690,7 @@ def check_pypi_integrity( context, version = None, index_url = '' ):
         This task requires Internet access and may take some time. '''
     version = version or __.discover_project_version( )
     __.render_boxed_title( f"Verify: Python Package Integrity ({version})" )
-    from devshim.packages import retrieve_pypi_release_information
+    from .packages import retrieve_pypi_release_information
     release_info = retrieve_pypi_release_information(
         __.project_name, version, index_url = index_url )
     for package_info in release_info:
@@ -702,7 +700,7 @@ def check_pypi_integrity( context, version = None, index_url = '' ):
         check_pypi_package( context, url )
 
 
-# TODO: Move to 'devshim.packages' and separate retry logic from fetch logic.
+# TODO: Move to '.packages' and separate retry logic from fetch logic.
 def check_pypi_package( context, package_url ):
     ''' Verifies signature on package. '''
     __.assert_gpg_tty( )

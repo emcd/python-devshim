@@ -120,8 +120,8 @@ def main( ):
     ''' Entrypoint for development activity. '''
     configure( )
     from invoke import Collection, Program
-    import devshim__tasks
-    program = Program( namespace = Collection.from_module( devshim__tasks ) )
+    from devshim import tasks
+    program = Program( namespace = Collection.from_module( tasks ) )
     program.run( )
 
 

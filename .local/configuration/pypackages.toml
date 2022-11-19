@@ -31,10 +31,12 @@ comments = [
 ]
 
 [[development.lint]]
-requirement = 'mypy; implementation_name != "pypy" or python_version >= "3.8"'
+requirement = 'mypy >= 0.991; implementation_name != "pypy" or python_version >= "3.8"'
 comments = [
   ''' Mypy relies on 'typed_ast', which does not build under PyPy 3.7.
       https://github.com/python/typed_ast/issues/111 ''',
+  ''' Mypy 0.990 crashes upon encounter with lockup.NamespaceClass
+      instances. ''',
 ]
 
 [[development.lint]]
