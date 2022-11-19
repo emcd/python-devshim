@@ -394,10 +394,10 @@ digests = [
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "identify"
-version = "2.5.8"
+version = "2.5.9"
 digests = [
-    "sha256:48b7925fe122720088aeb7a6c34f17b27e706b72c61070f27fe3789094233440",
-    "sha256:7a214a10313b9489a0d61467db2856ae8d0b8306fc923e03a9effa53d8aedc58",
+    "sha256:a390fb696e164dbddb047a0db26e57972ae52fbd037ae68797e5ae2f4492485d",
+    "sha256:906036344ca769539610436e40a684e170c3648b552194980bb7b617a8daeb9f",
 ]
 
 [["cpython-3.10.8--linux--x86_64"]]
@@ -921,12 +921,12 @@ digests = [
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "semgrep"
-version = "0.121.2"
+version = "0.122.0"
 digests = [
-    "sha256:7bb9438d375a546b1961444bdfaa0d9bb2620d1be0ee91400a3e45f9dc26b931",
-    "sha256:6672f2b53f4cb617aaa085be07f1f5cbe94560a7b96f0fbce60ea8f326dbc076",
-    "sha256:3541612d78733ec9aee299f0c4cec7a4ef5163cb5349f82080c82e938e127d99",
-    "sha256:075b6d33061a648799edb044f0245a9e510cc775a1c5ce77a20fb21c06773689",
+    "sha256:c7002b9aba97deb6677f4cabfa5dcc8faef2808ce6a6f28ecdd70cd8e90b01b5",
+    "sha256:e3fb9956e2bb926cfeff52deafe4cec24d5f1e91fe6d3fc4f81e86ec452b2ad5",
+    "sha256:6116391b0c8c87581d9d72113702b6f8c2938d799cdae7d71a845ec89249566c",
+    "sha256:a4c7400eb8bec9fe8df25520d1ffcb5d78b87c73dc654f1c2aec1195789bc611",
 ]
 
 [["cpython-3.10.8--linux--x86_64"]]
@@ -1698,10 +1698,10 @@ digests = [
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "identify"
-version = "2.5.8"
+version = "2.5.9"
 digests = [
-    "sha256:48b7925fe122720088aeb7a6c34f17b27e706b72c61070f27fe3789094233440",
-    "sha256:7a214a10313b9489a0d61467db2856ae8d0b8306fc923e03a9effa53d8aedc58",
+    "sha256:a390fb696e164dbddb047a0db26e57972ae52fbd037ae68797e5ae2f4492485d",
+    "sha256:906036344ca769539610436e40a684e170c3648b552194980bb7b617a8daeb9f",
 ]
 
 [["cpython-3.11.0--linux--x86_64"]]
@@ -2186,12 +2186,12 @@ digests = [
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "semgrep"
-version = "0.121.2"
+version = "0.122.0"
 digests = [
-    "sha256:7bb9438d375a546b1961444bdfaa0d9bb2620d1be0ee91400a3e45f9dc26b931",
-    "sha256:6672f2b53f4cb617aaa085be07f1f5cbe94560a7b96f0fbce60ea8f326dbc076",
-    "sha256:3541612d78733ec9aee299f0c4cec7a4ef5163cb5349f82080c82e938e127d99",
-    "sha256:075b6d33061a648799edb044f0245a9e510cc775a1c5ce77a20fb21c06773689",
+    "sha256:c7002b9aba97deb6677f4cabfa5dcc8faef2808ce6a6f28ecdd70cd8e90b01b5",
+    "sha256:e3fb9956e2bb926cfeff52deafe4cec24d5f1e91fe6d3fc4f81e86ec452b2ad5",
+    "sha256:6116391b0c8c87581d9d72113702b6f8c2938d799cdae7d71a845ec89249566c",
+    "sha256:a4c7400eb8bec9fe8df25520d1ffcb5d78b87c73dc654f1c2aec1195789bc611",
 ]
 
 [["cpython-3.11.0--linux--x86_64"]]
@@ -2971,10 +2971,10 @@ digests = [
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "identify"
-version = "2.5.8"
+version = "2.5.9"
 digests = [
-    "sha256:48b7925fe122720088aeb7a6c34f17b27e706b72c61070f27fe3789094233440",
-    "sha256:7a214a10313b9489a0d61467db2856ae8d0b8306fc923e03a9effa53d8aedc58",
+    "sha256:a390fb696e164dbddb047a0db26e57972ae52fbd037ae68797e5ae2f4492485d",
+    "sha256:906036344ca769539610436e40a684e170c3648b552194980bb7b617a8daeb9f",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
@@ -3514,12 +3514,12 @@ digests = [
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "semgrep"
-version = "0.121.2"
+version = "0.122.0"
 digests = [
-    "sha256:7bb9438d375a546b1961444bdfaa0d9bb2620d1be0ee91400a3e45f9dc26b931",
-    "sha256:6672f2b53f4cb617aaa085be07f1f5cbe94560a7b96f0fbce60ea8f326dbc076",
-    "sha256:3541612d78733ec9aee299f0c4cec7a4ef5163cb5349f82080c82e938e127d99",
-    "sha256:075b6d33061a648799edb044f0245a9e510cc775a1c5ce77a20fb21c06773689",
+    "sha256:c7002b9aba97deb6677f4cabfa5dcc8faef2808ce6a6f28ecdd70cd8e90b01b5",
+    "sha256:e3fb9956e2bb926cfeff52deafe4cec24d5f1e91fe6d3fc4f81e86ec452b2ad5",
+    "sha256:6116391b0c8c87581d9d72113702b6f8c2938d799cdae7d71a845ec89249566c",
+    "sha256:a4c7400eb8bec9fe8df25520d1ffcb5d78b87c73dc654f1c2aec1195789bc611",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
@@ -4329,10 +4329,10 @@ digests = [
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "identify"
-version = "2.5.8"
+version = "2.5.9"
 digests = [
-    "sha256:48b7925fe122720088aeb7a6c34f17b27e706b72c61070f27fe3789094233440",
-    "sha256:7a214a10313b9489a0d61467db2856ae8d0b8306fc923e03a9effa53d8aedc58",
+    "sha256:a390fb696e164dbddb047a0db26e57972ae52fbd037ae68797e5ae2f4492485d",
+    "sha256:906036344ca769539610436e40a684e170c3648b552194980bb7b617a8daeb9f",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
@@ -4872,12 +4872,12 @@ digests = [
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "semgrep"
-version = "0.121.2"
+version = "0.122.0"
 digests = [
-    "sha256:7bb9438d375a546b1961444bdfaa0d9bb2620d1be0ee91400a3e45f9dc26b931",
-    "sha256:6672f2b53f4cb617aaa085be07f1f5cbe94560a7b96f0fbce60ea8f326dbc076",
-    "sha256:3541612d78733ec9aee299f0c4cec7a4ef5163cb5349f82080c82e938e127d99",
-    "sha256:075b6d33061a648799edb044f0245a9e510cc775a1c5ce77a20fb21c06773689",
+    "sha256:c7002b9aba97deb6677f4cabfa5dcc8faef2808ce6a6f28ecdd70cd8e90b01b5",
+    "sha256:e3fb9956e2bb926cfeff52deafe4cec24d5f1e91fe6d3fc4f81e86ec452b2ad5",
+    "sha256:6116391b0c8c87581d9d72113702b6f8c2938d799cdae7d71a845ec89249566c",
+    "sha256:a4c7400eb8bec9fe8df25520d1ffcb5d78b87c73dc654f1c2aec1195789bc611",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
@@ -5657,10 +5657,10 @@ digests = [
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "identify"
-version = "2.5.8"
+version = "2.5.9"
 digests = [
-    "sha256:48b7925fe122720088aeb7a6c34f17b27e706b72c61070f27fe3789094233440",
-    "sha256:7a214a10313b9489a0d61467db2856ae8d0b8306fc923e03a9effa53d8aedc58",
+    "sha256:a390fb696e164dbddb047a0db26e57972ae52fbd037ae68797e5ae2f4492485d",
+    "sha256:906036344ca769539610436e40a684e170c3648b552194980bb7b617a8daeb9f",
 ]
 
 [["cpython-3.9.15--linux--x86_64"]]
@@ -6184,12 +6184,12 @@ digests = [
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "semgrep"
-version = "0.121.2"
+version = "0.122.0"
 digests = [
-    "sha256:7bb9438d375a546b1961444bdfaa0d9bb2620d1be0ee91400a3e45f9dc26b931",
-    "sha256:6672f2b53f4cb617aaa085be07f1f5cbe94560a7b96f0fbce60ea8f326dbc076",
-    "sha256:3541612d78733ec9aee299f0c4cec7a4ef5163cb5349f82080c82e938e127d99",
-    "sha256:075b6d33061a648799edb044f0245a9e510cc775a1c5ce77a20fb21c06773689",
+    "sha256:c7002b9aba97deb6677f4cabfa5dcc8faef2808ce6a6f28ecdd70cd8e90b01b5",
+    "sha256:e3fb9956e2bb926cfeff52deafe4cec24d5f1e91fe6d3fc4f81e86ec452b2ad5",
+    "sha256:6116391b0c8c87581d9d72113702b6f8c2938d799cdae7d71a845ec89249566c",
+    "sha256:a4c7400eb8bec9fe8df25520d1ffcb5d78b87c73dc654f1c2aec1195789bc611",
 ]
 
 [["cpython-3.9.15--linux--x86_64"]]
@@ -6970,10 +6970,10 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "identify"
-version = "2.5.8"
+version = "2.5.9"
 digests = [
-    "sha256:48b7925fe122720088aeb7a6c34f17b27e706b72c61070f27fe3789094233440",
-    "sha256:7a214a10313b9489a0d61467db2856ae8d0b8306fc923e03a9effa53d8aedc58",
+    "sha256:a390fb696e164dbddb047a0db26e57972ae52fbd037ae68797e5ae2f4492485d",
+    "sha256:906036344ca769539610436e40a684e170c3648b552194980bb7b617a8daeb9f",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -7383,12 +7383,12 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "semgrep"
-version = "0.121.2"
+version = "0.122.0"
 digests = [
-    "sha256:7bb9438d375a546b1961444bdfaa0d9bb2620d1be0ee91400a3e45f9dc26b931",
-    "sha256:6672f2b53f4cb617aaa085be07f1f5cbe94560a7b96f0fbce60ea8f326dbc076",
-    "sha256:3541612d78733ec9aee299f0c4cec7a4ef5163cb5349f82080c82e938e127d99",
-    "sha256:075b6d33061a648799edb044f0245a9e510cc775a1c5ce77a20fb21c06773689",
+    "sha256:c7002b9aba97deb6677f4cabfa5dcc8faef2808ce6a6f28ecdd70cd8e90b01b5",
+    "sha256:e3fb9956e2bb926cfeff52deafe4cec24d5f1e91fe6d3fc4f81e86ec452b2ad5",
+    "sha256:6116391b0c8c87581d9d72113702b6f8c2938d799cdae7d71a845ec89249566c",
+    "sha256:a4c7400eb8bec9fe8df25520d1ffcb5d78b87c73dc654f1c2aec1195789bc611",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -8107,10 +8107,10 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "identify"
-version = "2.5.8"
+version = "2.5.9"
 digests = [
-    "sha256:48b7925fe122720088aeb7a6c34f17b27e706b72c61070f27fe3789094233440",
-    "sha256:7a214a10313b9489a0d61467db2856ae8d0b8306fc923e03a9effa53d8aedc58",
+    "sha256:a390fb696e164dbddb047a0db26e57972ae52fbd037ae68797e5ae2f4492485d",
+    "sha256:906036344ca769539610436e40a684e170c3648b552194980bb7b617a8daeb9f",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -8613,12 +8613,12 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "semgrep"
-version = "0.121.2"
+version = "0.122.0"
 digests = [
-    "sha256:7bb9438d375a546b1961444bdfaa0d9bb2620d1be0ee91400a3e45f9dc26b931",
-    "sha256:6672f2b53f4cb617aaa085be07f1f5cbe94560a7b96f0fbce60ea8f326dbc076",
-    "sha256:3541612d78733ec9aee299f0c4cec7a4ef5163cb5349f82080c82e938e127d99",
-    "sha256:075b6d33061a648799edb044f0245a9e510cc775a1c5ce77a20fb21c06773689",
+    "sha256:c7002b9aba97deb6677f4cabfa5dcc8faef2808ce6a6f28ecdd70cd8e90b01b5",
+    "sha256:e3fb9956e2bb926cfeff52deafe4cec24d5f1e91fe6d3fc4f81e86ec452b2ad5",
+    "sha256:6116391b0c8c87581d9d72113702b6f8c2938d799cdae7d71a845ec89249566c",
+    "sha256:a4c7400eb8bec9fe8df25520d1ffcb5d78b87c73dc654f1c2aec1195789bc611",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -9415,10 +9415,10 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "identify"
-version = "2.5.8"
+version = "2.5.9"
 digests = [
-    "sha256:48b7925fe122720088aeb7a6c34f17b27e706b72c61070f27fe3789094233440",
-    "sha256:7a214a10313b9489a0d61467db2856ae8d0b8306fc923e03a9effa53d8aedc58",
+    "sha256:a390fb696e164dbddb047a0db26e57972ae52fbd037ae68797e5ae2f4492485d",
+    "sha256:906036344ca769539610436e40a684e170c3648b552194980bb7b617a8daeb9f",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
@@ -9905,12 +9905,12 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "semgrep"
-version = "0.121.2"
+version = "0.122.0"
 digests = [
-    "sha256:7bb9438d375a546b1961444bdfaa0d9bb2620d1be0ee91400a3e45f9dc26b931",
-    "sha256:6672f2b53f4cb617aaa085be07f1f5cbe94560a7b96f0fbce60ea8f326dbc076",
-    "sha256:3541612d78733ec9aee299f0c4cec7a4ef5163cb5349f82080c82e938e127d99",
-    "sha256:075b6d33061a648799edb044f0245a9e510cc775a1c5ce77a20fb21c06773689",
+    "sha256:c7002b9aba97deb6677f4cabfa5dcc8faef2808ce6a6f28ecdd70cd8e90b01b5",
+    "sha256:e3fb9956e2bb926cfeff52deafe4cec24d5f1e91fe6d3fc4f81e86ec452b2ad5",
+    "sha256:6116391b0c8c87581d9d72113702b6f8c2938d799cdae7d71a845ec89249566c",
+    "sha256:a4c7400eb8bec9fe8df25520d1ffcb5d78b87c73dc654f1c2aec1195789bc611",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
