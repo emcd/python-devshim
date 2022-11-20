@@ -88,3 +88,23 @@ Quick Tour
       upload-github-pages       Publishes Sphinx HTML output to Github Pages for project.
       upload-pypi               Publishes current sdist and wheels to PyPI.
       upload-test-pypi          Publishes current sdist and wheels to Test PyPI.
+
+`More Flair <https://www.imdb.com/title/tt0151804/characters/nm0431918>`_
+===============================================================================
+...than the required minimum
+
+.. image:: https://img.shields.io/github/last-commit/emcd/python-lockup
+   :alt: GitHub last commit
+   :target: https://github.com/emcd/python-lockup
+
+.. image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit
+   :alt: pre-commit
+   :target: https://github.com/pre-commit/pre-commit
+
+.. image:: https://img.shields.io/badge/security-bandit-yellow.svg
+   :alt: Security Status
+   :target: https://github.com/PyCQA/bandit
+
+.. image:: https://img.shields.io/badge/linting-pylint-yellowgreen
+   :alt: Static Analysis Status
+   :target: https://github.com/PyCQA/pylint
