@@ -93,9 +93,9 @@ Quick Tour
 ===============================================================================
 ...than the required minimum
 
-.. image:: https://img.shields.io/github/last-commit/emcd/python-lockup
+.. image:: https://img.shields.io/github/last-commit/emcd/python-devshim
    :alt: GitHub last commit
-   :target: https://github.com/emcd/python-lockup
+   :target: https://github.com/emcd/python-devshim
 
 .. image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit
    :alt: pre-commit
