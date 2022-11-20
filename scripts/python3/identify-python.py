@@ -17,10 +17,13 @@
 #                                                                            #
 #============================================================================#
 
+# pylint: disable=invalid-name
+
 ''' Reports Python compatibility identifier. '''
 
 
 def main( ):
+    ''' Prints identifier label for active Python process. '''
     _setup_python_search_paths( )
     from argparse import ArgumentParser
     from devshim.platforms.identity import dispatch_table

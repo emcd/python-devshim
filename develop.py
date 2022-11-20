@@ -86,8 +86,9 @@ def _attempt_clone_scm_modules( project_path ):
             'Git must be installed to use development support tools.' )
     from logging import info
     info( 'Cloning SCM modules to get development support tools.' )
-    from subprocess import run
-    run(
+    from subprocess import run # nosec: B404
+    # nosemgrep: scm-modules.semgrep-rules.python.lang.security.audit.dangerous-subprocess-use-audit
+    run( # nosec: B603
         ( git_path, *'submodule update --init --recursive'.split( ' ' ) ),
         capture_output = True, check = True, cwd = project_path, text = True )
 

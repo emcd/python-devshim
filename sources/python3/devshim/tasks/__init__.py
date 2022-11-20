@@ -126,7 +126,12 @@ def install_git_hooks( context ):
     ''' Installs hooks to check goodness of code changes before commit. '''
     context.run(
         f"pre-commit install --config {__.paths.configuration.pre_commit} "
-        f"--install-hooks", pty = True, **__.derive_venv_context_options( ) )
+        f"--hook-type pre-commit --install-hooks",
+        pty = True, **__.derive_venv_context_options( ) )
+    context.run(
+        f"pre-commit install --config {__.paths.configuration.pre_commit} "
+        f"--hook-type pre-push --install-hooks",
+        pty = True, **__.derive_venv_context_options( ) )
 
 
 @_task(
@@ -643,10 +648,7 @@ def check_code_style( context, write_changes = False ):
         pty = __.on_tty, **__.derive_venv_context_options( ) )
 
 
-@_task(
-    'SCM: Push Branch with Tags',
-    task_nomargs = dict( pre = ( test, ), ),
-)
+@_task( 'SCM: Push Branch with Tags' )
 def push( context, remote = 'origin' ):
     ''' Pushes commits on current branch, plus all tags. '''
     _ensure_clean_workspace( context )
@@ -659,7 +661,7 @@ def push( context, remote = 'origin' ):
         context.run(
             f"git push --set-upstream {remote} {true_branch}", pty = True )
     else: context.run( 'git push', pty = True )
-    context.run( 'git push --tags', pty = True )
+    context.run( 'git push --no-verify --tags', pty = True )
 
 
 @_task( )

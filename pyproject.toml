@@ -61,6 +61,7 @@ where = [ 'sources/python3' ]
 year-of-origin = 2021
 
 [tool.bandit]
+exclude_dirs = [ 'tests' ]
 skips = [
   'B310', # urllib_urlopen
 ]
