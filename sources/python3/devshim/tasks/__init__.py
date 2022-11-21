@@ -375,10 +375,18 @@ def freshen( context ): # pylint: disable=unused-argument
 )
 def lint_bandit( context, version = None ):
     ''' Security checks the source code with Bandit. '''
+    files = (
+        __.paths.sources.prj.python3,
+        __.paths.scripts.prj.python3,
+        __.paths.tests.prj.python3,
+        __.paths.project / 'develop.py',
+        __.paths.project / 'setup.py',
+        __.paths.sources.prj.sphinx / 'conf.py',
+    )
+    files_str = ' '.join( map( str, files ) )
     context.run(
         "bandit --recursive --verbose "
-        f"--configfile {__.paths.configuration.pyproject} "
-        f"{__.paths.sources.prj.python3}",
+        f"--configfile {__.paths.configuration.pyproject} {files_str}",
         pty = True, **__.derive_venv_context_options( version = version ) )
 
 
@@ -393,7 +401,14 @@ def lint_mypy( context, packages, modules, files, version = None ):
     if not __.test_package_executable( 'mypy', context_options[ 'env' ] ):
         return
     if not packages and not modules and not files:
-        files = ( __.paths.sources.prj.python3, )
+        files = (
+            __.paths.sources.prj.python3,
+            __.paths.scripts.prj.python3,
+            __.paths.tests.prj.python3,
+            __.paths.project / 'develop.py',
+            __.paths.project / 'setup.py',
+            __.paths.sources.prj.sphinx / 'conf.py',
+        )
     packages_str = ' '.join( map(
         lambda package: f"--package {package}", packages ) )
     modules_str = ' '.join( map(
@@ -418,6 +433,7 @@ def lint_pylint( context, targets, checks, version = None ):
     if not targets:
         targets = (
             *__.paths.sources.prj.python3.rglob( '*.py' ),
+            *__.paths.scripts.prj.python3.rglob( '*.py' ),
             *__.paths.tests.prj.python3.rglob( '*.py' ),
             __.paths.project / 'develop.py',
             __.paths.project / 'setup.py',
@@ -441,12 +457,21 @@ def lint_semgrep( context, version = None ):
     context_options = __.derive_venv_context_options( version = version )
     if not __.test_package_executable( 'semgrep', context_options[ 'env' ] ):
         return
+    files = (
+        __.paths.sources.prj.python3,
+        __.paths.scripts.prj.python3,
+        __.paths.tests.prj.python3,
+        __.paths.project / 'develop.py',
+        __.paths.project / 'setup.py',
+        __.paths.sources.prj.sphinx / 'conf.py',
+    )
+    files_str = ' '.join( map( str, files ) )
     sgconfig_path = __.paths.scm_modules.aux.joinpath(
         'semgrep-rules', 'python', 'lang' )
     context.run(
         #f"strace -ff -tt --string-limit=120 --output=strace/semgrep "
         f"semgrep --config {sgconfig_path} --error --use-git-ignore "
-        f"{__.paths.sources.prj.python3}", pty = __.on_tty, **context_options )
+        f"{files_str}", pty = __.on_tty, **context_options )
 
 
 @_task( )
@@ -474,10 +499,10 @@ def report_coverage( context ):
 @_task(
     version_expansion = 'declared Python virtual environments are targeted',
 )
-def test( context, version = None ):
+def test( context, prelint = True, version = None ):
     ''' Runs the test suite in Python virtual environment. '''
     clean( context, version = version )
-    lint( context, version = version )
+    if prelint: lint( context, version = version )
     __.render_boxed_title( 'Test: Unit + Code Coverage', supplement = version )
     context_options = __.derive_venv_context_options( version = version )
     context_options[ 'env' ].update( dict(
@@ -513,15 +538,17 @@ def check_readme( context ):
         pre = ( test, check_urls, ), post = ( check_readme, ),
     ),
 )
-def make_sdist( context ):
+def make_sdist( context, signature = True ):
     ''' Packages the Python sources for release. '''
     from ..user_interface import assert_gpg_tty
     assert_gpg_tty( )
     path = _get_sdist_path( )
+    if path.exists( ): path.unlink( ) # TODO: Python 3.8: missing_ok = True
     # TODO: https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
     context.run(
         'python3 setup.py sdist', **__.derive_venv_context_options( ) )
-    context.run( f"gpg --detach-sign --armor {path}", pty = True )
+    if signature:
+        context.run( f"gpg --detach-sign --armor {path}", pty = True )
 
 
 def _get_sdist_path( ):
@@ -534,15 +561,17 @@ def _get_sdist_path( ):
     'Artifact: Python Wheel',
     task_nomargs = dict( pre = ( make_sdist, ), ),
 )
-def make_wheel( context ):
+def make_wheel( context, signature = True ):
     ''' Packages a Python wheel for release. '''
     from ..user_interface import assert_gpg_tty
     assert_gpg_tty( )
     path = _get_wheel_path( )
+    if path.exists( ): path.unlink( ) # TODO: Python 3.8: missing_ok = True
     # TODO: https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
     context.run(
         'python3 setup.py bdist_wheel', **__.derive_venv_context_options( ) )
-    context.run( f"gpg --detach-sign --armor {path}", pty = True )
+    if signature:
+        context.run( f"gpg --detach-sign --armor {path}", pty = True )
 
 
 def _get_wheel_path( ):
@@ -651,6 +680,7 @@ def check_code_style( context, write_changes = False ):
 @_task( 'SCM: Push Branch with Tags' )
 def push( context, remote = 'origin' ):
     ''' Pushes commits on current branch, plus all tags. '''
+    # TODO: Discover remote corresponding to current branch.
     _ensure_clean_workspace( context )
     project_version = __.discover_project_version( )
     true_branch = context.run(

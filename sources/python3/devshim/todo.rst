@@ -1,9 +1,3 @@
-Testing Improvements
-===============================================================================
-
-* Build sdist and wheels as part of ``push`` command. Do not require to sign
-  them during a test run.
-
 Prefer Prebuilt Python Executables
 ===============================================================================
 

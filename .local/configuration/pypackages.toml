@@ -40,9 +40,6 @@ comments = [
 ]
 
 [[development.lint]]
-requirement = 'pre-commit'
-
-[[development.lint]]
 requirement = 'pylint >= 2.15.2; implementation_name != "pypy" or python_version >= "3.8"'
 comments = [
   ''' Pylint relies on 'typed_ast', which does not build under PyPy 3.7.
@@ -75,6 +72,9 @@ requirement = 'pytest'
 
 [[development.user-interface]]
 requirement = 'invoke'
+
+[[development.user-interface]]
+requirement = 'pre-commit'
 
 [[development.user-interface]]
 requirement = 'shellingham'
