@@ -21,12 +21,12 @@ repos:
   - id: mixed-line-ending
     args: [ '--fix', 'no' ]
 # TODO? yapf
-# TODO: Break out linting steps with passed files.
+# TODO: Apply linting steps with passed files.
 #       Cannot do this with Invoke's argument parsing.
 - repo: local
   hooks:
   - id: devshim-pylint
-    name: devshim-pylint
+    name: Devshim Lint Pylint
     stages: [ 'push' ]
     fail_fast: true
     language: system
@@ -34,7 +34,7 @@ repos:
     pass_filenames: false
     entry: 'python3 develop.py lint-pylint'
   - id: devshim-semgrep
-    name: devshim-semgrep
+    name: Devshim Lint Semgrep
     stages: [ 'push' ]
     fail_fast: true
     language: system
@@ -42,7 +42,7 @@ repos:
     pass_filenames: false
     entry: 'python3 develop.py lint-semgrep'
   - id: devshim-mypy
-    name: devshim-mypy
+    name: Devshim Lint Mypy
     stages: [ 'push' ]
     fail_fast: true
     language: system
@@ -50,7 +50,7 @@ repos:
     pass_filenames: false
     entry: 'python3 develop.py lint-mypy'
   - id: devshim-bandit
-    name: devshim-bandit
+    name: Devshim Lint Bandit
     stages: [ 'push' ]
     fail_fast: true
     language: system
@@ -58,26 +58,26 @@ repos:
     pass_filenames: false
     entry: 'python3 develop.py lint-bandit'
   - id: devshim-test
-    name: devshim-test
+    name: Devshim Test Suite
     stages: [ 'push' ]
     fail_fast: true
     language: system
     always_run: true
     pass_filenames: false
-    entry: 'python3 develop.py test --no-prelint'
-  - id: devshim-sdist
-    name: devshim-sdist
+    entry: 'python3 develop.py test --no-ensure-sanity'
+  - id: devshim-html
+    name: Devshim Documentation
     stages: [ 'push' ]
     fail_fast: true
     language: system
     always_run: true
     pass_filenames: false
-    entry: 'python3 develop.py make-sdist --no-signature'
+    entry: 'python3 develop.py make-html'
   - id: devshim-wheel
-    name: devshim-wheel
+    name: Devshim Packages
     stages: [ 'push' ]
     fail_fast: true
     language: system
     always_run: true
     pass_filenames: false
-    entry: 'python3 develop.py make-wheel --no-signature'
+    entry: 'python3 develop.py make-wheel --no-ensure-sanity --no-signature'

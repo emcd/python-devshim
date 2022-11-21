@@ -499,10 +499,10 @@ def report_coverage( context ):
 @_task(
     version_expansion = 'declared Python virtual environments are targeted',
 )
-def test( context, prelint = True, version = None ):
+def test( context, ensure_sanity = True, version = None ):
     ''' Runs the test suite in Python virtual environment. '''
     clean( context, version = version )
-    if prelint: lint( context, version = version )
+    if ensure_sanity: lint( context, version = version )
     __.render_boxed_title( 'Test: Unit + Code Coverage', supplement = version )
     context_options = __.derive_venv_context_options( version = version )
     context_options[ 'env' ].update( dict(
@@ -534,14 +534,15 @@ def check_readme( context ):
 
 @_task(
     'Artifact: Source Distribution',
-    task_nomargs = dict(
-        pre = ( test, check_urls, ), post = ( check_readme, ),
-    ),
+    task_nomargs = dict( post = ( check_readme, ), ),
 )
-def make_sdist( context, signature = True ):
+def make_sdist( context, ensure_sanity = True, signature = True ):
     ''' Packages the Python sources for release. '''
     from ..user_interface import assert_gpg_tty
     assert_gpg_tty( )
+    if ensure_sanity:
+        test( context )
+        check_urls( context )
     path = _get_sdist_path( )
     if path.exists( ): path.unlink( ) # TODO: Python 3.8: missing_ok = True
     # TODO: https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
@@ -557,14 +558,12 @@ def _get_sdist_path( ):
     return __.paths.artifacts.sdists / name
 
 
-@_task(
-    'Artifact: Python Wheel',
-    task_nomargs = dict( pre = ( make_sdist, ), ),
-)
-def make_wheel( context, signature = True ):
+@_task( 'Artifact: Python Wheel' )
+def make_wheel( context, ensure_sanity = True, signature = True ):
     ''' Packages a Python wheel for release. '''
     from ..user_interface import assert_gpg_tty
     assert_gpg_tty( )
+    make_sdist( context, ensure_sanity = ensure_sanity, signature = signature )
     path = _get_wheel_path( )
     if path.exists( ): path.unlink( ) # TODO: Python 3.8: missing_ok = True
     # TODO: https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
