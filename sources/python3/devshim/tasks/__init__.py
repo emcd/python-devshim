@@ -44,68 +44,17 @@ class __( metaclass = _NamespaceClass ):
     )
     from ..locations import paths
     from ..packages import Version
-    from ..platforms import calculate_python_versions
     from ..project import (
         discover_project_name,
         discover_project_version,
     )
-    from ..user_interface import render_boxed_title
 
     project_name = discover_project_name( )
     # https://www.sphinx-doc.org/en/master/man/sphinx-build.html
     sphinx_options = f"-j auto -d {paths.caches.sphinx} -n -T"
 
 
-def _task(
-    title = '',
-    task_nomargs = None,
-    version_expansion = '',
-):
-    ''' Produces decorator for the handling of assorted banalities.
-
-        Banalities include:
-        * Rendering a title box.
-        * Iterative execution over multiple platform versions. '''
-    from functools import wraps
-    from ._invoke import Task
-    from ..user_interface import render_boxed_title
-
-    def decorator( invocable ):
-        ''' Produces invoker for the handling of assorted banalities. '''
-        if version_expansion:
-            invocable.__doc__ = '\n\n'.join( (
-                invocable.__doc__,
-                f"If version is 'ALL', then all {version_expansion}." ) )
-
-        # nosemgrep: scm-modules.semgrep-rules.python.lang.maintainability.useless-inner-function
-        @wraps( invocable )
-        def invoker( *posargs, **nomargs ):
-            ''' Handles assorted banalities. '''
-            if version_expansion:
-                from ..platforms import calculate_python_versions
-                versions = calculate_python_versions(
-                    nomargs.get( 'version' ) )
-                for version in versions:
-                    if title: render_boxed_title( title, supplement = version )
-                    re_posargs, re_nomargs = _replace_arguments(
-                        invocable, posargs, nomargs,
-                        dict( version = version ) )
-                    invocable( *re_posargs, **re_nomargs )
-            else:
-                if title: render_boxed_title( title )
-                invocable( *posargs, **nomargs )
-
-        return Task( invoker, **( task_nomargs or { } ) )
-
-    return decorator
-
-
-def _replace_arguments( invocable, posargs, nomargs, replacements ):
-    from inspect import signature as scan_signature
-    binder = scan_signature( invocable ).bind( *posargs, **nomargs )
-    binder.arguments.update( replacements )
-    binder.apply_defaults( )
-    return binder.args, binder.kwargs
+from ._base import task as _task
 
 
 @_task( )
@@ -136,7 +85,7 @@ def install_git_hooks( context ):
 
 @_task(
     'Install: Python Release',
-    version_expansion = 'declared Python versions are installed',
+    version_expansion = 'declared Python versions',
 )
 def install_python( context, version ):
     ''' Installs requested Python version.
@@ -147,7 +96,7 @@ def install_python( context, version ):
 
 @_task(
     'Build: Python Virtual Environment',
-    version_expansion = 'declared Python versions are targeted',
+    version_expansion = 'declared Python versions',
 )
 def build_python_venv( context, version, overwrite = False ):
     ''' Creates virtual environment for requested Python version. '''
@@ -215,7 +164,7 @@ def clean_tool_caches( context, include_development_support = False ): # pylint:
 
 @_task(
     'Clean: Unused Python Packages',
-    version_expansion = 'declared Python virtual environments are targeted',
+    version_expansion = 'declared Python virtual environments',
 )
 def clean_python_packages( context, version = None ): # pylint: disable=unused-argument
     ''' Removes unused Python packages. '''
@@ -251,7 +200,7 @@ def clean( context, version = None ):
 
 @_task(
     'Lint: Package Security',
-    version_expansion = 'declared Python platforms are targeted',
+    version_expansion = 'declared Python virtual environments',
 )
 def check_security_issues( context, version = None ):
     ''' Checks for security issues in utilized packages and tools.
@@ -314,7 +263,7 @@ def _freshen_python( version ):
 
 @_task(
     'Freshen: Python Package Versions',
-    version_expansion = 'declared Python virtual environments are targeted',
+    version_expansion = 'declared Python virtual environments',
 )
 def freshen_python_packages( context, version = None ):
     ''' Updates declared Python packages in Python virtual environment. '''
@@ -371,7 +320,7 @@ def freshen( context ): # pylint: disable=unused-argument
 
 @_task(
     'Lint: Bandit',
-    version_expansion = 'declared Python virtual environments are targeted',
+    version_expansion = 'declared Python virtual environments',
 )
 def lint_bandit( context, version = None ):
     ''' Security checks the source code with Bandit. '''
@@ -393,7 +342,7 @@ def lint_bandit( context, version = None ):
 @_task(
     'Lint: Mypy',
     task_nomargs = dict( iterable = ( 'packages', 'modules', 'files', ), ),
-    version_expansion = 'declared Python virtual environments are targeted',
+    version_expansion = 'declared Python virtual environments',
 )
 def lint_mypy( context, packages, modules, files, version = None ):
     ''' Lints the source code with Mypy. '''
@@ -422,7 +371,7 @@ def lint_mypy( context, packages, modules, files, version = None ):
 @_task(
     'Lint: Pylint',
     task_nomargs = dict( iterable = ( 'targets', 'checks', ), ),
-    version_expansion = 'declared Python virtual environments are targeted',
+    version_expansion = 'declared Python virtual environments',
 )
 def lint_pylint( context, targets, checks, version = None ):
     ''' Lints the source code with Pylint. '''
@@ -474,16 +423,15 @@ def lint_semgrep( context, version = None ):
         f"{files_str}", pty = __.on_tty, **context_options )
 
 
-@_task( )
+@_task( version_expansion = 'declared Python virtual environments' )
 def lint( context, version = None ):
     ''' Lints the source code. '''
-    for version_ in __.calculate_python_versions( version ):
-        lint_pylint( context, targets = ( ), checks = ( ), version = version_ )
-        lint_semgrep( context, version = version_ )
-        lint_mypy(
-            context,
-            packages = ( ), modules = ( ), files = ( ), version = version_ )
-        lint_bandit( context, version = version_ )
+    lint_pylint( context, targets = ( ), checks = ( ), version = version )
+    lint_semgrep( context, version = version )
+    lint_mypy(
+        context,
+        packages = ( ), modules = ( ), files = ( ), version = version )
+    lint_bandit( context, version = version )
 
 
 @_task( 'Artifact: Code Coverage Report' )
@@ -497,13 +445,14 @@ def report_coverage( context ):
 
 
 @_task(
-    version_expansion = 'declared Python virtual environments are targeted',
+    version_expansion = 'declared Python virtual environments',
 )
 def test( context, ensure_sanity = True, version = None ):
     ''' Runs the test suite in Python virtual environment. '''
     clean( context, version = version )
     if ensure_sanity: lint( context, version = version )
-    __.render_boxed_title( 'Test: Unit + Code Coverage', supplement = version )
+    from ..user_interface import render_boxed_title
+    render_boxed_title( 'Test: Unit + Code Coverage', supplement = version )
     context_options = __.derive_venv_context_options( version = version )
     context_options[ 'env' ].update( dict(
         HYPOTHESIS_STORAGE_DIRECTORY = __.paths.caches.hypothesis,
@@ -697,7 +646,8 @@ def push( context, remote = 'origin' ):
 def check_pip_install( context, index_url = '', version = None ):
     ''' Checks import of current package after installation via Pip. '''
     version = version or __.discover_project_version( )
-    __.render_boxed_title( f"Verify: Python Package Installation ({version})" )
+    from ..user_interface import render_boxed_title
+    render_boxed_title( f"Verify: Python Package Installation ({version})" )
     from tempfile import TemporaryDirectory
     from time import sleep
     from venv import create as create_venv
@@ -734,7 +684,8 @@ def check_pypi_integrity( context, version = None, index_url = '' ):
 
         This task requires Internet access and may take some time. '''
     version = version or __.discover_project_version( )
-    __.render_boxed_title( f"Verify: Python Package Integrity ({version})" )
+    from ..user_interface import render_boxed_title
+    render_boxed_title( f"Verify: Python Package Integrity ({version})" )
     from ..packages import retrieve_pypi_release_information
     release_info = retrieve_pypi_release_information(
         __.project_name, version, index_url = index_url )
@@ -813,7 +764,8 @@ def _upload_pypi( context, repository_name = '' ):
     if repository_name:
         repository_option = f"--repository {repository_name}"
         task_name_suffix = f" ({repository_name})"
-    __.render_boxed_title( f"Publication: PyPI{task_name_suffix}" )
+    from ..user_interface import render_boxed_title
+    render_boxed_title( f"Publication: PyPI{task_name_suffix}" )
     artifacts = _get_pypi_artifacts( )
     context_options = __.derive_venv_context_options( )
     process_environment = context_options.get( 'env', { } )
