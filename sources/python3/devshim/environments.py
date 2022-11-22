@@ -43,8 +43,8 @@ def build_python_venv( version, overwrite = False ):
     venv_options = [ ]
     if overwrite: venv_options.append( '--clear' )
     venv_options_str = ' '.join( venv_options )
-    from .base import standard_execute_external
-    standard_execute_external(
+    from .base import execute_external
+    execute_external(
         f"{python_path} -m venv {venv_options_str} {venv_path}",
         capture_output = False )
     _install_packages_into_venv( version, venv_path )

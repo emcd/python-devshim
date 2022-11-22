@@ -33,10 +33,10 @@ from .base import expire as _expire
 
 def install_python_packages( context_options, identifier = None ):
     ''' Installs required Python packages into virtual environment. '''
-    from .base import standard_execute_external
+    from .base import execute_external
     raw, frozen, unpublished = generate_pip_requirements_text(
         identifier = identifier )
-    standard_execute_external(
+    execute_external(
         'pip install --upgrade setuptools pip wheel',
         capture_output = False, env = context_options[ 'env' ] )
     if not identifier or not frozen:
@@ -56,7 +56,7 @@ def install_python_packages( context_options, identifier = None ):
     # Pip cannot currently mix editable and digest-bound requirements,
     # so we must install editable packages separately. (As of 2022-02-06.)
     # https://github.com/pypa/pip/issues/4995
-    standard_execute_external(
+    execute_external(
         'pip install --editable .',
         capture_output = False, env = context_options[ 'env' ] )
 
@@ -66,7 +66,7 @@ def execute_pip_with_requirements(
 ):
     ''' Executes a Pip command with requirements. '''
     pip_options = pip_options or ( )
-    from .base import standard_execute_external
+    from .base import execute_external
     # Unfortunately, Pip does not support reading requirements from stdin,
     # as of 2022-01-02. To workaround, we need to write and then read
     # a temporary file. More details: https://github.com/pypa/pip/issues/7822
@@ -75,7 +75,7 @@ def execute_pip_with_requirements(
     with NamedTemporaryFile( mode = 'w+' ) as requirements_file:
         requirements_file.write( requirements )
         requirements_file.flush( )
-        standard_execute_external(
+        execute_external(
             "pip {command} {options} --requirement {requirements_file}".format(
                 command = command,
                 options = ' '.join( pip_options ),
@@ -265,8 +265,8 @@ def _ensure_python_packages( requirements ):
         requirements, cache = cache )
     if installable_requirements:
         from shlex import split as split_command
-        from .base import standard_execute_external
-        standard_execute_external(
+        from .base import execute_external
+        execute_external(
             ( *split_command( 'pip install --upgrade --target' ),
               cache, *installable_requirements ),
             capture_output = False )
@@ -358,9 +358,9 @@ def indicate_current_python_packages( environment ):
     from shlex import split as split_command
     from types import SimpleNamespace
     from packaging.requirements import Requirement
-    from .base import standard_execute_external
+    from .base import execute_external
     entries = [ ]
-    for line in standard_execute_external(
+    for line in execute_external(
         split_command( 'pip freeze' ), env = environment
     ).stdout.strip( ).splitlines( ):
         if line.startswith( '#' ): continue

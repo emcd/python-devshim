@@ -76,7 +76,7 @@ def _select_narrative_functions( ):
 eprint, epprint = _select_narrative_functions( )
 
 
-def standard_execute_external( command_specification, **nomargs ):
+def execute_external( command_specification, **nomargs ):
     ''' Executes command specification in subprocess.
 
         Raises exception on non-zero exit code. '''

@@ -33,8 +33,8 @@ def freshen_python( original_version ):
             version = original_version )
     # Version may not be installed.
     except SubprocessError: original_identifier = None
-    from ..base import standard_execute_external
-    standard_execute_external(
+    from ..base import execute_external
+    execute_external(
         f"asdf install python {successor_version}", capture_output = False )
     # Do not erase packages fixtures for extant versions.
     successor_identifier = pep508_identify_python(
@@ -46,8 +46,8 @@ def freshen_python( original_version ):
 def _derive_python_complete_version( minor_version ):
     ''' Given a minor version, return the corresponding complete version. '''
     from shlex import split as split_command
-    from ..base import standard_execute_external
-    return standard_execute_external(
+    from ..base import execute_external
+    return execute_external(
         ( *split_command( 'asdf latest python' ), minor_version )
     ).stdout.strip( )
 
@@ -75,8 +75,8 @@ def install_python_builder_posix( ):
     environment = active_process_environment.copy( )
     from ..locations import paths
     environment.update( dict( PREFIX = paths.caches.utilities.python_build, ) )
-    from ..base import standard_execute_external
-    standard_execute_external(
+    from ..base import execute_external
+    execute_external(
         str( paths.scm_modules.aux.joinpath(
             'pyenv', 'plugins', 'python-build', 'install.sh' ) ),
         env = environment )
@@ -102,8 +102,8 @@ def identify_python( mode, python_path ):
     ''' Reports compatibility identifier for Python at given path. '''
     from ..locations import paths
     detector_path = paths.scripts.aux.python3 / 'identify-python.py'
-    from ..base import standard_execute_external
-    return standard_execute_external(
+    from ..base import execute_external
+    return execute_external(
         ( python_path, detector_path, '--mode', mode ) ).stdout.strip( )
 
 
@@ -112,8 +112,8 @@ def detect_vmgr_python_path( version = None ):
     version = version or detect_vmgr_python_version( )
     from pathlib import Path
     from shlex import split as split_command
-    from ..base import standard_execute_external
-    installation_path = Path( standard_execute_external(
+    from ..base import execute_external
+    installation_path = Path( execute_external(
         ( *split_command( 'asdf where python' ), version ) ).stdout.strip( ) )
     return installation_path / 'bin' / 'python'
 
