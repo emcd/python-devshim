@@ -324,17 +324,10 @@ def freshen( context ): # pylint: disable=unused-argument
 )
 def lint_bandit( context, version = None ):
     ''' Security checks the source code with Bandit. '''
-    files = (
-        __.paths.sources.prj.python3,
-        __.paths.scripts.prj.python3,
-        __.paths.tests.prj.python3,
-        __.paths.project / 'develop.py',
-        __.paths.project / 'setup.py',
-        __.paths.sources.prj.sphinx / 'conf.py',
-    )
+    files = _lint_targets_default
     files_str = ' '.join( map( str, files ) )
     context.run(
-        "bandit --recursive --verbose "
+        "bandit --recursive "
         f"--configfile {__.paths.configuration.pyproject} {files_str}",
         pty = True, **__.derive_venv_context_options( version = version ) )
 
@@ -350,14 +343,8 @@ def lint_mypy( context, packages, modules, files, version = None ):
     if not __.test_package_executable( 'mypy', context_options[ 'env' ] ):
         return
     if not packages and not modules and not files:
-        files = (
-            __.paths.sources.prj.python3,
-            __.paths.scripts.prj.python3,
-            __.paths.tests.prj.python3,
-            __.paths.project / 'develop.py',
-            __.paths.project / 'setup.py',
-            __.paths.sources.prj.sphinx / 'conf.py',
-        )
+        # TODO: Is this the best approach?
+        files = _lint_targets_default
     packages_str = ' '.join( map(
         lambda package: f"--package {package}", packages ) )
     modules_str = ' '.join( map(
@@ -379,21 +366,13 @@ def lint_pylint( context, targets, checks, version = None ):
     if not __.test_package_executable( 'pylint', context_options[ 'env' ] ):
         return
     reports_str = '--reports=no --score=no' if targets or checks else ''
-    if not targets:
-        targets = (
-            *__.paths.sources.prj.python3.rglob( '*.py' ),
-            *__.paths.scripts.prj.python3.rglob( '*.py' ),
-            *__.paths.tests.prj.python3.rglob( '*.py' ),
-            __.paths.project / 'develop.py',
-            __.paths.project / 'setup.py',
-            __.paths.sources.prj.sphinx / 'conf.py',
-        )
+    if not targets: targets = _lint_targets_default
     targets_str = ' '.join( map( str, targets ) )
     checks_str = (
         "--disable=all --enable={}".format( ','.join( checks ) )
         if checks else '' )
     context.run(
-        f"pylint {reports_str} {checks_str} {targets_str}",
+        f"pylint {reports_str} {checks_str} --recursive yes {targets_str}",
         pty = True, **context_options )
 
 
@@ -406,14 +385,7 @@ def lint_semgrep( context, version = None ):
     context_options = __.derive_venv_context_options( version = version )
     if not __.test_package_executable( 'semgrep', context_options[ 'env' ] ):
         return
-    files = (
-        __.paths.sources.prj.python3,
-        __.paths.scripts.prj.python3,
-        __.paths.tests.prj.python3,
-        __.paths.project / 'develop.py',
-        __.paths.project / 'setup.py',
-        __.paths.sources.prj.sphinx / 'conf.py',
-    )
+    files = _lint_targets_default
     files_str = ' '.join( map( str, files ) )
     sgconfig_path = __.paths.scm_modules.aux.joinpath(
         'semgrep-rules', 'python', 'lang' )
@@ -421,6 +393,16 @@ def lint_semgrep( context, version = None ):
         #f"strace -ff -tt --string-limit=120 --output=strace/semgrep "
         f"semgrep --config {sgconfig_path} --error --use-git-ignore "
         f"{files_str}", pty = __.on_tty, **context_options )
+
+
+_lint_targets_default = (
+    __.paths.sources.prj.python3,
+    __.paths.scripts.prj.python3,
+    __.paths.tests.prj.python3,
+    __.paths.project / 'develop.py',
+    __.paths.project / 'setup.py',
+    __.paths.sources.prj.sphinx / 'conf.py',
+)
 
 
 @_task( version_expansion = 'declared Python virtual environments' )

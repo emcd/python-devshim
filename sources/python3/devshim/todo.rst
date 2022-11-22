@@ -44,6 +44,8 @@ Remove Dependency on ``invoke``
 
 * Handle via ``develop.py``.
 
+* Possibly use `Typer <https://typer.tiangolo.com/>` as partial replacement.
+
 Provide In-Tree PEP 517 Build Backend
 ===============================================================================
 
