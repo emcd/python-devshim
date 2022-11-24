@@ -54,6 +54,29 @@ Installable Devshim Wrapper Script
 
 * May also be segue to providing devshim as a package.
 
+* Can just make :file:`develop.py` an installable script and have it act as a
+  common interface for execution in-tree or from an installed package.
+
+Restructure Package Dependencies Format
+===============================================================================
+
+* Linters, test tools, and other utilities should be optional installation
+  dependencies for the Devshim package. Packages which have Devshim as a
+  development dependency can specify these options via the ``[]`` syntax.
+
+* Devshim should probe which options have been installed to generate list of
+  available commands for direct consumption and for what the metacommands
+  (``freshen``, ``lint``, etc...) execute.
+
+* Could consider treating development dependencies as optional installation
+  dependencies, as is the practice in parts of the Python community, and could
+  then fold into a PEP 621-/PEP 31-compliant :file:`pyproject.toml`. However,
+  we would lose the ability to treat comments as TOML lists, as we do now, and
+  would not be able to use alternative local paths (from Git submodules, for
+  example) for editable package "installation". (Rust's Cargo has the ability
+  to get packages from local paths, by preference, and fall back to an index,
+  such as crates.io, otherwise. This is very useful and what we want here too.)
+
 Remove Dependency on ``bump2version``
 ===============================================================================
 
@@ -61,6 +84,10 @@ Remove Dependency on ``bump2version``
   :file:`pyproject.toml` to ``dynamic``.
 
 * Will need to modify project version reader to support the ``dynamic`` field.
+
+* Or maybe use `tbump <https://github.com/your-tools/tbump>` as an alternative
+  that is ``pyproject.toml``-amenable and has a simpler interface for bumping
+  versions.
 
 Remove Dependency on ``invoke``
 ===============================================================================
@@ -71,9 +98,9 @@ Remove Dependency on ``invoke``
 
 * Context managers for task execution.
 
-* Pseudo-TTY support.
+* Pseudo-TTY support. (May not be necessary.)
 
-* Dynamic passing of arguments to subtasks.
+* Dynamic passing of arguments to subtasks. (Invoke cannot do this.)
 
 * Surfacing parameters from subtasks.
 
@@ -81,12 +108,14 @@ Remove Dependency on ``invoke``
 
 * Possibly use `Typer <https://typer.tiangolo.com/>` as partial replacement.
 
+* Async execution fanout. (Nice to have. Limited use cases actually.)
+
 Provide In-Tree PEP 517 Build Backend
 ===============================================================================
 
 * Proxy to Setuptools 'build_meta' backend, once it supports the 'build_base'
   and 'egg_base' options. Can use the command options overrides now baked in
-  'setup.py'.
+  'setup.py'; should reevaluate feasibility.
 
 * Or proxy to `Enscons <https://pypi.org/project/enscons/>`_.
 
@@ -106,4 +135,17 @@ Remove Dependency on ``pip``
   https://github.com/brettcannon/mousebender
 
 * Tradeoffs with this. More code must be shipped for package handling. More
-  code maintenance to keep up with latest PEPs and bug fixes.
+  code maintenance to keep up with latest PEPs and bug fixes. Unless we can
+  pull `*.pyz` files for helper packages, like a dependency resolver and a
+  wheel cache manager.
+
+Upstream Bug Reports
+===============================================================================
+
+* Mypy: Version >= 0.990 crashes on imports into class namespaces when custom
+  metaclass is involved.
+
+* Semgrep: No detection of dangerous calls if imported into namespace class.
+
+* YAPF: Uses ``toml`` package which does not support TOML 1 heterogeneous
+  lists. Breaks on parsing :file:`pyproject.toml`.
