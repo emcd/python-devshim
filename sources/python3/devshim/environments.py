@@ -102,16 +102,6 @@ def is_executable_in_venv( name, venv_path = None, version = None ):
     return False
 
 
-def derive_venv_context_options(
-    venv_path = None, version = None, variables = None
-):
-    ''' Derives flags for Python virtual environment in execution context. '''
-    return dict(
-        env = derive_venv_variables(
-            venv_path = venv_path, version = version, variables = variables ),
-        replace_env = True )
-
-
 def derive_venv_variables(
     venv_path = None, version = None, variables = None
 ):

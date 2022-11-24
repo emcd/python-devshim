@@ -22,6 +22,18 @@
 
 import typing as _typ
 
+from contextlib import contextmanager as _context_manager
+
+
+@_context_manager
+def springy_chdir( new_path ):
+    ''' Changes directory, restoring original directory on context exit. '''
+    from os import chdir, getcwd
+    old_path = getcwd( )
+    chdir( new_path )
+    yield new_path
+    chdir( old_path )
+
 
 def _detect_ci_environment( ):
     ''' Returns name of current continuous integration environment.

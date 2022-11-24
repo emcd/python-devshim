@@ -620,19 +620,31 @@ def branch_release( context, remote = 'origin' ): # pylint: disable=unused-argum
         f"git checkout -b {target_branch}", capture_output = False )
 
 
-@_task( )
-def check_code_style( context, write_changes = False ):
+@_task( 'Code Format: YAPF' )
+def check_code_style( context, write_changes = False ): # pylint: disable=unused-argument
     ''' Checks code style of new changes. '''
     yapf_options = [ ]
     if write_changes: yapf_options.append( '--in-place --verbose' )
     yapf_options_string = ' '.join( yapf_options )
-    from ..base import on_tty
-    from ..environments import derive_venv_context_options
-    # TODO: Model with popen pipeline.
-    context.run(
-        f"git diff --unified=0 --no-color -- {__.paths.sources.prj.python3} "
-        f"| yapf-diff {yapf_options_string}",
-        pty = on_tty, **derive_venv_context_options( ) )
+    from contextlib import ExitStack as ContextStack
+    from shlex import split as split_command
+    from subprocess import Popen, PIPE # nosec B404
+    process_environment = __.derive_venv_variables( )
+    contexts = ContextStack( )
+    # nosemgrep: scm-modules.semgrep-rules.python.lang.security.audit.dangerous-subprocess-use-audit
+    git_diff_process = contexts.enter_context( Popen( # nosec B603
+        ( *split_command("git diff --unified=0 --no-color --"),
+          *_lint_targets_default ), stdout = PIPE, text = True ) )
+    # nosemgrep: scm-modules.semgrep-rules.python.lang.security.audit.dangerous-subprocess-use-audit
+    yapf_diff_process = contexts.enter_context( Popen( # nosec B603
+        split_command( f"yapf-diff {yapf_options_string}" ),
+        env = process_environment,
+        stdin = git_diff_process.stdout, text = True ) )
+    with contexts:
+        git_diff_process.stdout.close( )
+        yapf_diff_process.communicate( )
+    exit_code = git_diff_process.returncode or yapf_diff_process.returncode
+    if exit_code: raise SystemExit( exit_code )
 
 
 @_task( 'SCM: Push Branch with Tags' )
@@ -808,33 +820,42 @@ def _get_pypi_credentials( repository_name ):
     'Publication: Github Pages',
     task_nomargs = dict( pre = ( test, make_html, ), ),
 )
-def upload_github_pages( context ):
+def upload_github_pages( context ): # pylint: disable=unused-argument
     ''' Publishes Sphinx HTML output to Github Pages for project. '''
     # Use relative path, since 'git subtree' needs it.
     html_path = __.paths.artifacts.sphinx_html.relative_to( __.paths.project )
     nojekyll_path = html_path / '.nojekyll'
     target_branch = 'documentation'
-    from contextlib import ExitStack as CMStack
-    with CMStack( ) as cm_stack:
+    from contextlib import ExitStack as ContextStack
+    from subprocess import SubprocessError # nosec B404
+    from ..base import springy_chdir
+    with ContextStack( ) as contexts:
         # Work from project root, since 'git subtree' requires relative paths.
-        cm_stack.enter_context( context.cd( __.paths.project ) )
-        saved_branch = context.run(
-            'git branch --show-current', hide = 'stdout' ).stdout.strip( )
-        context.run( f"git branch -D local-{target_branch}", warn = True )
-        context.run( f"git checkout -b local-{target_branch}", pty = True )
+        contexts.enter_context( springy_chdir( __.paths.project ) )
+        saved_branch = __.execute_external(
+            'git branch --show-current' ).stdout.strip( )
+        try:
+            __.execute_external(
+                f"git branch -D local-{target_branch}",
+                capture_output = False )
+        except SubprocessError: pass
+        __.execute_external(
+            f"git checkout -b local-{target_branch}", capture_output = False )
         def restore( *exc_info ): # pylint: disable=unused-argument
-            context.run( f"git checkout {saved_branch}", pty = True )
-        cm_stack.push( restore )
+            __.execute_external(
+                f"git checkout {saved_branch}", capture_output = False )
+        contexts.push( restore )
         nojekyll_path.touch( exist_ok = True )
         # Override .gitignore to pickup artifacts.
-        context.run( f"git add --force {html_path}", pty = True )
-        context.run( 'git commit -m "Update documentation."', pty = True )
-        subtree_id = context.run(
-            f"git subtree split --prefix {html_path}",
-            hide = 'stdout' ).stdout.strip( )
-        context.run(
+        __.execute_external(
+            f"git add --force {html_path}", capture_output = False )
+        __.execute_external(
+            'git commit -m "Update documentation."', capture_output = False )
+        subtree_id = __.execute_external(
+            f"git subtree split --prefix {html_path}" ).stdout.strip( )
+        __.execute_external(
             f"git push --force origin {subtree_id}:refs/heads/{target_branch}",
-            pty = True )
+            capture_output = False )
 
 
 @_task( task_nomargs = dict( pre = ( bump_patch, push, upload_pypi, ), ), )
