@@ -71,6 +71,9 @@ requirement = 'hypothesis'
 requirement = 'pytest'
 
 [[development.user-interface]]
+requirement = 'build'
+
+[[development.user-interface]]
 requirement = 'invoke'
 
 [[development.user-interface]]

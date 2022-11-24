@@ -113,20 +113,15 @@ Remove Dependency on ``invoke``
 Provide In-Tree PEP 517 Build Backend
 ===============================================================================
 
-* Proxy to Setuptools 'build_meta' backend, once it supports the 'build_base'
-  and 'egg_base' options. Can use the command options overrides now baked in
-  'setup.py'; should reevaluate feasibility.
-
-* Or proxy to `Enscons <https://pypi.org/project/enscons/>`_.
+* Proxy to `Enscons <https://pypi.org/project/enscons/>`_?
 
 * Or write our own, borrowing sdist- and wheel-building logic from something
-  like Flit or Whey.
+  like Flit or Whey? But would lose Setuptools expertise on compilaton of
+  binaries, if needed.
 
 * https://peps.python.org/pep-0517/#build-backend-interface
 
 * https://setuptools.pypa.io/en/latest/build_meta.html#dynamic-build-dependencies-and-other-build-meta-tweaks
-
-* https://github.com/pypa/setuptools/blob/main/setuptools/build_meta.py
 
 Remove Dependency on ``pip``
 ===============================================================================
@@ -149,3 +144,10 @@ Upstream Bug Reports
 
 * YAPF: Uses ``toml`` package which does not support TOML 1 heterogeneous
   lists. Breaks on parsing :file:`pyproject.toml`.
+
+PyPA Discussions of Interest
+===============================================================================
+
+* https://discuss.python.org/t/building-distributions-and-drawing-the-platypus/2062
+
+* https://discuss.python.org/t/pep-582-python-local-packages-directory/963

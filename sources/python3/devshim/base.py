@@ -149,7 +149,8 @@ def expire( exit_name, message ) -> _typ.NoReturn:
     else: exit_code = _exit_codes[ exit_name ]
     message = str( message )
     if 0 == exit_code: scribe.info( message )
-    else: scribe.critical( message, stack_info = True, stacklevel = 2 )
+    # TODO: Python 3.8: stacklevel = 2
+    else: scribe.critical( message, stack_info = True )
     raise SystemExit( exit_code )
 
 

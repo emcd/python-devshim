@@ -481,22 +481,18 @@ def check_readme( context ): # pylint: disable=unused-argument
 )
 def make_sdist( context, ensure_sanity = True, signature = True ):
     ''' Packages the Python sources for release. '''
-    from ..user_interface import assert_gpg_tty
-    assert_gpg_tty( )
     if ensure_sanity:
         test( context )
         check_urls( context )
     path = _get_sdist_path( )
     if path.exists( ): path.unlink( ) # TODO: Python 3.8: missing_ok = True
     process_environment = __.derive_venv_variables( )
-    # TODO: https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
     __.execute_external(
-        'python3 setup.py sdist',
+        f"python3 -m build --sdist --outdir {__.paths.artifacts.sdists}",
         capture_output = False, env = process_environment )
     if signature:
-        __.execute_external(
-            f"gpg --detach-sign --armor {path}",
-            capture_output = False, env = process_environment )
+        from ..file_utilities import gpg_sign_file
+        gpg_sign_file( path )
 
 
 def _get_sdist_path( ):
@@ -508,20 +504,16 @@ def _get_sdist_path( ):
 @_task( 'Artifact: Python Wheel' )
 def make_wheel( context, ensure_sanity = True, signature = True ):
     ''' Packages a Python wheel for release. '''
-    from ..user_interface import assert_gpg_tty
-    assert_gpg_tty( )
     make_sdist( context, ensure_sanity = ensure_sanity, signature = signature )
     path = _get_wheel_path( )
     if path.exists( ): path.unlink( ) # TODO: Python 3.8: missing_ok = True
     process_environment = __.derive_venv_variables( )
-    # TODO: https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
     __.execute_external(
-        'python3 setup.py bdist_wheel',
+        f"python3 -m build --wheel --outdir {__.paths.artifacts.wheels}",
         capture_output = False, env = process_environment )
     if signature:
-        __.execute_external(
-            f"gpg --detach-sign --armor {path}",
-            capture_output = False, env = process_environment )
+        from ..file_utilities import gpg_sign_file
+        gpg_sign_file( path )
 
 
 def _get_wheel_path( ):
@@ -563,7 +555,7 @@ def _ensure_clean_workspace( ):
 def bump( context, piece ): # pylint: disable=unused-argument
     ''' Bumps a piece of the current version. '''
     _ensure_clean_workspace( )
-    from ..user_interface import assert_gpg_tty
+    from ..file_utilities import assert_gpg_tty
     assert_gpg_tty( )
     project_version = __.discover_project_version( )
     current_version = __.Version.from_string( project_version )
@@ -725,7 +717,7 @@ def check_pypi_integrity( context, version = None, index_url = '' ):
 # TODO: Move to '.packages' and separate retry logic from fetch logic.
 def check_pypi_package( context, package_url ): # pylint: disable=unused-argument
     ''' Verifies signature on package. '''
-    from ..user_interface import assert_gpg_tty
+    from ..file_utilities import assert_gpg_tty
     assert_gpg_tty( )
     package_filename = __.parse_url( package_url ).path.split( '/' )[ -1 ]
     from tempfile import TemporaryDirectory

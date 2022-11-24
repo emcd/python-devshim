@@ -59,18 +59,6 @@ def format_boxed_title( title ):
         '', ) )
 
 
-def assert_gpg_tty( ):
-    ''' Ensures the the 'GPG_TTY' environment variable is set. '''
-    from os import environ as current_process_environment
-    if 'GPG_TTY' in current_process_environment: return
-    # TODO: Check for cached passphrase as an alternative.
-    # TODO: Use 'expire' instead of raising 'invoke.Exit'.
-    from invoke import Exit
-    raise Exit(
-        "ERROR: Environment variable 'GPG_TTY' is not set. "
-        "Task cannot prompt for GPG secret key passphrase." )
-
-
 def generate_cli_functions( shell_name, function_name, with_completions ):
     ''' Generates CLI functions for use of development shim.
 
