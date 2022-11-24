@@ -12,6 +12,41 @@ Windows Development Support
 
 * Or, manage Pythons on all platforms via ``develop.py``.
 
+Remove Dependency on System ``pip``
+===============================================================================
+
+* Some OS distributions make a separate ``python3-pip`` package (or similar),
+  which might not be installed by default, even if Python 3 is.
+
+* System Pip may also be out-of-date. Better to guarantee something recent.
+
+* Can bootstrap local installation with ``urllib`` and ``importlib`` from
+  https://bootstrap.pypa.io/pip/.
+
+* Maybe place in :file:`.local/caches/devshim/packages/python3/<hash>`,
+  where ``hash`` is calculated from SHA-1 of :py:data:`sys.version` and
+  the result of :py:func:`platform.uname`. Override with
+  :envvar:`DEVSHIM_PYTHON3_PACKAGES_CACHE`.
+
+Remove Dependency on ``git``
+===============================================================================
+
+* Will not have to handle Git variants, like TortoiseGit, or Git bridges to
+  other SCM systems.
+
+* Can use `Dulwich <https://www.dulwich.io/apidocs/>`, which does not rely on
+  Git executable. Will also be more efficient to eliminate subprocess fork-exec
+  actions.
+
+More Linters
+===============================================================================
+
+* `Fixit <https://github.com/Instagram/Fixit>`
+
+* `Ruff <https://github.com/charliermarsh/ruff>`
+
+* `Tryceratops <https://github.com/guilatrova/tryceratops>`
+
 Installable Devshim Wrapper Script
 ===============================================================================
 
@@ -69,3 +104,6 @@ Remove Dependency on ``pip``
 
 * Formula for resolving dependencies and installing packages:
   https://github.com/brettcannon/mousebender
+
+* Tradeoffs with this. More code must be shipped for package handling. More
+  code maintenance to keep up with latest PEPs and bug fixes.
