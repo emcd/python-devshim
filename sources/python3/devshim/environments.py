@@ -51,14 +51,14 @@ def build_python_venv( version, overwrite = False ):
 
 
 def _install_packages_into_venv( version, venv_path ):
-    context_options = derive_venv_context_options( venv_path )
+    process_environment = derive_venv_variables( venv_path = venv_path )
     from .packages import (
         calculate_python_packages_fixtures,
         install_python_packages,
         record_python_packages_fixtures,
     )
-    install_python_packages( context_options )
-    fixtures = calculate_python_packages_fixtures( context_options[ 'env' ] )
+    install_python_packages( process_environment )
+    fixtures = calculate_python_packages_fixtures( process_environment )
     from .platforms import pep508_identify_python
     identifier = pep508_identify_python( version = version )
     record_python_packages_fixtures( identifier, fixtures )
@@ -106,11 +106,26 @@ def derive_venv_context_options(
     venv_path = None, version = None, variables = None
 ):
     ''' Derives flags for Python virtual environment in execution context. '''
+    return dict(
+        env = derive_venv_variables(
+            venv_path = venv_path, version = version, variables = variables ),
+        replace_env = True )
+
+
+def derive_venv_variables(
+    venv_path = None, version = None, variables = None
+):
+    ''' Derives environment variables from Python virtual environment path. '''
+    from os import environ as current_process_environment, pathsep
     from pathlib import Path
     venv_path = Path( venv_path or derive_venv_path( version = version ) )
-    return dict(
-        env = derive_venv_variables( venv_path, variables = variables ),
-        replace_env = True )
+    variables = ( variables or current_process_environment ).copy( )
+    variables.pop( 'PYTHONHOME', None )
+    variables[ 'PATH' ] = pathsep.join( (
+        str( venv_path / 'bin' ), variables[ 'PATH' ] ) )
+    variables[ 'VIRTUAL_ENV' ] = str( venv_path )
+    variables[ 'OUR_VENV_NAME' ] = venv_path.name
+    return variables
 
 
 def derive_venv_path( version = None, python_path = None ):
@@ -131,15 +146,3 @@ def derive_venv_path( version = None, python_path = None ):
         'bdist-compatibility', python_path = python_path )
     from .locations import paths
     return paths.environments / abi_label
-
-
-def derive_venv_variables( venv_path, variables = None ):
-    ''' Derives environment variables from Python virtual environment path. '''
-    from os import environ as current_process_environment, pathsep
-    variables = ( variables or current_process_environment ).copy( )
-    variables.pop( 'PYTHONHOME', None )
-    variables[ 'PATH' ] = pathsep.join( (
-        str( venv_path / 'bin' ), variables[ 'PATH' ] ) )
-    variables[ 'VIRTUAL_ENV' ] = str( venv_path )
-    variables[ 'OUR_VENV_NAME' ] = venv_path.name
-    return variables

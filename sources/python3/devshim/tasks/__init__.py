@@ -37,9 +37,9 @@ class __( metaclass = _NamespaceClass ):
 
     from invoke import call
 
-    from ..base import on_tty
+    from ..base import execute_external
     from ..environments import (
-        derive_venv_context_options,
+        derive_venv_variables,
         test_package_executable,
     )
     from ..locations import paths
@@ -71,27 +71,29 @@ def ease(
 
 
 @_task( 'Install: Git Pre-Commit Hooks' )
-def install_git_hooks( context ):
+def install_git_hooks( context ): # pylint: disable=unused-argument
     ''' Installs hooks to check goodness of code changes before commit. '''
-    context.run(
+    process_environment = __.derive_venv_variables( )
+    __.execute_external(
         f"pre-commit install --config {__.paths.configuration.pre_commit} "
         f"--hook-type pre-commit --install-hooks",
-        pty = True, **__.derive_venv_context_options( ) )
-    context.run(
+        capture_output = False, env = process_environment )
+    __.execute_external(
         f"pre-commit install --config {__.paths.configuration.pre_commit} "
         f"--hook-type pre-push --install-hooks",
-        pty = True, **__.derive_venv_context_options( ) )
+        capture_output = False, env = process_environment )
 
 
 @_task(
     'Install: Python Release',
     version_expansion = 'declared Python versions',
 )
-def install_python( context, version ):
+def install_python( context, version ): # pylint: disable=unused-argument
     ''' Installs requested Python version.
 
         This task requires Internet access and may take some time. '''
-    context.run( f"asdf install python {version}", pty = True )
+    __.execute_external(
+        f"asdf install python {version}", capture_output = False )
 
 
 @_task(
@@ -168,7 +170,7 @@ def clean_tool_caches( context, include_development_support = False ): # pylint:
 )
 def clean_python_packages( context, version = None ): # pylint: disable=unused-argument
     ''' Removes unused Python packages. '''
-    context_options = __.derive_venv_context_options( version = version )
+    process_environment = __.derive_venv_variables( version = version )
     from ..platforms import pep508_identify_python
     identifier = pep508_identify_python( version = version )
     from ..packages import (
@@ -181,12 +183,12 @@ def clean_python_packages( context, version = None ): # pylint: disable=unused-a
     installed = frozenset(
         entry.requirement.name
         for entry
-        in indicate_current_python_packages( context_options[ 'env' ] ) )
+        in indicate_current_python_packages( process_environment ) )
     requirements_text = '\n'.join(
         installed - requested - { __.project_name } )
     if not requirements_text: return
     execute_pip_with_requirements(
-        context_options, 'uninstall', requirements_text,
+        process_environment, 'uninstall', requirements_text,
         pip_options = ( '--yes', ) )
 
 
@@ -202,28 +204,29 @@ def clean( context, version = None ):
     'Lint: Package Security',
     version_expansion = 'declared Python virtual environments',
 )
-def check_security_issues( context, version = None ):
+def check_security_issues( context, version = None ): # pylint: disable=unused-argument
     ''' Checks for security issues in utilized packages and tools.
 
         This task requires Internet access and may take some time. '''
-    context_options = __.derive_venv_context_options( version = version )
-    context.run( f"safety check", pty = __.on_tty, **context_options )
+    process_environment = __.derive_venv_variables( version = version )
+    __.execute_external(
+        f"safety check", capture_output = False, env = process_environment )
 
 
 @_task( 'Freshen: Version Manager' )
-def freshen_asdf( context ):
+def freshen_asdf( context ): # pylint: disable=unused-argument
     ''' Asks Asdf to update itself.
 
         This task requires Internet access and may take some time. '''
-    context.run( 'asdf update', pty = __.on_tty )
-    context.run( 'asdf plugin update python', pty = __.on_tty )
+    __.execute_external( 'asdf update', capture_output = False )
+    __.execute_external( 'asdf plugin update python', capture_output = False )
     # TODO: Preserve this call after 'freshen_asdf' has been removed.
     from ..platforms import install_python_builder
     install_python_builder( )
 
 
 @_task( task_nomargs = dict( pre = ( freshen_asdf, ), ), )
-def freshen_python( context, version = None ):
+def freshen_python( context, version = None ): # pylint: disable=unused-argument
     ''' Updates supported Python minor version to latest patch.
 
         If version is 'ALL', then all supported Pythons are targeted.
@@ -246,8 +249,8 @@ def freshen_python( context, version = None ):
     successor_versions = [
         version_replacements.get( version_, version_ )
         for version_ in original_versions ]
-    context.run( "asdf local python {versions}".format(
-        versions = ' '.join( successor_versions ) ), pty = True )
+    __.execute_external( "asdf local python {versions}".format(
+        versions = ' '.join( successor_versions ) ), capture_output = False )
     # Erase packages fixtures for versions which are no longer extant.
     from ..packages import delete_python_packages_fixtures
     delete_python_packages_fixtures( obsolete_identifiers )
@@ -267,7 +270,7 @@ def _freshen_python( version ):
 )
 def freshen_python_packages( context, version = None ):
     ''' Updates declared Python packages in Python virtual environment. '''
-    context_options = __.derive_venv_context_options( version = version )
+    process_environment = __.derive_venv_variables( version = version )
     from ..platforms import pep508_identify_python
     identifier = pep508_identify_python( version = version )
     from ..packages import (
@@ -275,30 +278,32 @@ def freshen_python_packages( context, version = None ):
         install_python_packages,
         record_python_packages_fixtures,
     )
-    install_python_packages( context_options )
-    fixtures = calculate_python_packages_fixtures( context_options[ 'env' ] )
+    install_python_packages( process_environment )
+    fixtures = calculate_python_packages_fixtures( process_environment )
     record_python_packages_fixtures( identifier, fixtures )
     check_security_issues( context, version = version )
     test( context, version = version )
 
 
 @_task( 'Freshen: Git Modules' )
-def freshen_git_modules( context ):
+def freshen_git_modules( context ): # pylint: disable=unused-argument
     ''' Performs recursive update of all Git modules.
 
         This task requires Internet access and may take some time. '''
-    context.run(
-        'git submodule update --init --recursive --remote', pty = True )
+    __.execute_external(
+        'git submodule update --init --recursive --remote',
+        capture_output = False )
 
 
 @_task( 'Freshen: Git Hooks' )
-def freshen_git_hooks( context ):
+def freshen_git_hooks( context ): # pylint: disable=unused-argument
     ''' Updates Git hooks to latest tagged release.
 
         This task requires Internet access and may take some time. '''
-    context.run(
+    process_environment = __.derive_venv_variables( )
+    __.execute_external(
         f"pre-commit autoupdate --config {__.paths.configuration.pre_commit}",
-        pty = True, **__.derive_venv_context_options( ) )
+        capture_output = False, env = process_environment )
 
 
 @_task(
@@ -322,14 +327,15 @@ def freshen( context ): # pylint: disable=unused-argument
     'Lint: Bandit',
     version_expansion = 'declared Python virtual environments',
 )
-def lint_bandit( context, version = None ):
+def lint_bandit( context, version = None ): # pylint: disable=unused-argument
     ''' Security checks the source code with Bandit. '''
     files = _lint_targets_default
     files_str = ' '.join( map( str, files ) )
-    context.run(
+    process_environment = __.derive_venv_variables( version = version )
+    __.execute_external(
         "bandit --recursive "
         f"--configfile {__.paths.configuration.pyproject} {files_str}",
-        pty = True, **__.derive_venv_context_options( version = version ) )
+        capture_output = False, env = process_environment )
 
 
 @_task(
@@ -337,11 +343,11 @@ def lint_bandit( context, version = None ):
     task_nomargs = dict( iterable = ( 'packages', 'modules', 'files', ), ),
     version_expansion = 'declared Python virtual environments',
 )
-def lint_mypy( context, packages, modules, files, version = None ):
+def lint_mypy( context, packages, modules, files, version = None ): # pylint: disable=unused-argument
     ''' Lints the source code with Mypy. '''
-    context_options = __.derive_venv_context_options( version = version )
-    if not __.test_package_executable( 'mypy', context_options[ 'env' ] ):
-        return
+    process_environment = __.derive_venv_variables( version = version )
+    # TODO: Check executable in '_task'.
+    if not __.test_package_executable( 'mypy', process_environment ): return
     if not packages and not modules and not files:
         # TODO: Is this the best approach?
         files = _lint_targets_default
@@ -350,9 +356,9 @@ def lint_mypy( context, packages, modules, files, version = None ):
     modules_str = ' '.join( map(
         lambda module: f"--module {module}", modules ) )
     files_str = ' '.join( map( str, files ) )
-    context.run(
+    __.execute_external(
         f"mypy {packages_str} {modules_str} {files_str}",
-        pty = True, **context_options )
+        capture_output = False, env = process_environment )
 
 
 @_task(
@@ -360,39 +366,39 @@ def lint_mypy( context, packages, modules, files, version = None ):
     task_nomargs = dict( iterable = ( 'targets', 'checks', ), ),
     version_expansion = 'declared Python virtual environments',
 )
-def lint_pylint( context, targets, checks, version = None ):
+def lint_pylint( context, targets, checks, version = None ): # pylint: disable=unused-argument
     ''' Lints the source code with Pylint. '''
-    context_options = __.derive_venv_context_options( version = version )
-    if not __.test_package_executable( 'pylint', context_options[ 'env' ] ):
-        return
+    process_environment = __.derive_venv_variables( version = version )
+    # TODO: Check executable in '_task'.
+    if not __.test_package_executable( 'pylint', process_environment ): return
     reports_str = '--reports=no --score=no' if targets or checks else ''
     if not targets: targets = _lint_targets_default
     targets_str = ' '.join( map( str, targets ) )
     checks_str = (
         "--disable=all --enable={}".format( ','.join( checks ) )
         if checks else '' )
-    context.run(
+    __.execute_external(
         f"pylint {reports_str} {checks_str} --recursive yes {targets_str}",
-        pty = True, **context_options )
+        capture_output = False, env = process_environment )
 
 
 @_task(
     'Lint: Semgrep',
     version_expansion = 'declared Python virtual environments',
 )
-def lint_semgrep( context, version = None ):
+def lint_semgrep( context, version = None ): # pylint: disable=unused-argument
     ''' Lints the source code with Semgrep. '''
-    context_options = __.derive_venv_context_options( version = version )
-    if not __.test_package_executable( 'semgrep', context_options[ 'env' ] ):
-        return
+    process_environment = __.derive_venv_variables( version = version )
+    # TODO: Check executable in '_task'.
+    if not __.test_package_executable( 'semgrep', process_environment ): return
     files = _lint_targets_default
     files_str = ' '.join( map( str, files ) )
     sgconfig_path = __.paths.scm_modules.aux.joinpath(
         'semgrep-rules', 'python', 'lang' )
-    context.run(
+    __.execute_external(
         #f"strace -ff -tt --string-limit=120 --output=strace/semgrep "
         f"semgrep --config {sgconfig_path} --error --use-git-ignore "
-        f"{files_str}", pty = __.on_tty, **context_options )
+        f"{files_str}", capture_output = False, env = process_environment )
 
 
 _lint_targets_default = (
@@ -417,13 +423,17 @@ def lint( context, version = None ):
 
 
 @_task( 'Artifact: Code Coverage Report' )
-def report_coverage( context ):
+def report_coverage( context ): # pylint: disable=unused-argument
     ''' Combines multiple code coverage results into a single report. '''
-    context_options = __.derive_venv_context_options( )
-    context.run( 'coverage combine', pty = True, **context_options )
-    context.run( 'coverage report', pty = True, **context_options )
-    context.run( 'coverage html', pty = True, **context_options )
-    context.run( 'coverage xml', pty = True, **context_options )
+    process_environment = __.derive_venv_variables( )
+    __.execute_external(
+        'coverage combine', capture_output = False, env = process_environment )
+    __.execute_external(
+        'coverage report', capture_output = False, env = process_environment )
+    __.execute_external(
+        'coverage html', capture_output = False, env = process_environment )
+    __.execute_external(
+        'coverage xml', capture_output = False, env = process_environment )
 
 
 @_task(
@@ -435,32 +445,34 @@ def test( context, ensure_sanity = True, version = None ):
     if ensure_sanity: lint( context, version = version )
     from ..user_interface import render_boxed_title
     render_boxed_title( 'Test: Unit + Code Coverage', supplement = version )
-    context_options = __.derive_venv_context_options( version = version )
-    context_options[ 'env' ].update( dict(
+    process_environment = __.derive_venv_variables( version = version )
+    process_environment.update( dict(
         HYPOTHESIS_STORAGE_DIRECTORY = __.paths.caches.hypothesis,
         PYTHONUNBUFFERED = 'TRUE', # Ensure complete crash output.
     ) )
-    context.run(
+    __.execute_external(
         f"coverage run --source {__.project_name}",
-        pty = True, **context_options )
+        capture_output = False, env = process_environment )
 
 
 @_task( 'Test: Documentation URLs' )
-def check_urls( context ):
+def check_urls( context ): # pylint: disable=unused-argument
     ''' Checks the HTTP URLs in the documentation for liveness. '''
-    context.run(
+    process_environment = __.derive_venv_variables( )
+    __.execute_external(
         f"sphinx-build -b linkcheck {__.sphinx_options} "
         f"{__.paths.sources.prj.sphinx} {__.paths.artifacts.sphinx_linkcheck}",
-        pty = __.on_tty, **__.derive_venv_context_options( ) )
+        capture_output = False, env = process_environment )
 
 
 @_task( 'Test: README Render' )
-def check_readme( context ):
+def check_readme( context ): # pylint: disable=unused-argument
     ''' Checks that the README will render correctly on PyPI. '''
     path = _get_sdist_path( )
-    context.run(
+    process_environment = __.derive_venv_variables( )
+    __.execute_external(
         f"twine check {path}",
-        pty = __.on_tty, **__.derive_venv_context_options( ) )
+        capture_output = False, env = process_environment )
 
 
 @_task(
@@ -476,11 +488,15 @@ def make_sdist( context, ensure_sanity = True, signature = True ):
         check_urls( context )
     path = _get_sdist_path( )
     if path.exists( ): path.unlink( ) # TODO: Python 3.8: missing_ok = True
+    process_environment = __.derive_venv_variables( )
     # TODO: https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
-    context.run(
-        'python3 setup.py sdist', **__.derive_venv_context_options( ) )
+    __.execute_external(
+        'python3 setup.py sdist',
+        capture_output = False, env = process_environment )
     if signature:
-        context.run( f"gpg --detach-sign --armor {path}", pty = True )
+        __.execute_external(
+            f"gpg --detach-sign --armor {path}",
+            capture_output = False, env = process_environment )
 
 
 def _get_sdist_path( ):
@@ -497,11 +513,15 @@ def make_wheel( context, ensure_sanity = True, signature = True ):
     make_sdist( context, ensure_sanity = ensure_sanity, signature = signature )
     path = _get_wheel_path( )
     if path.exists( ): path.unlink( ) # TODO: Python 3.8: missing_ok = True
+    process_environment = __.derive_venv_variables( )
     # TODO: https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
-    context.run(
-        'python3 setup.py bdist_wheel', **__.derive_venv_context_options( ) )
+    __.execute_external(
+        'python3 setup.py bdist_wheel',
+        capture_output = False, env = process_environment )
     if signature:
-        context.run( f"gpg --detach-sign --armor {path}", pty = True )
+        __.execute_external(
+            f"gpg --detach-sign --armor {path}",
+            capture_output = False, env = process_environment )
 
 
 def _get_wheel_path( ):
@@ -514,14 +534,15 @@ def _get_wheel_path( ):
     'Artifact: Documentation',
     task_nomargs = dict( pre = ( check_urls, ), ),
 )
-def make_html( context ):
+def make_html( context ): # pylint: disable=unused-argument
     ''' Generates documentation as HTML artifacts. '''
     from ..fs_utilities import unlink_recursively
     unlink_recursively( __.paths.artifacts.sphinx_html )
-    context.run(
+    process_environment = __.derive_venv_variables( )
+    __.execute_external(
         f"sphinx-build -b html {__.sphinx_options} "
         f"{__.paths.sources.prj.sphinx} {__.paths.artifacts.sphinx_html}",
-        pty = __.on_tty, **__.derive_venv_context_options( ) )
+        capture_output = False, env = process_environment )
 
 
 @_task( task_nomargs = dict( pre = ( clean, make_wheel, make_html, ), ), )
@@ -529,9 +550,9 @@ def make( context ): # pylint: disable=unused-argument
     ''' Generates all of the artifacts. '''
 
 
-def _ensure_clean_workspace( context ):
+def _ensure_clean_workspace( ):
     ''' Error if version control reports any dirty or untracked files. '''
-    result = context.run( 'git status --short', pty = True )
+    result = __.execute_external( 'git status --short' )
     if result.stdout or result.stderr:
         # TODO: Use different error-handling mechanism.
         from invoke import Exit
@@ -539,9 +560,9 @@ def _ensure_clean_workspace( context ):
 
 
 @_task( 'Version: Adjust' )
-def bump( context, piece ):
+def bump( context, piece ): # pylint: disable=unused-argument
     ''' Bumps a piece of the current version. '''
-    _ensure_clean_workspace( context )
+    _ensure_clean_workspace( )
     from ..user_interface import assert_gpg_tty
     assert_gpg_tty( )
     project_version = __.discover_project_version( )
@@ -552,11 +573,12 @@ def bump( context, piece ):
         if current_version.stage in ( 'a', 'rc' ): part = 'prerelease'
         else: part = 'patch'
     else: part = piece
-    context.run(
+    process_environment = __.derive_venv_variables( )
+    __.execute_external(
         f"bumpversion --config-file={__.paths.configuration.bumpversion}"
         f" --current-version {current_version}"
         f" --new-version {new_version}"
-        f" {part}", pty = True, **__.derive_venv_context_options( ) )
+        f" {part}", capture_output = False, env = process_environment )
 
 
 @_task(
@@ -574,25 +596,28 @@ def bump_stage( context ): # pylint: disable=unused-argument
 
 
 @_task( task_nomargs = dict( post = ( bump_stage, ), ), )
-def branch_release( context, remote = 'origin' ):
+def branch_release( context, remote = 'origin' ): # pylint: disable=unused-argument
     ''' Makes a new branch for development torwards a release. '''
     from invoke import Exit  # TODO: Use different error-handling mechanism.
-    _ensure_clean_workspace( context )
+    _ensure_clean_workspace( )
     project_version = __.discover_project_version( )
     mainline_regex = __.re.compile(
         r'''^\s+HEAD branch:\s+(.*)$''', __.re.MULTILINE )
-    mainline_branch = mainline_regex.search( context.run(
-        f"git remote show {remote}", hide = 'stdout' ).stdout.strip( ) )[ 1 ]
-    true_branch = context.run(
-        'git branch --show-current', hide = 'stdout' ).stdout.strip( )
+    mainline_branch = mainline_regex.search( __.execute_external(
+        f"git remote show {remote}" ).stdout.strip( ) )[ 1 ]
+    true_branch = __.execute_external(
+        'git branch --show-current' ).stdout.strip( )
     if mainline_branch != true_branch:
+        # TODO: Use different error-reporting mechanism.
         raise Exit( f"Cannot create release from branch: {true_branch}" )
     this_version = __.Version.from_string( project_version )
     stage = this_version.stage
     if 'a' != stage:
+        # TODO: Use different error-reporting mechanism.
         raise Exit( f"Cannot create release from stage: {stage}" )
     target_branch = f"release-{this_version.major}.{this_version.minor}"
-    context.run( f"git checkout -b {target_branch}", pty = True )
+    __.execute_external(
+        f"git checkout -b {target_branch}", capture_output = False )
 
 
 @_task( )
@@ -601,62 +626,67 @@ def check_code_style( context, write_changes = False ):
     yapf_options = [ ]
     if write_changes: yapf_options.append( '--in-place --verbose' )
     yapf_options_string = ' '.join( yapf_options )
+    from ..base import on_tty
+    from ..environments import derive_venv_context_options
+    # TODO: Model with popen pipeline.
     context.run(
         f"git diff --unified=0 --no-color -- {__.paths.sources.prj.python3} "
         f"| yapf-diff {yapf_options_string}",
-        pty = __.on_tty, **__.derive_venv_context_options( ) )
+        pty = on_tty, **derive_venv_context_options( ) )
 
 
 @_task( 'SCM: Push Branch with Tags' )
-def push( context, remote = 'origin' ):
+def push( context, remote = 'origin' ): # pylint: disable=unused-argument
     ''' Pushes commits on current branch, plus all tags. '''
     # TODO: Discover remote corresponding to current branch.
-    _ensure_clean_workspace( context )
+    _ensure_clean_workspace( )
     project_version = __.discover_project_version( )
-    true_branch = context.run(
-        'git branch --show-current', hide = 'stdout' ).stdout.strip( )
+    true_branch = __.execute_external(
+        'git branch --show-current' ).stdout.strip( )
     this_version = __.Version.from_string( project_version )
     target_branch = f"release-{this_version.major}.{this_version.minor}"
     if true_branch == target_branch:
-        context.run(
-            f"git push --set-upstream {remote} {true_branch}", pty = True )
-    else: context.run( 'git push', pty = True )
-    context.run( 'git push --no-verify --tags', pty = True )
+        __.execute_external(
+            f"git push --set-upstream {remote} {true_branch}",
+            capture_output = False )
+    else: __.execute_external( 'git push', capture_output = False )
+    __.execute_external(
+        'git push --no-verify --tags', capture_output = False )
 
 
 @_task( )
-def check_pip_install( context, index_url = '', version = None ):
+def check_pip_install( context, index_url = '', version = None ): # pylint: disable=unused-argument
     ''' Checks import of current package after installation via Pip. '''
     version = version or __.discover_project_version( )
     from ..user_interface import render_boxed_title
     render_boxed_title( f"Verify: Python Package Installation ({version})" )
+    from subprocess import SubprocessError # nosec B404
     from tempfile import TemporaryDirectory
     from time import sleep
     from venv import create as create_venv
-    from invoke import Failure
     with TemporaryDirectory( ) as venv_path:
         venv_path = __.Path( venv_path )
         create_venv( venv_path, clear = True, with_pip = True )
         index_url_option = ''
         if index_url: index_url_option = f"--index-url {index_url}"
-        context_options = __.derive_venv_context_options( venv_path )
+        process_environment = __.derive_venv_variables( venv_path = venv_path )
         attempts_count_max = 2
         for attempts_count in range( attempts_count_max + 1 ):
             try:
-                context.run(
+                __.execute_external(
                     f"pip install {index_url_option} "
                     f"  {__.project_name}=={version}",
-                    pty = __.on_tty, **context_options )
-            except Failure:
+                    capture_output = False, env = process_environment )
+            except SubprocessError:
                 if attempts_count_max == attempts_count: raise
                 sleep( 2 ** attempts_count )
             else: break
         python_import_command = (
             f"import {__.project_name}; "
             f"print( {__.project_name}.__version__ )" )
-        context.run(
+        __.execute_external(
             f"python -c '{python_import_command}'",
-            pty = True, **context_options )
+            capture_output = False, env = process_environment )
 
 
 @_task( )
@@ -681,7 +711,7 @@ def check_pypi_integrity( context, version = None, index_url = '' ):
 
 
 # TODO: Move to '.packages' and separate retry logic from fetch logic.
-def check_pypi_package( context, package_url ):
+def check_pypi_package( context, package_url ): # pylint: disable=unused-argument
     ''' Verifies signature on package. '''
     from ..user_interface import assert_gpg_tty
     assert_gpg_tty( )
@@ -705,7 +735,8 @@ def check_pypi_package( context, package_url ):
                 if attempts_count_max == attempts_count: raise
                 sleep( 2 ** attempts_count )
             else: break
-        context.run( f"gpg --verify {signature_path}" )
+        __.execute_external(
+            f"gpg --verify {signature_path}", capture_output = False )
 
 
 @_task(
@@ -721,9 +752,9 @@ def check_pypi_package( context, package_url ):
         ),
     ),
 )
-def upload_test_pypi( context ):
+def upload_test_pypi( context ): # pylint: disable=unused-argument
     ''' Publishes current sdist and wheels to Test PyPI. '''
-    _upload_pypi( context, 'testpypi' )
+    _upload_pypi( 'testpypi' )
 
 
 @_task(
@@ -735,12 +766,12 @@ def upload_test_pypi( context ):
         post = ( check_pypi_integrity, check_pip_install, ),
     ),
 )
-def upload_pypi( context ):
+def upload_pypi( context ): # pylint: disable=unused-argument
     ''' Publishes current sdist and wheels to PyPI. '''
-    _upload_pypi( context )
+    _upload_pypi( )
 
 
-def _upload_pypi( context, repository_name = '' ):
+def _upload_pypi( repository_name = '' ):
     repository_option = ''
     task_name_suffix = ''
     if repository_name:
@@ -749,13 +780,11 @@ def _upload_pypi( context, repository_name = '' ):
     from ..user_interface import render_boxed_title
     render_boxed_title( f"Publication: PyPI{task_name_suffix}" )
     artifacts = _get_pypi_artifacts( )
-    context_options = __.derive_venv_context_options( )
-    process_environment = context_options.get( 'env', { } )
+    process_environment = __.derive_venv_variables( )
     process_environment.update( _get_pypi_credentials( repository_name ) )
-    context_options[ 'env' ] = process_environment
-    context.run(
+    __.execute_external(
         f"twine upload --skip-existing --verbose {repository_option} "
-        f"{artifacts}", pty = True, **context_options )
+        f"{artifacts}", capture_output = False, env = process_environment )
 
 
 def _get_pypi_artifacts( ):
@@ -819,9 +848,8 @@ def release_new_stage( context ): # pylint: disable=unused-argument
 
 
 @_task( )
-def run( context, command, version = None ):
+def run( context, command, version = None ): # pylint: disable=unused-argument
     ''' Runs command in virtual environment. '''
-    context.run(
-        command,
-        pty = __.on_tty,
-        **__.derive_venv_context_options( version = version ) )
+    process_environment = __.derive_venv_variables( version = version )
+    __.execute_external(
+        command, capture_output = False, env = process_environment )

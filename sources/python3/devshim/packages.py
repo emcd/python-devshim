@@ -31,38 +31,38 @@ from re import compile as _regex_compile
 from .base import expire as _expire
 
 
-def install_python_packages( context_options, identifier = None ):
+def install_python_packages( process_environment, identifier = None ):
     ''' Installs required Python packages into virtual environment. '''
     from .base import execute_external
     raw, frozen, unpublished = generate_pip_requirements_text(
         identifier = identifier )
     execute_external(
         'pip install --upgrade setuptools pip wheel',
-        capture_output = False, env = context_options[ 'env' ] )
+        capture_output = False, env = process_environment )
     if not identifier or not frozen:
         pip_options = [ ]
         if not identifier:
             pip_options.append( '--upgrade' )
             pip_options.append( '--upgrade-strategy eager' )
         execute_pip_with_requirements(
-            context_options, 'install', raw, pip_options = pip_options )
+            process_environment, 'install', raw, pip_options = pip_options )
     else:
         pip_options = [ '--require-hashes' ]
         execute_pip_with_requirements(
-            context_options, 'install', frozen, pip_options = pip_options )
+            process_environment, 'install', frozen, pip_options = pip_options )
     if unpublished:
         execute_pip_with_requirements(
-            context_options, 'install', unpublished )
+            process_environment, 'install', unpublished )
     # Pip cannot currently mix editable and digest-bound requirements,
     # so we must install editable packages separately. (As of 2022-02-06.)
     # https://github.com/pypa/pip/issues/4995
     execute_external(
         'pip install --editable .',
-        capture_output = False, env = context_options[ 'env' ] )
+        capture_output = False, env = process_environment )
 
 
 def execute_pip_with_requirements(
-    context_options, command, requirements, pip_options = None
+    process_environment, command, requirements, pip_options = None
 ):
     ''' Executes a Pip command with requirements. '''
     pip_options = pip_options or ( )
@@ -80,7 +80,7 @@ def execute_pip_with_requirements(
                 command = command,
                 options = ' '.join( pip_options ),
                 requirements_file = shell_quote( requirements_file.name ) ),
-            capture_output = False, env = context_options[ 'env' ] )
+            capture_output = False, env = process_environment )
 
 
 def generate_pip_requirements_text( identifier = None ):
