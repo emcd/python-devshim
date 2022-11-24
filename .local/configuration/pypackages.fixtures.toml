@@ -434,7 +434,11 @@ digests = [
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "invoke"
-url = "git+https://github.com/emcd/invoke.git@fb40a3c79b3fa59cb589a642d0c4b8fa87ca082e"
+version = "1.7.3"
+digests = [
+    "sha256:d9694a865764dd3fd91f25f7e9a97fb41666e822bbb00e670091e3f43933574d",
+    "sha256:41b428342d466a82135d5ab37119685a989713742be46e42a3a399d685579314",
+]
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "isort"
@@ -470,10 +474,10 @@ digests = [
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "jsonschema"
-version = "4.17.0"
+version = "4.17.1"
 digests = [
-    "sha256:f660066c3966db7d6daeaea8a75e0b68237a48e51cf49882087757bb59916248",
-    "sha256:5bfcf2bca16a087ade17e02b282d34af7ccd749ef76241e7f9bd7c0cb8a9424d",
+    "sha256:410ef23dcdbca4eaedc08b850079179883c2ed09378bd1f760d4af4aacfa28d7",
+    "sha256:05b2d22c83640cde0b7e0aa329ca7754fbd98ea66ad8ae24aa61328dfe057fa3",
 ]
 
 [["cpython-3.10.8--linux--x86_64"]]
@@ -899,10 +903,10 @@ digests = [
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "safety"
-version = "2.3.1"
+version = "2.3.2"
 digests = [
-    "sha256:8f098d12b607db2756886280e85c28ece8db1bba4f45fc5f981f4663217bd619",
-    "sha256:6e6fcb7d4e8321098cf289f59b65051cafd3467f089c6e57c9f894ae32c23b71",
+    "sha256:d824cccd76fcf451c745d0a280dabc5176903878a68b9b9a2ec7dbfc2f8d03ff",
+    "sha256:7ed8d71f5ba7590d1c9abfa22c72a64de389ae2e07c6732b1c90955a168c55bf",
 ]
 
 [["cpython-3.10.8--linux--x86_64"]]
@@ -1188,10 +1192,10 @@ digests = [
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "urllib3"
-version = "1.26.12"
+version = "1.26.13"
 digests = [
-    "sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997",
-    "sha256:3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e",
+    "sha256:47cc05d99aaa09c9e72ed5809b60e7ba354e64b59c9c173ac3018642d8bb41fc",
+    "sha256:c083dd0dce68dbfbe1129d5271cb90f9447dea7d52097c6e0126120c521ddea8",
 ]
 
 [["cpython-3.10.8--linux--x86_64"]]
@@ -1732,7 +1736,11 @@ digests = [
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "invoke"
-url = "git+https://github.com/emcd/invoke.git@fb40a3c79b3fa59cb589a642d0c4b8fa87ca082e"
+version = "1.7.3"
+digests = [
+    "sha256:d9694a865764dd3fd91f25f7e9a97fb41666e822bbb00e670091e3f43933574d",
+    "sha256:41b428342d466a82135d5ab37119685a989713742be46e42a3a399d685579314",
+]
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "isort"
@@ -1768,10 +1776,10 @@ digests = [
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "jsonschema"
-version = "4.17.0"
+version = "4.17.1"
 digests = [
-    "sha256:f660066c3966db7d6daeaea8a75e0b68237a48e51cf49882087757bb59916248",
-    "sha256:5bfcf2bca16a087ade17e02b282d34af7ccd749ef76241e7f9bd7c0cb8a9424d",
+    "sha256:410ef23dcdbca4eaedc08b850079179883c2ed09378bd1f760d4af4aacfa28d7",
+    "sha256:05b2d22c83640cde0b7e0aa329ca7754fbd98ea66ad8ae24aa61328dfe057fa3",
 ]
 
 [["cpython-3.11.0--linux--x86_64"]]
@@ -2158,10 +2166,10 @@ digests = [
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "safety"
-version = "2.3.1"
+version = "2.3.2"
 digests = [
-    "sha256:8f098d12b607db2756886280e85c28ece8db1bba4f45fc5f981f4663217bd619",
-    "sha256:6e6fcb7d4e8321098cf289f59b65051cafd3467f089c6e57c9f894ae32c23b71",
+    "sha256:d824cccd76fcf451c745d0a280dabc5176903878a68b9b9a2ec7dbfc2f8d03ff",
+    "sha256:7ed8d71f5ba7590d1c9abfa22c72a64de389ae2e07c6732b1c90955a168c55bf",
 ]
 
 [["cpython-3.11.0--linux--x86_64"]]
@@ -2447,10 +2455,10 @@ digests = [
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "urllib3"
-version = "1.26.12"
+version = "1.26.13"
 digests = [
-    "sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997",
-    "sha256:3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e",
+    "sha256:47cc05d99aaa09c9e72ed5809b60e7ba354e64b59c9c173ac3018642d8bb41fc",
+    "sha256:c083dd0dce68dbfbe1129d5271cb90f9447dea7d52097c6e0126120c521ddea8",
 ]
 
 [["cpython-3.11.0--linux--x86_64"]]
@@ -3007,7 +3015,11 @@ digests = [
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "invoke"
-url = "git+https://github.com/emcd/invoke.git@fb40a3c79b3fa59cb589a642d0c4b8fa87ca082e"
+version = "1.7.3"
+digests = [
+    "sha256:d9694a865764dd3fd91f25f7e9a97fb41666e822bbb00e670091e3f43933574d",
+    "sha256:41b428342d466a82135d5ab37119685a989713742be46e42a3a399d685579314",
+]
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "isort"
@@ -3043,10 +3055,10 @@ digests = [
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "jsonschema"
-version = "4.17.0"
+version = "4.17.1"
 digests = [
-    "sha256:f660066c3966db7d6daeaea8a75e0b68237a48e51cf49882087757bb59916248",
-    "sha256:5bfcf2bca16a087ade17e02b282d34af7ccd749ef76241e7f9bd7c0cb8a9424d",
+    "sha256:410ef23dcdbca4eaedc08b850079179883c2ed09378bd1f760d4af4aacfa28d7",
+    "sha256:05b2d22c83640cde0b7e0aa329ca7754fbd98ea66ad8ae24aa61328dfe057fa3",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
@@ -3480,10 +3492,10 @@ digests = [
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "safety"
-version = "2.3.1"
+version = "2.3.2"
 digests = [
-    "sha256:8f098d12b607db2756886280e85c28ece8db1bba4f45fc5f981f4663217bd619",
-    "sha256:6e6fcb7d4e8321098cf289f59b65051cafd3467f089c6e57c9f894ae32c23b71",
+    "sha256:d824cccd76fcf451c745d0a280dabc5176903878a68b9b9a2ec7dbfc2f8d03ff",
+    "sha256:7ed8d71f5ba7590d1c9abfa22c72a64de389ae2e07c6732b1c90955a168c55bf",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
@@ -3799,10 +3811,10 @@ digests = [
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "urllib3"
-version = "1.26.12"
+version = "1.26.13"
 digests = [
-    "sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997",
-    "sha256:3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e",
+    "sha256:47cc05d99aaa09c9e72ed5809b60e7ba354e64b59c9c173ac3018642d8bb41fc",
+    "sha256:c083dd0dce68dbfbe1129d5271cb90f9447dea7d52097c6e0126120c521ddea8",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
@@ -4359,7 +4371,11 @@ digests = [
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "invoke"
-url = "git+https://github.com/emcd/invoke.git@fb40a3c79b3fa59cb589a642d0c4b8fa87ca082e"
+version = "1.7.3"
+digests = [
+    "sha256:d9694a865764dd3fd91f25f7e9a97fb41666e822bbb00e670091e3f43933574d",
+    "sha256:41b428342d466a82135d5ab37119685a989713742be46e42a3a399d685579314",
+]
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "isort"
@@ -4395,10 +4411,10 @@ digests = [
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "jsonschema"
-version = "4.17.0"
+version = "4.17.1"
 digests = [
-    "sha256:f660066c3966db7d6daeaea8a75e0b68237a48e51cf49882087757bb59916248",
-    "sha256:5bfcf2bca16a087ade17e02b282d34af7ccd749ef76241e7f9bd7c0cb8a9424d",
+    "sha256:410ef23dcdbca4eaedc08b850079179883c2ed09378bd1f760d4af4aacfa28d7",
+    "sha256:05b2d22c83640cde0b7e0aa329ca7754fbd98ea66ad8ae24aa61328dfe057fa3",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
@@ -4832,10 +4848,10 @@ digests = [
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "safety"
-version = "2.3.1"
+version = "2.3.2"
 digests = [
-    "sha256:8f098d12b607db2756886280e85c28ece8db1bba4f45fc5f981f4663217bd619",
-    "sha256:6e6fcb7d4e8321098cf289f59b65051cafd3467f089c6e57c9f894ae32c23b71",
+    "sha256:d824cccd76fcf451c745d0a280dabc5176903878a68b9b9a2ec7dbfc2f8d03ff",
+    "sha256:7ed8d71f5ba7590d1c9abfa22c72a64de389ae2e07c6732b1c90955a168c55bf",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
@@ -5121,10 +5137,10 @@ digests = [
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "urllib3"
-version = "1.26.12"
+version = "1.26.13"
 digests = [
-    "sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997",
-    "sha256:3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e",
+    "sha256:47cc05d99aaa09c9e72ed5809b60e7ba354e64b59c9c173ac3018642d8bb41fc",
+    "sha256:c083dd0dce68dbfbe1129d5271cb90f9447dea7d52097c6e0126120c521ddea8",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
@@ -5673,7 +5689,11 @@ digests = [
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "invoke"
-url = "git+https://github.com/emcd/invoke.git@fb40a3c79b3fa59cb589a642d0c4b8fa87ca082e"
+version = "1.7.3"
+digests = [
+    "sha256:d9694a865764dd3fd91f25f7e9a97fb41666e822bbb00e670091e3f43933574d",
+    "sha256:41b428342d466a82135d5ab37119685a989713742be46e42a3a399d685579314",
+]
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "isort"
@@ -5709,10 +5729,10 @@ digests = [
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "jsonschema"
-version = "4.17.0"
+version = "4.17.1"
 digests = [
-    "sha256:f660066c3966db7d6daeaea8a75e0b68237a48e51cf49882087757bb59916248",
-    "sha256:5bfcf2bca16a087ade17e02b282d34af7ccd749ef76241e7f9bd7c0cb8a9424d",
+    "sha256:410ef23dcdbca4eaedc08b850079179883c2ed09378bd1f760d4af4aacfa28d7",
+    "sha256:05b2d22c83640cde0b7e0aa329ca7754fbd98ea66ad8ae24aa61328dfe057fa3",
 ]
 
 [["cpython-3.9.15--linux--x86_64"]]
@@ -6138,10 +6158,10 @@ digests = [
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "safety"
-version = "2.3.1"
+version = "2.3.2"
 digests = [
-    "sha256:8f098d12b607db2756886280e85c28ece8db1bba4f45fc5f981f4663217bd619",
-    "sha256:6e6fcb7d4e8321098cf289f59b65051cafd3467f089c6e57c9f894ae32c23b71",
+    "sha256:d824cccd76fcf451c745d0a280dabc5176903878a68b9b9a2ec7dbfc2f8d03ff",
+    "sha256:7ed8d71f5ba7590d1c9abfa22c72a64de389ae2e07c6732b1c90955a168c55bf",
 ]
 
 [["cpython-3.9.15--linux--x86_64"]]
@@ -6427,10 +6447,10 @@ digests = [
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "urllib3"
-version = "1.26.12"
+version = "1.26.13"
 digests = [
-    "sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997",
-    "sha256:3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e",
+    "sha256:47cc05d99aaa09c9e72ed5809b60e7ba354e64b59c9c173ac3018642d8bb41fc",
+    "sha256:c083dd0dce68dbfbe1129d5271cb90f9447dea7d52097c6e0126120c521ddea8",
 ]
 
 [["cpython-3.9.15--linux--x86_64"]]
@@ -6988,7 +7008,11 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "invoke"
-url = "git+https://github.com/emcd/invoke.git@fb40a3c79b3fa59cb589a642d0c4b8fa87ca082e"
+version = "1.7.3"
+digests = [
+    "sha256:d9694a865764dd3fd91f25f7e9a97fb41666e822bbb00e670091e3f43933574d",
+    "sha256:41b428342d466a82135d5ab37119685a989713742be46e42a3a399d685579314",
+]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "jaraco.classes"
@@ -7016,10 +7040,10 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "jsonschema"
-version = "4.17.0"
+version = "4.17.1"
 digests = [
-    "sha256:f660066c3966db7d6daeaea8a75e0b68237a48e51cf49882087757bb59916248",
-    "sha256:5bfcf2bca16a087ade17e02b282d34af7ccd749ef76241e7f9bd7c0cb8a9424d",
+    "sha256:410ef23dcdbca4eaedc08b850079179883c2ed09378bd1f760d4af4aacfa28d7",
+    "sha256:05b2d22c83640cde0b7e0aa329ca7754fbd98ea66ad8ae24aa61328dfe057fa3",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -7337,10 +7361,10 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "safety"
-version = "2.3.1"
+version = "2.3.2"
 digests = [
-    "sha256:8f098d12b607db2756886280e85c28ece8db1bba4f45fc5f981f4663217bd619",
-    "sha256:6e6fcb7d4e8321098cf289f59b65051cafd3467f089c6e57c9f894ae32c23b71",
+    "sha256:d824cccd76fcf451c745d0a280dabc5176903878a68b9b9a2ec7dbfc2f8d03ff",
+    "sha256:7ed8d71f5ba7590d1c9abfa22c72a64de389ae2e07c6732b1c90955a168c55bf",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -7618,10 +7642,10 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "urllib3"
-version = "1.26.12"
+version = "1.26.13"
 digests = [
-    "sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997",
-    "sha256:3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e",
+    "sha256:47cc05d99aaa09c9e72ed5809b60e7ba354e64b59c9c173ac3018642d8bb41fc",
+    "sha256:c083dd0dce68dbfbe1129d5271cb90f9447dea7d52097c6e0126120c521ddea8",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -8125,7 +8149,11 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "invoke"
-url = "git+https://github.com/emcd/invoke.git@fb40a3c79b3fa59cb589a642d0c4b8fa87ca082e"
+version = "1.7.3"
+digests = [
+    "sha256:d9694a865764dd3fd91f25f7e9a97fb41666e822bbb00e670091e3f43933574d",
+    "sha256:41b428342d466a82135d5ab37119685a989713742be46e42a3a399d685579314",
+]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "isort"
@@ -8161,10 +8189,10 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "jsonschema"
-version = "4.17.0"
+version = "4.17.1"
 digests = [
-    "sha256:f660066c3966db7d6daeaea8a75e0b68237a48e51cf49882087757bb59916248",
-    "sha256:5bfcf2bca16a087ade17e02b282d34af7ccd749ef76241e7f9bd7c0cb8a9424d",
+    "sha256:410ef23dcdbca4eaedc08b850079179883c2ed09378bd1f760d4af4aacfa28d7",
+    "sha256:05b2d22c83640cde0b7e0aa329ca7754fbd98ea66ad8ae24aa61328dfe057fa3",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -8561,10 +8589,10 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "safety"
-version = "2.3.1"
+version = "2.3.2"
 digests = [
-    "sha256:8f098d12b607db2756886280e85c28ece8db1bba4f45fc5f981f4663217bd619",
-    "sha256:6e6fcb7d4e8321098cf289f59b65051cafd3467f089c6e57c9f894ae32c23b71",
+    "sha256:d824cccd76fcf451c745d0a280dabc5176903878a68b9b9a2ec7dbfc2f8d03ff",
+    "sha256:7ed8d71f5ba7590d1c9abfa22c72a64de389ae2e07c6732b1c90955a168c55bf",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -8850,10 +8878,10 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "urllib3"
-version = "1.26.12"
+version = "1.26.13"
 digests = [
-    "sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997",
-    "sha256:3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e",
+    "sha256:47cc05d99aaa09c9e72ed5809b60e7ba354e64b59c9c173ac3018642d8bb41fc",
+    "sha256:c083dd0dce68dbfbe1129d5271cb90f9447dea7d52097c6e0126120c521ddea8",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -9419,7 +9447,11 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "invoke"
-url = "git+https://github.com/emcd/invoke.git@fb40a3c79b3fa59cb589a642d0c4b8fa87ca082e"
+version = "1.7.3"
+digests = [
+    "sha256:d9694a865764dd3fd91f25f7e9a97fb41666e822bbb00e670091e3f43933574d",
+    "sha256:41b428342d466a82135d5ab37119685a989713742be46e42a3a399d685579314",
+]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "isort"
@@ -9455,10 +9487,10 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "jsonschema"
-version = "4.17.0"
+version = "4.17.1"
 digests = [
-    "sha256:f660066c3966db7d6daeaea8a75e0b68237a48e51cf49882087757bb59916248",
-    "sha256:5bfcf2bca16a087ade17e02b282d34af7ccd749ef76241e7f9bd7c0cb8a9424d",
+    "sha256:410ef23dcdbca4eaedc08b850079179883c2ed09378bd1f760d4af4aacfa28d7",
+    "sha256:05b2d22c83640cde0b7e0aa329ca7754fbd98ea66ad8ae24aa61328dfe057fa3",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
@@ -9847,10 +9879,10 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "safety"
-version = "2.3.1"
+version = "2.3.2"
 digests = [
-    "sha256:8f098d12b607db2756886280e85c28ece8db1bba4f45fc5f981f4663217bd619",
-    "sha256:6e6fcb7d4e8321098cf289f59b65051cafd3467f089c6e57c9f894ae32c23b71",
+    "sha256:d824cccd76fcf451c745d0a280dabc5176903878a68b9b9a2ec7dbfc2f8d03ff",
+    "sha256:7ed8d71f5ba7590d1c9abfa22c72a64de389ae2e07c6732b1c90955a168c55bf",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
@@ -10136,10 +10168,10 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "urllib3"
-version = "1.26.12"
+version = "1.26.13"
 digests = [
-    "sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997",
-    "sha256:3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e",
+    "sha256:47cc05d99aaa09c9e72ed5809b60e7ba354e64b59c9c173ac3018642d8bb41fc",
+    "sha256:c083dd0dce68dbfbe1129d5271cb90f9447dea7d52097c6e0126120c521ddea8",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
