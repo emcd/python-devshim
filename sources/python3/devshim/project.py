@@ -21,23 +21,24 @@
 ''' Management of project. '''
 
 
-def discover_project_name( ):
+def discover_name( ):
     ''' Returns project name, as parsed from local configuration. '''
-    return discover_project_information( )[ 'name' ]
+    return discover_information( )[ 'name' ]
 
 
-def discover_project_version( ):
+def discover_version( ):
     ''' Returns project version, as parsed from local configuration. '''
-    return discover_project_information( )[ 'version' ]
+    return discover_information( )[ 'version' ]
 
 
-def discover_project_information( ):
+def discover_information( ):
     ''' Discovers information about project from local configuration. '''
     from tomli import load
-    from devshim.locations import paths
+    from .data import paths
     with paths.configuration.pyproject.open( 'rb' ) as file:
         tables = load( file )
     information = tables[ 'project' ]
     information.update( tables[ 'tool' ][ 'setuptools' ] )
+    # TODO: Tool should be 'devshim'.
     information.update( tables[ 'tool' ][ 'SELF' ] )
     return information

@@ -43,6 +43,14 @@ def freshen_python( original_version ):
     return { original_version: successor_version }, original_identifier
 
 
+#def install_python( version ):
+#    ''' Installs requested version of Python, if possible. '''
+#    # TODO: Calculate cache path for current platform and requested version.
+#    # TODO: Check cache for prebuilt distribution, if not forced install.
+#    # TODO: If no prebuilt found, then download and install one, if possible.
+#    # TODO: If no prebuilt available, then build, if possible.
+
+
 def _derive_python_complete_version( minor_version ):
     ''' Given a minor version, return the corresponding complete version. '''
     from shlex import split as split_command
@@ -73,7 +81,7 @@ def install_python_builder_posix( ):
     ''' Installs 'python-build' utility. '''
     from os import environ as active_process_environment
     environment = active_process_environment.copy( )
-    from ..locations import paths
+    from ..data import paths
     environment.update( dict( PREFIX = paths.caches.utilities.python_build, ) )
     from ..base import execute_external
     execute_external(
@@ -100,7 +108,7 @@ def pep508_identify_python( version = None ):
 
 def identify_python( mode, python_path ):
     ''' Reports compatibility identifier for Python at given path. '''
-    from ..locations import paths
+    from ..data import paths
     detector_path = paths.scripts.aux.python3 / 'identify-python.py'
     from ..base import execute_external
     return execute_external(
@@ -137,6 +145,6 @@ def indicate_python_versions_support( ):
     if None is not version: return ( version, )
     from re import MULTILINE, compile as regex_compile
     regex = regex_compile( r'''^python\s+(.*)$''', MULTILINE )
-    from ..locations import paths
+    from ..data import paths
     with paths.configuration.asdf.open( ) as file:
         return regex.match( file.read( ) )[ 1 ].split( )

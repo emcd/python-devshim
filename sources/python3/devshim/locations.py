@@ -20,9 +20,6 @@
 
 ''' Constants and utilities for locations.
 
-    A cache of locations are precalculated during module import.
-    This is a very rapid set of calculations and will not affect performance.
-
     Locations are modeled in Python code rather than a data language
     or DSL, so that a separate file does not need to be loaded during
     early startup and because the Python code is more flexible than
@@ -34,31 +31,34 @@
     compact but it is not supported in the Python standard library. '''
 
 
-# TODO? Early importation of immutable namespace class.
+# TODO: Work directly with dictionary.
+#       Conversion to immutable namespace will happen on return from public
+#       interface.
 from types import SimpleNamespace as _SimpleNamespace
 
 
-def _calculate_paths( ):
+def assemble( ):
+    ''' Assembles project file system locations from configuration. '''
     from .base import configuration
-    paths_ = _SimpleNamespace(
+    paths = _SimpleNamespace(
         auxiliary = configuration[ 'auxiliary_path' ],
         project = configuration[ 'project_path' ],
     )
-    paths_.local = paths_.project / '.local'
-    paths_.artifacts = _calculate_artifacts_paths( paths_ )
-    paths_.caches = _calculate_caches_paths( paths_ )
-    paths_.configuration = _calculate_configuration_paths( paths_ )
-    paths_.environments = paths_.local / 'environments'
-    paths_.scm_modules = _calculate_scm_modules_paths( paths_ )
-    paths_.state = paths_.local / 'state'
-    paths_.scripts = _calculate_scripts_paths( paths_ )
-    paths_.sources = _calculate_sources_paths( paths_ )
-    paths_.tests = _calculate_tests_paths( paths_ )
-    return paths_
+    paths.local = paths.project / '.local'
+    paths.artifacts = _calculate_artifacts_paths( paths )
+    paths.caches = _calculate_caches_paths( paths )
+    paths.configuration = _calculate_configuration_paths( paths )
+    paths.environments = paths.local / 'environments'
+    paths.scm_modules = _calculate_scm_modules_paths( paths )
+    paths.state = paths.local / 'state'
+    paths.scripts = _calculate_scripts_paths( paths )
+    paths.sources = _calculate_sources_paths( paths )
+    paths.tests = _calculate_tests_paths( paths )
+    return _create_namespace_recursive( paths.__dict__ )
 
 
-def _calculate_artifacts_paths( paths_ ):
-    artifacts_path = paths_.local / 'artifacts'
+def _calculate_artifacts_paths( paths ):
+    artifacts_path = paths.local / 'artifacts'
     html_path = artifacts_path / 'html'
     return _SimpleNamespace(
         SELF = artifacts_path,
@@ -69,8 +69,8 @@ def _calculate_artifacts_paths( paths_ ):
     )
 
 
-def _calculate_caches_paths( paths_ ):
-    caches_path = paths_.local / 'caches'
+def _calculate_caches_paths( paths ):
+    caches_path = paths.local / 'caches'
     packages_path = caches_path / 'packages'
     platforms_path = caches_path / 'platforms'
     utilities_path = caches_path / 'utilities'
@@ -91,28 +91,28 @@ def _calculate_caches_paths( paths_ ):
     )
 
 
-def _calculate_configuration_paths( paths_ ):
-    configuration_path = paths_.local / 'configuration'
+def _calculate_configuration_paths( paths ):
+    configuration_path = paths.local / 'configuration'
     return _SimpleNamespace(
-        asdf = paths_.project / '.tool-versions',
+        asdf = paths.project / '.tool-versions',
         bumpversion = configuration_path / 'bumpversion.cfg',
         pre_commit = configuration_path / 'pre-commit.yaml',
         pypackages = configuration_path / 'pypackages.toml',
         pypackages_fixtures = configuration_path / 'pypackages.fixtures.toml',
-        pyproject = paths_.project / 'pyproject.toml',
+        pyproject = paths.project / 'pyproject.toml',
     )
 
 
-def _calculate_scm_modules_paths( paths_ ):
+def _calculate_scm_modules_paths( paths ):
     return _SimpleNamespace(
-        aux = paths_.auxiliary / 'scm-modules',
-        prj = paths_.local / 'scm-modules',
+        aux = paths.auxiliary / 'scm-modules',
+        prj = paths.local / 'scm-modules',
     )
 
 
-def _calculate_scripts_paths( paths_ ):
-    auxiliary_path = paths_.auxiliary / 'scripts'
-    project_path = paths_.project / 'scripts'
+def _calculate_scripts_paths( paths ):
+    auxiliary_path = paths.auxiliary / 'scripts'
+    project_path = paths.project / 'scripts'
     return _SimpleNamespace(
         aux = _SimpleNamespace(
             python3 = auxiliary_path / 'python3',
@@ -123,9 +123,9 @@ def _calculate_scripts_paths( paths_ ):
     )
 
 
-def _calculate_sources_paths( paths_ ):
-    auxiliary_path = paths_.auxiliary / 'sources'
-    project_path = paths_.project / 'sources'
+def _calculate_sources_paths( paths ):
+    auxiliary_path = paths.auxiliary / 'sources'
+    project_path = paths.project / 'sources'
     return _SimpleNamespace(
         aux = _SimpleNamespace(
             python3 = auxiliary_path / 'python3',
@@ -137,9 +137,9 @@ def _calculate_sources_paths( paths_ ):
     )
 
 
-def _calculate_tests_paths( paths_ ):
-    auxiliary_path = paths_.auxiliary / 'tests'
-    project_path = paths_.project / 'tests'
+def _calculate_tests_paths( paths ):
+    auxiliary_path = paths.auxiliary / 'tests'
+    project_path = paths.project / 'tests'
     return _SimpleNamespace(
         aux = _SimpleNamespace(
             python3 = auxiliary_path / 'python3',
@@ -150,5 +150,21 @@ def _calculate_tests_paths( paths_ ):
     )
 
 
-#: Precalculated cache of filesystem locations.
-paths = _calculate_paths( )
+def _create_namespace_recursive( dictionary ):
+    from collections.abc import Mapping as AbstractDictionary
+    from inspect import isfunction as is_function
+    from types import SimpleNamespace
+    namespace = { }
+    for name, value in dictionary.items( ):
+        # TODO: Filter for valid Python identifiers.
+        # TODO: Filter for public names.
+        if is_function( value ):
+            namespace[ name ] = staticmethod( value )
+        elif isinstance( value, AbstractDictionary ):
+            namespace[ name ] = _create_namespace_recursive( value )
+        elif isinstance( value, SimpleNamespace ):
+            namespace[ name ] = _create_namespace_recursive( value.__dict__ )
+        else: namespace[ name ] = value
+    namespace[ '__slots__' ] = ( )
+    class_ = type( 'Namespace', ( ), namespace )
+    return class_( )

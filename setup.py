@@ -49,7 +49,7 @@ class BuildCommand( _BuildCommand ): # pylint: disable=too-many-ancestors
     def initialize_options( self ):
         ''' Override 'build_base' attribute. '''
         _BuildCommand.initialize_options( self )
-        from devshim.locations import paths
+        from devshim.data import paths
         self.build_base = str( paths.caches.setuptools )
 
 
@@ -62,7 +62,7 @@ class EggInfoCommand( _EggInfoCommand ):
     def initialize_options( self ):
         ''' Override 'egg_base' attribute. '''
         _EggInfoCommand.initialize_options( self )
-        from devshim.locations import paths
+        from devshim.data import paths
         self.egg_base = str( paths.caches.setuptools ) # pylint: disable=attribute-defined-outside-init
 
 
@@ -73,7 +73,7 @@ class SdistCommand( _SdistCommand ): # pylint: disable=too-many-ancestors
     def initialize_options( self ):
         ''' Override 'dist_dir' attribute. '''
         _SdistCommand.initialize_options( self )
-        from devshim.locations import paths
+        from devshim.data import paths
         self.dist_dir = str( paths.artifacts.sdists )
 
 
@@ -84,7 +84,7 @@ class BdistWheelCommand( _BdistWheelCommand ):
     def initialize_options( self ):
         ''' Override 'dist_dir' attribute. '''
         _BdistWheelCommand.initialize_options( self )
-        from devshim.locations import paths
+        from devshim.data import paths
         self.dist_dir = str( paths.artifacts.wheels ) # pylint: disable=attribute-defined-outside-init
 
 

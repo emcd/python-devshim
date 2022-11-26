@@ -17,7 +17,18 @@
 #                                                                            #
 #============================================================================#
 
-''' Constants and utilities for project maintenance tasks. '''
+''' Constants, imports, and utilities for project maintenance tasks. '''
+
+
+# Common Imports
+# pylint: disable=unused-import
+from invoke import call
+
+from ..base import execute_external
+from ..data import paths, project_name
+from ..environments import derive_venv_variables
+from ..project import discover_version as discover_project_version
+# pylint: enable=unused-import
 
 
 def task(

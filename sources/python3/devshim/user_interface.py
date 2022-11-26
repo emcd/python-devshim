@@ -71,7 +71,7 @@ def generate_cli_functions( shell_name, function_name, with_completions ):
             shell_name = _provide_default_shell_name( )
     from inspect import cleandoc
     from sys import executable as active_python_path
-    from .locations import paths
+    from .data import paths
     invocation_code = cleandoc(
         invocation_code_table[ shell_name ].format(
             python_path = active_python_path,

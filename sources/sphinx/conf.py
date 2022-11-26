@@ -25,7 +25,7 @@ def _install_prerequisite_packages( ):
     # Hack to install documentation requirements for ReadTheDocs builder.
     # (Better than maintaining a separate 'requirements.txt'.)
     from os import environ as current_process_environment
-    from devshim.locations import paths
+    from devshim.data import paths
     if 'True' != current_process_environment.get( 'READTHEDOCS', 'False' ):
         return
     from devshim.packages import ensure_python_packages
@@ -47,7 +47,9 @@ def _calculate_copyright_notice( information, author_ ):
     else: year_range = str( first_year )
     return f"{year_range}, {author_}"
 
-from devshim.project import discover_project_information
+from devshim.project import (
+    discover_information as discover_project_information,
+)
 _information = discover_project_information( )
 project = _information[ 'name' ]
 release = _information[ 'version' ]

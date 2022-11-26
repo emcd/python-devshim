@@ -27,6 +27,7 @@
 
 
 from re import compile as _regex_compile
+from types import MappingProxyType as _DictionaryProxy
 
 from .base import expire as _expire
 
@@ -212,7 +213,7 @@ def indicate_python_packages( identifier = None ):
         platform identifier. Will be empty if none is given. '''
     assert_python_packages( ( 'tomli', ) )
     from tomli import load
-    from .locations import paths
+    from .data import paths
     fixtures_path = paths.configuration.pypackages_fixtures
     if identifier and fixtures_path.exists( ):
         with fixtures_path.open( 'rb' ) as file:
@@ -241,6 +242,22 @@ def assert_python_packages( requirements ):
         map( _pep508_requirement_to_name, installable_requirements ) )
     expire( 'invalid state',
             f"Packages absent from local cache: {names!r}" )
+
+
+def ensure_import_package( name ):
+    ''' Ensures package is available for import and imports it.
+
+        Translates aliases for forward compatibility. '''
+    name = _package_aliases.get( name, name )
+    _ensure_python_packages( ( name, ) )
+    from importlib import import_module
+    # nosemgrep: scm-modules.semgrep-rules.python.lang.security.audit.non-literal-import
+    return import_module( name )
+
+
+_package_aliases = _DictionaryProxy( {
+    'tomllib': 'tomli', # TODO: Python 3.11: Remove.
+} )
 
 
 def _ensure_essential_python_packages( ):
@@ -286,9 +303,9 @@ def _filter_available_python_packages( requirements, cache = None ):
 
 def _ensure_python_packages_cache( ):
     ''' Ensures availability of packages cache for active Python. '''
-    from devshim.fs_utilities import ensure_directory
-    from devshim.locations import paths
-    from devshim.platforms import active_python_abi_label
+    from .data import paths
+    from .fs_utilities import ensure_directory
+    from .platforms import active_python_abi_label
     cache = ensure_directory(
         paths.caches.packages.python3 / active_python_abi_label )
     cache_ = str( cache )
@@ -303,7 +320,7 @@ def record_python_packages_fixtures( identifier, fixtures ):
     from operator import itemgetter
     from tomli import load
     from tomli_w import dump
-    from .locations import paths
+    from .data import paths
     fixtures_path = paths.configuration.pypackages_fixtures
     if fixtures_path.exists( ):
         with fixtures_path.open( 'rb' ) as file: document = load( file )
@@ -319,7 +336,7 @@ def delete_python_packages_fixtures( identifiers ):
     ''' Deletes tables of Python packages fixtures. '''
     from tomli import load
     from tomli_w import dump
-    from .locations import paths
+    from .data import paths
     fixtures_path = paths.configuration.pypackages_fixtures
     if not fixtures_path.exists( ): return
     with fixtures_path.open( 'rb' ) as file: document = load( file )
