@@ -47,11 +47,6 @@ class Task( _Task ):
             NO_DEFAULT if Variate.empty is variate.default else variate.default
             for variate_name, variate in variates.items( )
             if variate.kind in acceptable_variate_species }
-        if not specifications:
-            # TODO: Use more appropriate error signal.
-            raise TypeError( "Tasks must have an initial Context argument!" )
-        # Drop context parameter.
-        specifications.pop( next( iter( specifications ) ) )
         return specifications.keys( ), specifications
 
 

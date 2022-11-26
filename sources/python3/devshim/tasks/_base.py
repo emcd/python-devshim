@@ -55,7 +55,7 @@ def task(
 
         # nosemgrep: scm-modules.semgrep-rules.python.lang.maintainability.useless-inner-function
         @wraps( invocable )
-        def invoker( *posargs, **nomargs ):
+        def invoker( context, *posargs, **nomargs ): # pylint: disable=unused-argument
             ''' Handles assorted banalities. '''
             if version_expansion:
                 from ..platforms import calculate_python_versions
@@ -74,6 +74,13 @@ def task(
         return Task( invoker, **( task_nomargs or { } ) )
 
     return decorator
+
+
+def invoke_task( task_, *posargs, **nomargs ):
+    ''' Invokes task with context. '''
+    # Invoke with fake context until we remove dependency on Invoke.
+    from invoke import Context
+    return task_( Context( ), *posargs, **nomargs )
 
 
 def _replace_arguments( invocable, posargs, nomargs, replacements ):
