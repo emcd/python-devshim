@@ -34,18 +34,22 @@ Remove Dependency on ``git``
 * Will not have to handle Git variants, like TortoiseGit, or Git bridges to
   other SCM systems.
 
-* Can use `Dulwich <https://www.dulwich.io/apidocs/>`, which does not rely on
+* Can use `Dulwich <https://www.dulwich.io/apidocs/>`_, which does not rely on
   Git executable. Will also be more efficient to eliminate subprocess fork-exec
   actions.
 
 More Linters
 ===============================================================================
 
-* `Fixit <https://github.com/Instagram/Fixit>`
+* `Fixit <https://github.com/Instagram/Fixit>`_
 
-* `Ruff <https://github.com/charliermarsh/ruff>`
+* `Pylint Utilities <https://github.com/jackdewinter/pylint_utils>`_
 
-* `Tryceratops <https://github.com/guilatrova/tryceratops>`
+* `Ruff <https://github.com/charliermarsh/ruff>`_
+
+* `Sourcery <https://sourcery.ai/>`_
+
+* `Tryceratops <https://github.com/guilatrova/tryceratops>`_
 
 Installable Devshim Wrapper Script
 ===============================================================================
@@ -85,7 +89,7 @@ Remove Dependency on ``bump2version``
 
 * Will need to modify project version reader to support the ``dynamic`` field.
 
-* Or maybe use `tbump <https://github.com/your-tools/tbump>` as an alternative
+* Or maybe use `tbump <https://github.com/your-tools/tbump>`_ as an alternative
   that is ``pyproject.toml``-amenable and has a simpler interface for bumping
   versions.
 
@@ -106,7 +110,7 @@ Remove Dependency on ``invoke``
 
 * Handle via ``develop.py``.
 
-* Possibly use `Typer <https://typer.tiangolo.com/>` as partial replacement.
+* Possibly use `Typer <https://typer.tiangolo.com/>`_ as partial replacement.
 
 * Async execution fanout. (Nice to have. Limited use cases actually.)
 
@@ -139,6 +143,9 @@ Upstream Bug Reports
 
 * Mypy: Version >= 0.990 crashes on imports into class namespaces when custom
   metaclass is involved.
+
+* Mypy: Version crashes on dynamic imports from modules that define
+  ``__getattr__``.
 
 * Semgrep: No detection of dangerous calls if imported into namespace class.
 
