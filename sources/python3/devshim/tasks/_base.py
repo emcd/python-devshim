@@ -22,7 +22,7 @@
 
 # Common Imports
 # pylint: disable=unused-import
-from invoke import call
+from invoke import Collection as TaskCollection, call
 
 from ..base import execute_external
 from ..data import paths, project_name

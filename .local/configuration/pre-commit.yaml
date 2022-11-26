@@ -32,7 +32,7 @@ repos:
     language: system
     always_run: true
     pass_filenames: false
-    entry: 'python3 develop.py lint-pylint'
+    entry: 'python3 develop.py lint.pylint'
   - id: devshim-semgrep
     name: Devshim Lint Semgrep
     stages: [ 'push' ]
@@ -40,7 +40,7 @@ repos:
     language: system
     always_run: true
     pass_filenames: false
-    entry: 'python3 develop.py lint-semgrep'
+    entry: 'python3 develop.py lint.semgrep'
   - id: devshim-mypy
     name: Devshim Lint Mypy
     stages: [ 'push' ]
@@ -48,7 +48,7 @@ repos:
     language: system
     always_run: true
     pass_filenames: false
-    entry: 'python3 develop.py lint-mypy'
+    entry: 'python3 develop.py lint.mypy'
   - id: devshim-bandit
     name: Devshim Lint Bandit
     stages: [ 'push' ]
@@ -56,7 +56,7 @@ repos:
     language: system
     always_run: true
     pass_filenames: false
-    entry: 'python3 develop.py lint-bandit'
+    entry: 'python3 develop.py lint.bandit'
   - id: devshim-test
     name: Devshim Test Suite
     stages: [ 'push' ]
@@ -72,7 +72,7 @@ repos:
     language: system
     always_run: true
     pass_filenames: false
-    entry: 'python3 develop.py make-html'
+    entry: 'python3 develop.py make.html'
   - id: devshim-wheel
     name: Devshim Packages
     stages: [ 'push' ]
@@ -80,4 +80,4 @@ repos:
     language: system
     always_run: true
     pass_filenames: false
-    entry: 'python3 develop.py make-wheel --no-ensure-sanity --no-signature'
+    entry: 'python3 develop.py make.wheel --no-ensure-sanity --no-signature'

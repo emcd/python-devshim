@@ -55,6 +55,6 @@ runs:
       if: "${{ 'true' != steps.python-cache.outputs.cache-hit }}"
       run: |
         set -eu
-        /usr/bin/python3 develop.py build-python-venv --version ${{ env.ASDF_PYTHON_VERSION }}
+        /usr/bin/python3 develop.py build.python-venv --version ${{ env.ASDF_PYTHON_VERSION }}
         asdf reshim python
       shell: bash

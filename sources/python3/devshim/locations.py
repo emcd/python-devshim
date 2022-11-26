@@ -96,8 +96,18 @@ def _calculate_configuration_paths( paths ):
     return _SimpleNamespace(
         asdf = paths.project / '.tool-versions',
         bumpversion = configuration_path / 'bumpversion.cfg',
+        devshim = _SimpleNamespace(
+            python = _SimpleNamespace(
+                packages = configuration_path.joinpath(
+                    'devshim', 'python', 'packages.toml' ),
+                versions = configuration_path.joinpath(
+                    'devshim', 'python', 'versions.toml' ),
+            ),
+        ),
         pre_commit = configuration_path / 'pre-commit.yaml',
+        # TODO: Move 'pypackages.toml' to Devshim config path.
         pypackages = configuration_path / 'pypackages.toml',
+        # TODO: Move 'pypackages.fixtures.toml' to data path.
         pypackages_fixtures = configuration_path / 'pypackages.fixtures.toml',
         pyproject = paths.project / 'pyproject.toml',
     )

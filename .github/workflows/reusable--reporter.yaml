@@ -19,7 +19,7 @@ jobs:
           name: coverage-results-${{ github.run_id }}
           path: .local/caches/pytest
       - name: Report Coverage
-        run: python3 develop.py report-coverage
+        run: python3 develop.py make.coverage
         shell: bash
       - name: Upload Coverage Report
         if: inputs.publish

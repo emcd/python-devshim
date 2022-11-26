@@ -27,6 +27,13 @@ from . import _base as __
 _sphinx_options = f"-j auto -d {__.paths.caches.sphinx} -n -T"
 
 
+@__.task( 'Show: Python Versions' )
+def list_python_versions( context ): # pylint: disable=unused-argument
+    ''' Lists names of supported Python versions. '''
+    from ..languages.python import survey_versions_support
+    for version in survey_versions_support( ).keys( ): print( version )
+
+
 @__.task( )
 def ease(
     context, # pylint: disable=unused-argument
@@ -34,7 +41,7 @@ def ease(
     function_name = 'devshim',
     with_completions = False
 ):
-    ''' Prints shell functions for easy invocation of development shim. '''
+    ''' Prints shell functions for easier invocation. '''
     from ..user_interface import generate_cli_functions
     print( generate_cli_functions(
         shell_name, function_name, with_completions ) )
@@ -42,7 +49,7 @@ def ease(
 
 @__.task( 'Install: Git Pre-Commit Hooks' )
 def install_git_hooks( context ): # pylint: disable=unused-argument
-    ''' Installs hooks to check goodness of code changes before commit. '''
+    ''' Installs hooks to check goodness of code before commit. '''
     process_environment = __.derive_venv_variables( )
     __.execute_external(
         f"pre-commit install --config {__.paths.configuration.pre_commit} "
@@ -67,7 +74,7 @@ def install_python( context, version ): # pylint: disable=unused-argument
 
 
 @__.task(
-    'Build: Python Virtual Environment',
+    'Make: Python Virtual Environment',
     version_expansion = 'declared Python versions',
 )
 def build_python_venv( context, version, overwrite = False ):
@@ -173,11 +180,11 @@ def clean( context, version = None ):
 
 
 @__.task(
-    'Lint: Package Security',
+    'Check: Python Package Security',
     version_expansion = 'declared Python virtual environments',
 )
 def check_security_issues( context, version = None ): # pylint: disable=unused-argument
-    ''' Checks for security issues in utilized packages and tools.
+    ''' Checks for security issues in installed Python packages.
 
         This task requires Internet access and may take some time. '''
     process_environment = __.derive_venv_variables( version = version )
@@ -397,7 +404,7 @@ def lint( context, version = None ):
     lint_bandit( context, version = version )
 
 
-@__.task( 'Artifact: Code Coverage Report' )
+@__.task( 'Make: Code Coverage Report' )
 def report_coverage( context ): # pylint: disable=unused-argument
     ''' Combines multiple code coverage results into a single report. '''
     process_environment = __.derive_venv_variables( )
@@ -526,7 +533,7 @@ def _ensure_clean_workspace( ):
         raise Exit( 'Dirty workspace. Please stash or commit changes.' )
 
 
-@__.task( 'Version: Adjust' )
+@__.task( 'Change: Project Version' )
 def bump( context, piece ): # pylint: disable=unused-argument
     ''' Bumps a piece of the current version. '''
     _ensure_clean_workspace( )
@@ -617,7 +624,7 @@ def check_code_style( context, write_changes = False ): # pylint: disable=unused
     if exit_code: raise SystemExit( exit_code )
 
 
-@__.task( 'SCM: Push Branch with Tags' )
+@__.task( 'Publish: Push Branch with Tags' )
 def push( context, remote = 'origin' ): # pylint: disable=unused-argument
     ''' Pushes commits on current branch, plus all tags. '''
     # TODO: Discover remote corresponding to current branch.
@@ -730,6 +737,7 @@ def check_pypi_package( context, package_url ): # pylint: disable=unused-argumen
 
 
 @__.task(
+    'Publish: Test PyPI',
     task_nomargs = dict(
         pre = ( make, ),
         post = (
@@ -748,6 +756,7 @@ def upload_test_pypi( context ): # pylint: disable=unused-argument
 
 
 @__.task(
+    'Publish: PyPI',
     task_nomargs = dict(
         pre = (
             __.call( upload_test_pypi ),
@@ -796,7 +805,7 @@ def _get_pypi_credentials( repository_name ):
 
 # Inspiration: https://stackoverflow.com/a/58993849/14833542
 @__.task(
-    'Publication: Github Pages',
+    'Publish: Github Pages',
     task_nomargs = dict( pre = ( test, make_html, ), ),
 )
 def upload_github_pages( context ): # pylint: disable=unused-argument
@@ -853,3 +862,85 @@ def run( context, command, version = None ): # pylint: disable=unused-argument
     process_environment = __.derive_venv_variables( version = version )
     __.execute_external(
         command, capture_output = False, env = process_environment )
+
+
+# For use by Invoke's module loader. Must be called 'namespace' (or 'ns').
+namespace = __.TaskCollection( )
+namespace.add_task( bootstrap )
+namespace.add_task( ease )
+namespace.add_task( push )
+namespace.add_task( run )
+namespace.add_task( test )
+namespace.add_collection( __.TaskCollection(
+    'build',
+    python_venv = build_python_venv,
+    release_branch = branch_release,
+) )
+namespace.add_collection( __.TaskCollection(
+    'change',
+    version_piece = bump,
+    version_patch = bump_patch,
+    version_stage = bump_stage,
+) )
+namespace.add_collection( __.TaskCollection(
+    'check',
+    pip_install = check_pip_install,
+    pypi_integrity = check_pypi_integrity,
+    pypi_readme = check_readme,
+    pypackages = check_security_issues,
+    sphinx_urls = check_urls,
+) )
+namespace.add_collection( __.TaskCollection(
+    'clean',
+    pycaches = clean_pycaches,
+    pypackages = clean_python_packages,
+    tool_caches = clean_tool_caches,
+) )
+namespace.subcollection_from_path( 'clean' ).add_task(
+    clean, name = 'ALL', default = True )
+namespace.add_collection( __.TaskCollection(
+    'freshen',
+    asdf = freshen_asdf,
+    git_hooks = freshen_git_hooks,
+    git_modules = freshen_git_modules,
+    pypackages = freshen_python_packages,
+    python = freshen_python,
+) )
+namespace.subcollection_from_path( 'freshen' ).add_task(
+    freshen, name = 'ALL', default = True )
+namespace.add_collection( __.TaskCollection(
+    'install',
+    git_hooks = install_git_hooks,
+    python = install_python,
+) )
+namespace.add_collection( __.TaskCollection(
+    'lint',
+    bandit = lint_bandit,
+    mypy = lint_mypy,
+    pylint = lint_pylint,
+    semgrep = lint_semgrep,
+    yapf = check_code_style,
+) )
+namespace.subcollection_from_path( 'lint' ).add_task(
+    lint, name = 'ALL', default = True )
+namespace.add_collection( __.TaskCollection(
+    'make',
+    coverage = report_coverage,
+    html = make_html,
+    sdist = make_sdist,
+    wheel = make_wheel,
+) )
+namespace.subcollection_from_path( 'make' ).add_task(
+    make, name = 'ALL', default = True )
+namespace.add_collection( __.TaskCollection(
+    'publish',
+    new_patch = release_new_patch,
+    new_stage = release_new_stage,
+    github_pages = upload_github_pages,
+    pypi = upload_pypi,
+    test_pypi = upload_test_pypi,
+) )
+namespace.add_collection( __.TaskCollection(
+    'show',
+    pythons = list_python_versions,
+) )

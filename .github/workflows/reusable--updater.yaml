@@ -20,7 +20,7 @@ jobs:
       - name: Construct Foundation
         uses: emcd/python-devshim/.github/actions/clone@master
       - name: Freshen Git Modules
-        run: /usr/bin/python3 develop.py freshen-git-modules
+        run: /usr/bin/python3 develop.py freshen.git-modules
         shell: bash
       - name: Freshen Python Versions
         run: |
@@ -51,13 +51,13 @@ jobs:
           python-version: '${{ matrix.python-version }}'
           use-versions-update: true
       - name: Freshen Git Modules
-        run: /usr/bin/python3 develop.py freshen-git-modules
+        run: /usr/bin/python3 develop.py freshen.git-modules
         shell: bash
       - name: Update Python Packages Fixtures
         run: |
           set -eu
           rm .local/configuration/pypackages.fixtures.toml
-          /usr/bin/python3 develop.py freshen-python-packages
+          /usr/bin/python3 develop.py freshen.pypackages
           mv .local/configuration/{,python-${{ matrix.python-version }}--}pypackages.fixtures.toml
         shell: bash
       - name: Store Updates
@@ -75,10 +75,10 @@ jobs:
         with:
           use-versions-update: true
       - name: Freshen Git Modules
-        run: /usr/bin/python3 develop.py freshen-git-modules
+        run: /usr/bin/python3 develop.py freshen.git-modules
         shell: bash
       - name: Freshen Git Hooks
-        run: /usr/bin/python3 develop.py freshen-git-hooks
+        run: /usr/bin/python3 develop.py freshen.git-hooks
         shell: bash
       - name: Restore Updates
         uses: actions/download-artifact@v3
