@@ -43,14 +43,6 @@ def freshen_python( original_version ):
     return { original_version: successor_version }, original_identifier
 
 
-#def install_python( version ):
-#    ''' Installs requested version of Python, if possible. '''
-#    # TODO: Calculate cache path for current platform and requested version.
-#    # TODO: Check cache for prebuilt distribution, if not forced install.
-#    # TODO: If no prebuilt found, then download and install one, if possible.
-#    # TODO: If no prebuilt available, then build, if possible.
-
-
 def _derive_python_complete_version( minor_version ):
     ''' Given a minor version, return the corresponding complete version. '''
     from shlex import split as split_command
@@ -69,25 +61,6 @@ def _derive_python_minor_version( version ):
     return "{prefix}{minor}".format(
         prefix = groups.get( 'prefix' ) or '',
         minor = groups[ 'minor' ] )
-
-
-def install_python_builder( ):
-    ''' Install Python builder utility for platform, if one exists. '''
-    from os import name as os_class
-    if 'posix' == os_class: install_python_builder_posix( )
-
-
-def install_python_builder_posix( ):
-    ''' Installs 'python-build' utility. '''
-    from os import environ as active_process_environment
-    environment = active_process_environment.copy( )
-    from ..data import paths
-    environment.update( dict( PREFIX = paths.caches.utilities.python_build, ) )
-    from ..base import execute_external
-    execute_external(
-        str( paths.scm_modules.aux.joinpath(
-            'pyenv', 'plugins', 'python-build', 'install.sh' ) ),
-        env = environment )
 
 
 def identify_active_python( mode ):

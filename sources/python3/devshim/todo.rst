@@ -2,15 +2,12 @@ Prefer Prebuilt Python Executables
 ===============================================================================
 
 * Pull from https://github.com/indygreg/python-build-standalone/releases/latest
+  for multiple platforms.
 
-Windows Development Support
-===============================================================================
-
-* Investigate ``conda`` for environment management.
-  If viable, then recommend its installation instead of ``asdf`` if the
-  development environment is not a virtualized Linux, such as WSL.
-
-* Or, manage Pythons on all platforms via ``develop.py``.
+* Prefer `Windows embeddable packages
+  <https://docs.python.org/3/using/windows.html#the-embeddable-package>`_ for
+  that platform. Download from official Python "FTP" server:
+  https://www.python.org/ftp/python/.
 
 Remove Dependency on System ``pip``
 ===============================================================================

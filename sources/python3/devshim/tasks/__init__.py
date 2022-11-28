@@ -30,8 +30,9 @@ _sphinx_options = f"-j auto -d {__.paths.caches.sphinx} -n -T"
 @__.task( 'Show: Python Versions' )
 def list_python_versions( ):
     ''' Lists names of supported Python versions. '''
-    from ..languages.python import survey_versions_support
-    for version in survey_versions_support( ).keys( ): print( version )
+    from ..languages.python import survey_support
+    # TODO? With Rich and 'detail' flag, show panels with details.
+    for version in survey_support( ).keys( ): print( version )
 
 
 @__.task( )
@@ -70,6 +71,8 @@ def install_python( version ):
         This task requires Internet access and may take some time. '''
     __.execute_external(
         f"asdf install python {version}", capture_output = False )
+#    from ..languages.python import install
+#    install( version )
 
 
 @__.task(
@@ -198,9 +201,6 @@ def freshen_asdf( ):
         This task requires Internet access and may take some time. '''
     __.execute_external( 'asdf update', capture_output = False )
     __.execute_external( 'asdf plugin update python', capture_output = False )
-    # TODO: Preserve this call after 'freshen_asdf' has been removed.
-    from ..platforms import install_python_builder
-    install_python_builder( )
 
 
 @__.task( task_nomargs = dict( pre = ( freshen_asdf, ), ), )
@@ -677,7 +677,7 @@ def check_pip_install( index_url = '', version = None ):
             f"import {__.project_name}; "
             f"print( {__.project_name}.__version__ )" )
         __.execute_external(
-            f"python -c '{python_import_command}'",
+            f"python3 -c '{python_import_command}'",
             capture_output = False, env = process_environment )
 
 

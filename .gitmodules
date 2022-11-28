@@ -1,6 +1,3 @@
-[submodule "scm-modules/pyenv"]
-	path = scm-modules/pyenv
-	url = https://github.com/pyenv/pyenv.git
 [submodule "scm-modules/semgrep-rules"]
 	path = scm-modules/semgrep-rules
 	url = https://github.com/returntocorp/semgrep-rules.git

@@ -31,7 +31,7 @@ from ..project import discover_version as discover_project_version
 # pylint: enable=unused-import
 
 
-def task(
+def task( # pylint: disable=too-complex
     title = '',
     task_nomargs = None,
     version_expansion = '',
@@ -42,6 +42,7 @@ def task(
         * Rendering a title box.
         * Iterative execution over multiple platform versions. '''
     from functools import wraps
+    from invoke import Exit
     from ._invoke import Task
     from ..user_interface import render_boxed_title
 
@@ -66,10 +67,14 @@ def task(
                     re_posargs, re_nomargs = _replace_arguments(
                         invocable, posargs, nomargs,
                         dict( version = version ) )
-                    invocable( *re_posargs, **re_nomargs )
+                    try: invocable( *re_posargs, **re_nomargs )
+                    except SystemExit as exc:
+                        raise Exit( code = exc.code ) from exc
             else:
                 if title: render_boxed_title( title )
-                invocable( *posargs, **nomargs )
+                try: invocable( *posargs, **nomargs )
+                except SystemExit as exc:
+                    raise Exit( code = exc.code ) from exc
 
         return Task( invoker, **( task_nomargs or { } ) )
 

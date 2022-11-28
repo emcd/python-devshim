@@ -27,6 +27,6 @@ features = [ 'cpython-tracerefs' ]
 
 [versions.'PyPy 3.7']
 base-version = '3.7'
-implementation = 'pypy'
+implementation = 'pypy3'
 implementation-version = '7.3.9'
 providers = [ 'python-build', ]

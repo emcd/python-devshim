@@ -49,6 +49,7 @@ def assemble( ):
     paths.caches = _calculate_caches_paths( paths )
     paths.configuration = _calculate_configuration_paths( paths )
     paths.environments = paths.local / 'environments'
+    paths.installations = paths.local / 'installations'
     paths.scm_modules = _calculate_scm_modules_paths( paths )
     paths.state = paths.local / 'state'
     paths.scripts = _calculate_scripts_paths( paths )
@@ -73,9 +74,11 @@ def _calculate_caches_paths( paths ):
     caches_path = paths.local / 'caches'
     packages_path = caches_path / 'packages'
     platforms_path = caches_path / 'platforms'
-    utilities_path = caches_path / 'utilities'
     return _SimpleNamespace(
         SELF = caches_path,
+        DEV = _SimpleNamespace(
+            repositories = caches_path / f"{__package__}/repositories",
+        ),
         hypothesis = caches_path / 'hypothesis',
         packages = _SimpleNamespace(
             python3 = packages_path / 'python3',
@@ -85,9 +88,6 @@ def _calculate_caches_paths( paths ):
         ),
         setuptools = caches_path / 'setuptools',
         sphinx = caches_path / 'sphinx',
-        utilities = _SimpleNamespace(
-            python_build = utilities_path / 'python-build',
-        ),
     )
 
 
