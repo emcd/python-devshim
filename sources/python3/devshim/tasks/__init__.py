@@ -345,20 +345,23 @@ def lint_mypy( packages, modules, files, version = None ):
     task_nomargs = dict( iterable = ( 'targets', 'checks', ), ),
     version_expansion = 'declared Python virtual environments',
 )
-def lint_pylint( targets, checks, version = None ):
+def lint_pylint( targets, checks, report = False, version = None ):
     ''' Lints the source code with Pylint. '''
     process_environment = __.derive_venv_variables( version = version )
     # TODO: Check executable in '_task'.
     from ..environments import test_package_executable
     if not test_package_executable( 'pylint', process_environment ): return
-    reports_str = '--reports=no --score=no' if targets or checks else ''
+    options_str = ' '.join( (
+        "--reports={}".format( 'no' if not report else 'yes' ),
+        "--score={}".format( 'no' if targets or checks else 'yes' ),
+    ) )
     if not targets: targets = _lint_targets_default
     targets_str = ' '.join( map( str, targets ) )
     checks_str = (
         "--disable=all --enable={}".format( ','.join( checks ) )
         if checks else '' )
     __.execute_external(
-        f"pylint {reports_str} {checks_str} --recursive yes {targets_str}",
+        f"pylint {options_str} {checks_str} --recursive yes {targets_str}",
         capture_output = False, env = process_environment )
 
 

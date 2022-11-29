@@ -42,7 +42,6 @@ def task( # pylint: disable=too-complex
         * Rendering a title box.
         * Iterative execution over multiple platform versions. '''
     from functools import wraps
-    from invoke import Exit
     from ._invoke import Task
     from ..user_interface import render_boxed_title
 
@@ -62,19 +61,13 @@ def task( # pylint: disable=too-complex
                 from ..platforms import calculate_python_versions
                 versions = calculate_python_versions(
                     nomargs.get( 'version' ) )
-                for version in versions:
-                    if title: render_boxed_title( title, supplement = version )
-                    re_posargs, re_nomargs = _replace_arguments(
-                        invocable, posargs, nomargs,
-                        dict( version = version ) )
-                    try: invocable( *re_posargs, **re_nomargs )
-                    except SystemExit as exc:
-                        raise Exit( code = exc.code ) from exc
-            else:
-                if title: render_boxed_title( title )
-                try: invocable( *posargs, **nomargs )
-                except SystemExit as exc:
-                    raise Exit( code = exc.code ) from exc
+            else: versions = ( None, )
+            for version in versions:
+                if title: render_boxed_title( title, supplement = version )
+                re_posargs, re_nomargs = _replace_arguments(
+                    invocable, posargs, nomargs,
+                    dict( version = version ) )
+                _invoke_task_invocable( invocable, re_posargs, re_nomargs )
 
         return Task( invoker, **( task_nomargs or { } ) )
 
@@ -94,3 +87,19 @@ def _replace_arguments( invocable, posargs, nomargs, replacements ):
     binder.arguments.update( replacements )
     binder.apply_defaults( )
     return binder.args, binder.kwargs
+
+
+def _invoke_task_invocable( invocable, posargs, nomargs ):
+    from invoke import Exit
+    allowable_exceptions = _calculate_allowable_exceptions( ) # TODO? Cache.
+    try: invocable( *posargs, **nomargs )
+    except allowable_exceptions: raise # pylint: disable=catching-non-exception,try-except-raise
+    except SystemExit as exc: raise Exit( code = exc.code ) from exc
+    except BaseException as exc: raise Exit( message = str( exc ) ) from exc
+
+
+def _calculate_allowable_exceptions( ):
+    import invoke.exceptions
+    return tuple(
+        attribute for attribute in vars( invoke.exceptions ).values( )
+        if isinstance( attribute, BaseException ) )
