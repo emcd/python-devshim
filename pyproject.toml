@@ -86,8 +86,8 @@ output = '.local/artifacts/coverage-pytest/coverage.xml'
 cache_dir = '.local/caches/mypy'
 show_traceback = true
 show_error_codes = true
-# TODO: Re-enable disabled error code.
-disable_error_code = [ 'assignment', 'import', 'misc', 'var-annotated' ]
+# TODO: Re-enable disabled error codes.
+disable_error_code = [ 'import', 'var-annotated' ]
 
 [tool.pylint.MASTER]
 ignore = []
