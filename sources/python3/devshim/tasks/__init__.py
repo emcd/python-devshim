@@ -318,7 +318,10 @@ def lint_bandit( version = None ):
 
 @__.task(
     'Lint: Mypy',
-    task_nomargs = dict( iterable = ( 'packages', 'modules', 'files', ), ),
+    task_nomargs = dict(
+        iterable = ( 'packages', 'modules', 'files', ),
+        pre = ( clean_tool_caches, ), # TODO: Target Mypy cache only.
+    ),
     version_expansion = 'declared Python virtual environments',
 )
 def lint_mypy( packages, modules, files, version = None ):

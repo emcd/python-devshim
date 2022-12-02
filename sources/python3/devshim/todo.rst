@@ -138,9 +138,6 @@ Remove Dependency on ``pip``
 Upstream Bug Reports
 ===============================================================================
 
-* Mypy: Version crashes on dynamic imports from modules that define
-  ``__getattr__``.
-
 * Pylint: Does not detect valid tuple of exceptions given to ``except`` arm.
 
 * Pylint: Does not understand re-raising of specific exceptions before
