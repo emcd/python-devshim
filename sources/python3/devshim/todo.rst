@@ -132,22 +132,19 @@ Remove Dependency on ``pip``
 
 * Tradeoffs with this. More code must be shipped for package handling. More
   code maintenance to keep up with latest PEPs and bug fixes. Unless we can
-  pull `*.pyz` files for helper packages, like a dependency resolver and a
+  pull ``*.pyz`` files for helper packages, like a dependency resolver and a
   wheel cache manager.
 
 Upstream Bug Reports
 ===============================================================================
 
-* Mypy: Version >= 0.990 crashes on imports into class namespaces when custom
-  metaclass is involved.
-
 * Mypy: Version crashes on dynamic imports from modules that define
   ``__getattr__``.
 
-* Semgrep: No detection of dangerous calls if imported into namespace class.
+* Pylint: Does not detect valid tuple of exceptions given to ``except`` arm.
 
-* YAPF: Uses ``toml`` package which does not support TOML 1 heterogeneous
-  lists. Breaks on parsing :file:`pyproject.toml`.
+* Pylint: Does not understand re-raising of specific exceptions before
+  BaseException is handled.
 
 PyPA Discussions of Interest
 ===============================================================================
