@@ -84,7 +84,7 @@ class BdistWheelCommand( _BdistWheelCommand ):
     def initialize_options( self ):
         ''' Override 'dist_dir' attribute. '''
         _BdistWheelCommand.initialize_options( self )
-        from devshim.locations import paths
+        from devshim__base import paths
         self.dist_dir = str( paths.artifacts.wheels ) # pylint: disable=attribute-defined-outside-init
 
 
