@@ -16,4 +16,4 @@ runs:
         git submodule foreach 'git fetch origin'
       shell: bash
     - name: Install Asdf with Plugins
-      uses: emcd/python-devshim/.github/actions/asdf-vm@master
+      uses: emcd/python-devshim/.github/actions/asdf-vm@stable

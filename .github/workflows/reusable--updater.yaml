@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Construct Foundation
-        uses: emcd/python-devshim/.github/actions/clone@master
+        uses: emcd/python-devshim/.github/actions/clone@stable
       - name: Freshen Git Modules
         run: /usr/bin/python3 develop.py freshen-git-modules
         shell: bash
@@ -46,7 +46,7 @@ jobs:
         python-version: ${{ fromJSON(inputs.python-versions-json) }}
     steps:
       - name: Prepare Python Virtual Environment
-        uses: emcd/python-devshim/.github/actions/python-venv@master
+        uses: emcd/python-devshim/.github/actions/python-venv@stable
         with:
           python-version: '${{ matrix.python-version }}'
           use-versions-update: true
@@ -71,7 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prepare Python Virtual Environment
-        uses: emcd/python-devshim/.github/actions/python-venv@master
+        uses: emcd/python-devshim/.github/actions/python-venv@stable
         with:
           use-versions-update: true
       - name: Freshen Git Modules

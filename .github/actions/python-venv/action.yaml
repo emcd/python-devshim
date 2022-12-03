@@ -20,7 +20,7 @@ runs:
   steps:
     - name: Construct Foundation
       if: "${{ 'true' == inputs.needs-clone }}"
-      uses: emcd/python-devshim/.github/actions/clone@master
+      uses: emcd/python-devshim/.github/actions/clone@stable
     - name: Restore Tool Versions (if requested)
       if: "${{ 'true' == inputs.use-versions-update }}"
       uses: actions/download-artifact@v3
