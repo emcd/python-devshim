@@ -9,6 +9,16 @@ Prefer Prebuilt Python Executables
   that platform. Download from official Python "FTP" server:
   https://www.python.org/ftp/python/.
 
+Fixes
+===============================================================================
+
+* Ensure that diagnostic output is all on stderr for the ``ease`` task,
+  as it is used in shell captures.
+
+* Ensure that tools run from the correct directory. For example, Pylint errors
+  if it has a working directory other than the repository root, since it cannot
+  find the correct Pylint settings.
+
 Remove Dependency on System ``pip``
 ===============================================================================
 
