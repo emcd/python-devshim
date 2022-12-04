@@ -22,10 +22,9 @@
 
 def gpg_sign_file( path ):
     ''' Generates detached, ASCII-armored GPG signature for file. '''
-    from .base import execute_external
     assert_gpg_tty( )
-    execute_external(
-        f"gpg --yes --detach-sign --armor {path}", capture_output = False )
+    from .base import execute_external
+    execute_external( f"gpg --yes --detach-sign --armor {path}" )
 
 
 def assert_gpg_tty( ):

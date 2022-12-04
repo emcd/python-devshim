@@ -107,8 +107,8 @@ class PythonBuild( __.LanguageProvider ):
         if installation_path.exists( ): return
         from ...base import execute_external
         execute_external(
-            ( self.our_installer_path, pb_definition_name, installation_path ),
-            capture_output = False )
+            ( self.our_installer_path, pb_definition_name, installation_path )
+            )
 
     def _calculate_pb_definition_name( self ):
         base_version = self.version_data[ 'base-version' ]

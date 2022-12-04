@@ -39,7 +39,7 @@ def install_python_packages( process_environment, identifier = None ):
         identifier = identifier )
     execute_external(
         'pip install --upgrade setuptools pip wheel',
-        capture_output = False, env = process_environment )
+        env = process_environment )
     if not identifier or not frozen:
         pip_options = [ ]
         if not identifier:
@@ -57,9 +57,7 @@ def install_python_packages( process_environment, identifier = None ):
     # Pip cannot currently mix editable and digest-bound requirements,
     # so we must install editable packages separately. (As of 2022-02-06.)
     # https://github.com/pypa/pip/issues/4995
-    execute_external(
-        'pip install --editable .',
-        capture_output = False, env = process_environment )
+    execute_external( 'pip install --editable .', env = process_environment )
 
 
 def execute_pip_with_requirements(
@@ -81,7 +79,7 @@ def execute_pip_with_requirements(
                 command = command,
                 options = ' '.join( pip_options ),
                 requirements_file = shell_quote( requirements_file.name ) ),
-            capture_output = False, env = process_environment )
+            env = process_environment )
 
 
 def generate_pip_requirements_text( identifier = None ):
@@ -285,8 +283,7 @@ def _ensure_python_packages( requirements ):
         from .base import execute_external
         execute_external(
             ( *split_command( 'pip install --upgrade --target' ),
-              cache, *installable_requirements ),
-            capture_output = False )
+              cache, *installable_requirements ) )
 
 
 def _filter_available_python_packages( requirements, cache = None ):
@@ -378,7 +375,8 @@ def indicate_current_python_packages( environment ):
     from .base import execute_external
     entries = [ ]
     for line in execute_external(
-        split_command( 'pip freeze' ), env = environment
+        split_command( 'pip freeze' ),
+        capture_output = True, env = environment,
     ).stdout.strip( ).splitlines( ):
         if line.startswith( '#' ): continue
         entry = SimpleNamespace( flags = [ ] )

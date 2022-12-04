@@ -49,29 +49,26 @@ def _detect_ci_environment( ):
 ci_environment = _detect_ci_environment( )
 
 
+def _select_narration_target( ):
+    ''' Selects which stream is target for narration and diagnostics. '''
+    # Note: Until we have a good reason to use stdout,
+    #       we always choose stderr.
+    from sys import stderr
+    return stderr
+
+#: Target stream for narration and diagnostics.
+narration_target = _select_narration_target( )
+
+
 def _probe_tty( ):
     ''' Detects if current process attached to a TTY.
 
         Boolean result can be used to decide whether to suppress the use of
         ANSI SGR codes for some programs, for example. '''
-    from sys import stderr
-    # TODO: Check other streams, particularly if streams are merged.
-    return stderr.isatty( )
+    return narration_target.isatty( )
 
 #: Is current process attached to a TTY?
 on_tty = _probe_tty( )
-
-
-def _select_narration_target( ):
-    ''' Selects which stream is target for narration and diagnostics. '''
-    from sys import stdout, stderr
-    # If in CI environment with a buffered pseudo-TTY,
-    # then use 'stdout' for properly interleaved output.
-    if ci_environment in ( 'Github Actions', ): return stdout
-    return stderr
-
-#: Target stream for narration and diagnostics.
-narration_target = _select_narration_target( )
 
 
 def _select_narrative_functions( ):
@@ -88,18 +85,22 @@ def _select_narrative_functions( ):
 eprint, epprint = _select_narrative_functions( )
 
 
+# TODO: Provide appropriate logging handler.
+
+
 def execute_external( command_specification, **nomargs ):
-    ''' Executes command specification in subprocess.
+    ''' Executes command in subprocess.
 
         Raises exception on non-zero exit code. '''
-    options = dict( capture_output = True, text = True )
-    from subprocess import STDOUT, run # nosec B404
-    from sys import stdout
+    options = dict( text = True )
+    from subprocess import run # nosec B404
+    from sys import stdout, stderr
     options.update( nomargs )
-    if not options[ 'capture_output' ] and stdout is narration_target:
-        options[ 'stderr' ] = STDOUT
+    if not options.get( 'capture_output', False ):
+        if stdout is narration_target: options[ 'stderr' ] = stdout
+        else: options[ 'stdout' ] = stderr
     if { 'stdout', 'stderr' } & options.keys( ):
-        options.pop( 'capture_output' )
+        options.pop( 'capture_output', None )
     options.pop( 'check', None )
     if isinstance( command_specification, str ):
         from shlex import split as split_command

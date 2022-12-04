@@ -31,6 +31,26 @@ from ..project import discover_version as discover_project_version
 # pylint: enable=unused-import
 
 
+def project_execute_external(
+    command_specification, venv_specification = None, **nomargs
+):
+    ''' Executes command in subprocess from project directory.
+
+        Sets the process environment according to ``venv_specification``,
+        if supplied.
+
+        Raises exception on non-zero exit code. '''
+    if None is venv_specification:
+        return execute_external(
+            command_specification, cwd = paths.project, **nomargs )
+    from ..environments import venv_execute_external
+    return venv_execute_external(
+        command_specification,
+        cwd = paths.project,
+        venv_specification = venv_specification,
+        **nomargs )
+
+
 def task( # pylint: disable=too-complex
     title = '',
     task_nomargs = None,

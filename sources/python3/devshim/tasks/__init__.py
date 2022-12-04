@@ -50,15 +50,14 @@ def ease(
 @__.task( 'Install: Git Pre-Commit Hooks' )
 def install_git_hooks( ):
     ''' Installs hooks to check goodness of code before commit. '''
-    process_environment = __.derive_venv_variables( )
-    __.execute_external(
+    __.project_execute_external(
         f"pre-commit install --config {__.paths.configuration.pre_commit} "
         f"--hook-type pre-commit --install-hooks",
-        capture_output = False, env = process_environment )
-    __.execute_external(
+        venv_specification = { } )
+    __.project_execute_external(
         f"pre-commit install --config {__.paths.configuration.pre_commit} "
         f"--hook-type pre-push --install-hooks",
-        capture_output = False, env = process_environment )
+        venv_specification = { } )
 
 
 @__.task(
@@ -69,8 +68,7 @@ def install_python( version ):
     ''' Installs requested Python version.
 
         This task requires Internet access and may take some time. '''
-    __.execute_external(
-        f"asdf install python {version}", capture_output = False )
+    __.execute_external( f"asdf install python {version}" )
 #    from ..languages.python import install
 #    install( version )
 
@@ -187,9 +185,8 @@ def check_security_issues( version = None ):
     ''' Checks for security issues in installed Python packages.
 
         This task requires Internet access and may take some time. '''
-    process_environment = __.derive_venv_variables( version = version )
-    __.execute_external(
-        f"safety check", capture_output = False, env = process_environment )
+    __.project_execute_external(
+        f"safety check", venv_specification = dict( version = version ) )
 
 
 @__.task( 'Freshen: Version Manager' )
@@ -197,8 +194,8 @@ def freshen_asdf( ):
     ''' Asks Asdf to update itself.
 
         This task requires Internet access and may take some time. '''
-    __.execute_external( 'asdf update', capture_output = False )
-    __.execute_external( 'asdf plugin update python', capture_output = False )
+    __.execute_external( 'asdf update' )
+    __.execute_external( 'asdf plugin update python' )
 
 
 @__.task( task_nomargs = dict( pre = ( freshen_asdf, ), ), )
@@ -225,8 +222,8 @@ def freshen_python( version = None ):
     successor_versions = [
         version_replacements.get( version_, version_ )
         for version_ in original_versions ]
-    __.execute_external( "asdf local python {versions}".format(
-        versions = ' '.join( successor_versions ) ), capture_output = False )
+    __.project_execute_external( "asdf local python {versions}".format(
+        versions = ' '.join( successor_versions ) ) )
     # Erase packages fixtures for versions which are no longer extant.
     from ..packages import delete_python_packages_fixtures
     delete_python_packages_fixtures( obsolete_identifiers )
@@ -266,9 +263,7 @@ def freshen_git_modules( ):
     ''' Performs recursive update of all Git modules.
 
         This task requires Internet access and may take some time. '''
-    __.execute_external(
-        'git submodule update --init --recursive --remote',
-        capture_output = False )
+    __.execute_external( 'git submodule update --init --recursive --remote' )
 
 
 @__.task( 'Freshen: Git Hooks' )
@@ -276,10 +271,9 @@ def freshen_git_hooks( ):
     ''' Updates Git hooks to latest tagged release.
 
         This task requires Internet access and may take some time. '''
-    process_environment = __.derive_venv_variables( )
-    __.execute_external(
+    __.project_execute_external(
         f"pre-commit autoupdate --config {__.paths.configuration.pre_commit}",
-        capture_output = False, env = process_environment )
+        venv_specification = { } )
 
 
 @__.task(
@@ -307,11 +301,10 @@ def lint_bandit( version = None ):
     ''' Security checks the source code with Bandit. '''
     files = _lint_targets_default
     files_str = ' '.join( map( str, files ) )
-    process_environment = __.derive_venv_variables( version = version )
-    __.execute_external(
+    __.project_execute_external(
         "bandit --recursive "
         f"--configfile {__.paths.configuration.pyproject} {files_str}",
-        capture_output = False, env = process_environment )
+        venv_specification = dict( version = version ) )
 
 
 @__.task(
@@ -325,7 +318,7 @@ def lint_bandit( version = None ):
 def lint_mypy( packages, modules, files, version = None ):
     ''' Lints the source code with Mypy. '''
     process_environment = __.derive_venv_variables( version = version )
-    # TODO: Check executable in '_task'.
+    # TODO: Check executable in decorator.
     from ..environments import test_package_executable
     if not test_package_executable( 'mypy', process_environment ): return
     if not packages and not modules and not files:
@@ -336,10 +329,8 @@ def lint_mypy( packages, modules, files, version = None ):
     modules_str = ' '.join( map(
         lambda module: f"--module {module}", modules ) )
     files_str = ' '.join( map( str, files ) )
-    __.execute_external(
+    __.project_execute_external(
         f"mypy {packages_str} {modules_str} {files_str}",
-        capture_output = False,
-        cwd = __.paths.project,
         env = process_environment )
 
 
@@ -351,7 +342,7 @@ def lint_mypy( packages, modules, files, version = None ):
 def lint_pylint( targets, checks, report = False, version = None ):
     ''' Lints the source code with Pylint. '''
     process_environment = __.derive_venv_variables( version = version )
-    # TODO: Check executable in '_task'.
+    # TODO: Check executable in decorator.
     from ..environments import test_package_executable
     if not test_package_executable( 'pylint', process_environment ): return
     options_str = ' '.join( (
@@ -364,9 +355,9 @@ def lint_pylint( targets, checks, report = False, version = None ):
     checks_str = (
         "--disable=all --enable={}".format( ','.join( checks ) )
         if checks else '' )
-    __.execute_external(
+    __.project_execute_external(
         f"pylint {options_str} {checks_str} --recursive yes {targets_str}",
-        capture_output = False, env = process_environment )
+        env = process_environment )
 
 
 @__.task(
@@ -376,7 +367,7 @@ def lint_pylint( targets, checks, report = False, version = None ):
 def lint_semgrep( version = None ):
     ''' Lints the source code with Semgrep. '''
     process_environment = __.derive_venv_variables( version = version )
-    # TODO: Check executable in '_task'.
+    # TODO: Check executable in decorator.
     from ..environments import test_package_executable
     if not test_package_executable( 'semgrep', process_environment ): return
     files = _lint_targets_default
@@ -386,10 +377,7 @@ def lint_semgrep( version = None ):
     __.execute_external(
         #f"strace -ff -tt --string-limit=120 --output=strace/semgrep "
         f"semgrep --config {sgconfig_python_path} --error --use-git-ignore "
-        f"{files_str}",
-        capture_output = False,
-        cwd = sgconfig_base_path,
-        env = process_environment )
+        f"{files_str}", cwd = sgconfig_base_path, env = process_environment )
 
 
 _lint_targets_default = (
@@ -417,16 +405,11 @@ def lint( version = None ):
 @__.task( 'Make: Code Coverage Report' )
 def report_coverage( ):
     ''' Combines multiple code coverage results into a single report. '''
-    process_environment = __.derive_venv_variables( )
-    execution_options = dict(
-        capture_output = False,
-        cwd = __.paths.project,
-        env = process_environment,
-    )
-    __.execute_external( f"coverage combine", **execution_options )
-    __.execute_external( f"coverage report", **execution_options )
-    __.execute_external( f"coverage html", **execution_options )
-    __.execute_external( f"coverage xml", **execution_options )
+    execution_options = dict( venv_specification = { } )
+    __.project_execute_external( f"coverage combine", **execution_options )
+    __.project_execute_external( f"coverage report", **execution_options )
+    __.project_execute_external( f"coverage html", **execution_options )
+    __.project_execute_external( f"coverage xml", **execution_options )
 
 
 @__.task(
@@ -443,35 +426,25 @@ def test( ensure_sanity = True, version = None ):
         HYPOTHESIS_STORAGE_DIRECTORY = __.paths.caches.hypothesis,
         PYTHONUNBUFFERED = 'TRUE', # Ensure complete crash output.
     ) )
-    __.execute_external(
-        f"coverage run --source {__.project_name}",
-        capture_output = False,
-        cwd = __.paths.project,
-        env = process_environment )
+    __.project_execute_external(
+        f"coverage run --source {__.project_name}", env = process_environment )
 
 
 @__.task( 'Test: Documentation URLs' )
 def check_urls( ):
     ''' Checks the HTTP URLs in the documentation for liveness. '''
-    process_environment = __.derive_venv_variables( )
-    __.execute_external(
+    __.project_execute_external(
         f"sphinx-build -b linkcheck {_sphinx_options} "
         f"{__.paths.sources.prj.sphinx} {__.paths.artifacts.sphinx_linkcheck}",
-        capture_output = False,
-        cwd = __.paths.project,
-        env = process_environment )
+        venv_specification = { } )
 
 
 @__.task( 'Test: README Render' )
 def check_readme( ):
     ''' Checks that the README will render correctly on PyPI. '''
     path = _get_sdist_path( )
-    process_environment = __.derive_venv_variables( )
-    __.execute_external(
-        f"twine check {path}",
-        capture_output = False,
-        cwd = __.paths.project,
-        env = process_environment )
+    __.project_execute_external(
+        f"twine check {path}", venv_specification = { } )
 
 
 @__.task(
@@ -485,12 +458,9 @@ def make_sdist( ensure_sanity = True, signature = True ):
         __.invoke_task( check_urls )
     path = _get_sdist_path( )
     if path.exists( ): path.unlink( ) # TODO: Python 3.8: missing_ok = True
-    process_environment = __.derive_venv_variables( )
-    __.execute_external(
+    __.project_execute_external(
         f"python3 -m build --sdist --outdir {__.paths.artifacts.sdists}",
-        capture_output = False,
-        cwd = __.paths.project,
-        env = process_environment )
+        venv_specification = { } )
     if signature:
         from ..file_utilities import gpg_sign_file
         gpg_sign_file( path )
@@ -509,12 +479,9 @@ def make_wheel( ensure_sanity = True, signature = True ):
         make_sdist, ensure_sanity = ensure_sanity, signature = signature )
     path = _get_wheel_path( )
     if path.exists( ): path.unlink( ) # TODO: Python 3.8: missing_ok = True
-    process_environment = __.derive_venv_variables( )
-    __.execute_external(
+    __.project_execute_external(
         f"python3 -m build --wheel --outdir {__.paths.artifacts.wheels}",
-        capture_output = False,
-        cwd = __.paths.project,
-        env = process_environment )
+        venv_specification = { } )
     if signature:
         from ..file_utilities import gpg_sign_file
         gpg_sign_file( path )
@@ -534,13 +501,10 @@ def make_html( ):
     ''' Generates documentation as HTML artifacts. '''
     from ..fs_utilities import unlink_recursively
     unlink_recursively( __.paths.artifacts.sphinx_html )
-    process_environment = __.derive_venv_variables( )
-    __.execute_external(
+    __.project_execute_external(
         f"sphinx-build -b html {_sphinx_options} "
         f"{__.paths.sources.prj.sphinx} {__.paths.artifacts.sphinx_html}",
-        capture_output = False,
-        cwd = __.paths.project,
-        env = process_environment )
+        venv_specification = { } )
 
 
 @__.task( task_nomargs = dict( pre = ( clean, make_wheel, make_html, ), ), )
@@ -550,7 +514,8 @@ def make( ):
 
 def _ensure_clean_workspace( ):
     ''' Error if version control reports any dirty or untracked files. '''
-    result = __.execute_external( 'git status --short' )
+    result = __.project_execute_external(
+        'git status --short', capture_output = True )
     if result.stdout or result.stderr:
         # TODO: Use different error-handling mechanism.
         from invoke import Exit
@@ -572,15 +537,11 @@ def bump( piece ):
         if current_version.stage in ( 'a', 'rc' ): part = 'prerelease'
         else: part = 'patch'
     else: part = piece
-    process_environment = __.derive_venv_variables( )
-    __.execute_external(
+    __.project_execute_external(
         f"bumpversion --config-file={__.paths.configuration.bumpversion}"
         f" --current-version {current_version}"
         f" --new-version {new_version}"
-        f" {part}",
-        capture_output = False,
-        cwd = __.paths.project,
-        env = process_environment )
+        f" {part}", venv_specification = { } )
 
 
 @__.task(
@@ -606,10 +567,11 @@ def branch_release( remote = 'origin' ):
     project_version = __.discover_project_version( )
     mainline_regex = re.compile(
         r'''^\s+HEAD branch:\s+(.*)$''', re.MULTILINE )
-    mainline_branch = mainline_regex.search( __.execute_external(
-        f"git remote show {remote}" ).stdout.strip( ) )[ 1 ]
-    true_branch = __.execute_external(
-        'git branch --show-current' ).stdout.strip( )
+    mainline_branch = mainline_regex.search( __.project_execute_external(
+        f"git remote show {remote}",
+        capture_output = True ).stdout.strip( ) )[ 1 ]
+    true_branch = __.project_execute_external(
+        'git branch --show-current', capture_output = True ).stdout.strip( )
     if mainline_branch != true_branch:
         # TODO: Use different error-reporting mechanism.
         raise Exit( f"Cannot create release from branch: {true_branch}" )
@@ -620,8 +582,7 @@ def branch_release( remote = 'origin' ):
         # TODO: Use different error-reporting mechanism.
         raise Exit( f"Cannot create release from stage: {stage}" )
     target_branch = f"release-{this_version.major}.{this_version.minor}"
-    __.execute_external(
-        f"git checkout -b {target_branch}", capture_output = False )
+    __.project_execute_external( f"git checkout -b {target_branch}" )
 
 
 @__.task( 'Code Format: YAPF' )
@@ -657,18 +618,16 @@ def push( remote = 'origin' ):
     # TODO: Discover remote corresponding to current branch.
     _ensure_clean_workspace( )
     project_version = __.discover_project_version( )
-    true_branch = __.execute_external(
-        'git branch --show-current' ).stdout.strip( )
+    true_branch = __.project_execute_external(
+        'git branch --show-current', capture_output = True ).stdout.strip( )
     from ..packages import Version
     this_version = Version.from_string( project_version )
     target_branch = f"release-{this_version.major}.{this_version.minor}"
     if true_branch == target_branch:
-        __.execute_external(
-            f"git push --set-upstream {remote} {true_branch}",
-            capture_output = False )
-    else: __.execute_external( 'git push', capture_output = False )
-    __.execute_external(
-        'git push --no-verify --tags', capture_output = False )
+        __.project_execute_external(
+            f"git push --set-upstream {remote} {true_branch}" )
+    else: __.project_execute_external( 'git push' )
+    __.project_execute_external( 'git push --no-verify --tags' )
 
 
 @__.task( )
@@ -694,7 +653,7 @@ def check_pip_install( index_url = '', version = None ):
                 __.execute_external(
                     f"pip install {index_url_option} "
                     f"  {__.project_name}=={version}",
-                    capture_output = False, env = process_environment )
+                    env = process_environment )
             except SubprocessError:
                 if attempts_count_max == attempts_count: raise
                 sleep( 2 ** attempts_count )
@@ -704,7 +663,7 @@ def check_pip_install( index_url = '', version = None ):
             f"print( {__.project_name}.__version__ )" )
         __.execute_external(
             f"python3 -c '{python_import_command}'",
-            capture_output = False, env = process_environment )
+            env = process_environment )
 
 
 @__.task( )
@@ -759,8 +718,7 @@ def check_pypi_package( package_url ): # pylint: disable=too-many-locals
                 if attempts_count_max == attempts_count: raise
                 sleep( 2 ** attempts_count )
             else: break
-        __.execute_external(
-            f"gpg --verify {signature_path}", capture_output = False )
+        __.execute_external( f"gpg --verify {signature_path}" )
 
 
 @__.task(
@@ -808,12 +766,9 @@ def _upload_pypi( repository_name = '' ):
     artifacts = _get_pypi_artifacts( )
     process_environment = __.derive_venv_variables( )
     process_environment.update( _get_pypi_credentials( repository_name ) )
-    __.execute_external(
+    __.project_execute_external(
         f"twine upload --skip-existing --verbose {repository_option} "
-        f"{artifacts}",
-        capture_output = False,
-        cwd = __.paths.project,
-        env = process_environment )
+        f"{artifacts}", env = process_environment )
 
 
 def _get_pypi_artifacts( ):
@@ -851,29 +806,25 @@ def upload_github_pages( ):
         # Work from project root, since 'git subtree' requires relative paths.
         contexts.enter_context( springy_chdir( __.paths.project ) )
         saved_branch = __.execute_external(
-            'git branch --show-current' ).stdout.strip( )
+            'git branch --show-current',
+            capture_output = True ).stdout.strip( )
         try:
-            __.execute_external(
-                f"git branch -D local-{target_branch}",
-                capture_output = False )
+            __.execute_external( f"git branch -D local-{target_branch}" )
         except SubprocessError: pass
-        __.execute_external(
-            f"git checkout -b local-{target_branch}", capture_output = False )
+        __.execute_external( f"git checkout -b local-{target_branch}" )
         def restore( *exc_info ): # pylint: disable=unused-argument
-            __.execute_external(
-                f"git checkout {saved_branch}", capture_output = False )
+            __.execute_external( f"git checkout {saved_branch}" )
         contexts.push( restore )
         nojekyll_path.touch( exist_ok = True )
         # Override .gitignore to pickup artifacts.
-        __.execute_external(
-            f"git add --force {html_path}", capture_output = False )
-        __.execute_external(
-            'git commit -m "Update documentation."', capture_output = False )
+        __.execute_external( f"git add --force {html_path}" )
+        __.execute_external( 'git commit -m "Update documentation."' )
         subtree_id = __.execute_external(
-            f"git subtree split --prefix {html_path}" ).stdout.strip( )
+            f"git subtree split --prefix {html_path}",
+            capture_output = True ).stdout.strip( )
         __.execute_external(
-            f"git push --force origin {subtree_id}:refs/heads/{target_branch}",
-            capture_output = False )
+            "git push --force origin "
+            f"{subtree_id}:refs/heads/{target_branch}" )
 
 
 @__.task( task_nomargs = dict( pre = ( bump_patch, push, upload_pypi, ), ), )
@@ -889,9 +840,8 @@ def release_new_stage( ):
 @__.task( )
 def run( command, version = None ):
     ''' Runs command in virtual environment. '''
-    process_environment = __.derive_venv_variables( version = version )
     __.execute_external(
-        command, capture_output = False, env = process_environment )
+        command, venv_specification = dict( version = version ) )
 
 
 # For use by Invoke's module loader. Must be called 'namespace' (or 'ns').

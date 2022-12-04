@@ -44,9 +44,7 @@ def build_python_venv( version, overwrite = False ):
     if overwrite: venv_options.append( '--clear' )
     venv_options_str = ' '.join( venv_options )
     from .base import execute_external
-    execute_external(
-        f"{python_path} -m venv {venv_options_str} {venv_path}",
-        capture_output = False )
+    execute_external( f"{python_path} -m venv {venv_options_str} {venv_path}" )
     _install_packages_into_venv( version, venv_path )
 
 
@@ -100,6 +98,20 @@ def is_executable_in_venv( name, venv_path = None, version = None ):
         if name != path.name: continue
         if test_fs_access( path, F_OK | R_OK | X_OK ): return True
     return False
+
+
+def venv_execute_external(
+    command_specification, venv_specification = None, **nomargs
+):
+    ''' Executes command in virtual environment subprocess.
+
+        Raises exception on non-zero exit code. '''
+    process_environment = derive_venv_variables(
+        **( { } if venv_specification is None else venv_specification ) )
+    # TODO: Consider if environment is already being passed.
+    from .base import execute_external
+    return execute_external(
+        command_specification, env = process_environment, **nomargs )
 
 
 def derive_venv_variables(

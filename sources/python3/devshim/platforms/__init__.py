@@ -34,8 +34,7 @@ def freshen_python( original_version ):
     # Version may not be installed.
     except SubprocessError: original_identifier = None
     from ..base import execute_external
-    execute_external(
-        f"asdf install python {successor_version}", capture_output = False )
+    execute_external( f"asdf install python {successor_version}" )
     # Do not erase packages fixtures for extant versions.
     successor_identifier = pep508_identify_python(
         version = successor_version )
@@ -48,7 +47,8 @@ def _derive_python_complete_version( minor_version ):
     from shlex import split as split_command
     from ..base import execute_external
     return execute_external(
-        ( *split_command( 'asdf latest python' ), minor_version )
+        ( *split_command( 'asdf latest python' ), minor_version ),
+        capture_output = True,
     ).stdout.strip( )
 
 
@@ -85,7 +85,8 @@ def identify_python( mode, python_path ):
     detector_path = paths.scripts.aux.python3 / 'identify-python.py'
     from ..base import execute_external
     return execute_external(
-        ( python_path, detector_path, '--mode', mode ) ).stdout.strip( )
+        ( python_path, detector_path, '--mode', mode ),
+        capture_output = True ).stdout.strip( )
 
 
 def detect_vmgr_python_path( version = None ):
@@ -95,7 +96,8 @@ def detect_vmgr_python_path( version = None ):
     from shlex import split as split_command
     from ..base import execute_external
     installation_path = Path( execute_external(
-        ( *split_command( 'asdf where python' ), version ) ).stdout.strip( ) )
+        ( *split_command( 'asdf where python' ), version ),
+        capture_output = True ).stdout.strip( ) )
     return installation_path / 'bin' / 'python'
 
 
