@@ -9,11 +9,10 @@ Prefer Prebuilt Python Executables
   that platform. Download from official Python "FTP" server:
   https://www.python.org/ftp/python/.
 
-Fixes
+Fixes and Minor Improvements
 ===============================================================================
 
-* Ensure that diagnostic output is all on stderr for the ``ease`` task,
-  as it is used in shell captures.
+* Suppress Setuptools warning when running Pylint.
 
 Remove Dependency on System ``pip``
 ===============================================================================
