@@ -15,10 +15,6 @@ Fixes
 * Ensure that diagnostic output is all on stderr for the ``ease`` task,
   as it is used in shell captures.
 
-* Ensure that tools run from the correct directory. For example, Pylint errors
-  if it has a working directory other than the repository root, since it cannot
-  find the correct Pylint settings.
-
 Remove Dependency on System ``pip``
 ===============================================================================
 
@@ -27,7 +23,7 @@ Remove Dependency on System ``pip``
 
 * System Pip may also be out-of-date. Better to guarantee something recent.
 
-* Can bootstrap local installation with ``urllib`` and ``importlib`` from
+* Can bootstrap local installation with ``urllib`` from
   https://bootstrap.pypa.io/pip/.
 
 * Maybe place in :file:`.local/caches/devshim/packages/python3/<hash>`,
@@ -47,6 +43,8 @@ Remove Dependency on ``git``
 
 More Linters
 ===============================================================================
+
+* `Codespell <https://github.com/codespell-project/codespell>`_
 
 * `Fixit <https://github.com/Instagram/Fixit>`_
 

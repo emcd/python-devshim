@@ -53,7 +53,7 @@ def task( # pylint: disable=too-complex
                 "If version is 'ALL', "
                 f"then the task affects all {version_expansion}." ) )
 
-        # nosemgrep: scm-modules.semgrep-rules.python.lang.maintainability.useless-inner-function
+        # nosemgrep: python.lang.maintainability.useless-inner-function
         @wraps( invocable )
         def invoker( context, *posargs, **nomargs ): # pylint: disable=unused-argument
             ''' Handles assorted banalities. '''

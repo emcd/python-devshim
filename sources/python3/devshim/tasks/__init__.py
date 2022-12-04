@@ -124,11 +124,9 @@ def clean_tool_caches( include_development_support = False ):
     anchors = __.paths.caches.SELF.glob( '*' )
     ignorable_paths = set( __.paths.caches.SELF.glob( '*/.gitignore' ) )
     if not include_development_support:
-        from ..platforms import active_python_abi_label
-        ds_path = __.paths.caches.packages.python3 / active_python_abi_label
-        ignorable_paths.add( __.paths.caches.packages.python3 )
-        ignorable_paths.add( ds_path )
-        ignorable_paths.update( ds_path.rglob( '*' ) )
+        support_cache_path = __.paths.caches.packages.python3
+        ignorable_paths.add( support_cache_path )
+        ignorable_paths.update( support_cache_path.rglob( '*' ) )
     dirs_stack = [ ]
     for path in chain.from_iterable( map(
         lambda anchor: anchor.rglob( '*' ), anchors
@@ -139,7 +137,7 @@ def clean_tool_caches( include_development_support = False ):
             continue
         path.unlink( )
     while dirs_stack: dirs_stack.pop( ).rmdir( )
-    # Regnerate development support packages cache, if necessary.
+    # Regenerate development support packages cache, if necessary.
     if include_development_support:
         from ..packages import ensure_python_packages
         ensure_python_packages( domain = 'development' )
@@ -340,7 +338,9 @@ def lint_mypy( packages, modules, files, version = None ):
     files_str = ' '.join( map( str, files ) )
     __.execute_external(
         f"mypy {packages_str} {modules_str} {files_str}",
-        capture_output = False, env = process_environment )
+        capture_output = False,
+        cwd = __.paths.project,
+        env = process_environment )
 
 
 @__.task(
@@ -355,6 +355,7 @@ def lint_pylint( targets, checks, report = False, version = None ):
     from ..environments import test_package_executable
     if not test_package_executable( 'pylint', process_environment ): return
     options_str = ' '.join( (
+        f"--rcfile={__.paths.configuration.pyproject}",
         "--reports={}".format( 'no' if not report else 'yes' ),
         "--score={}".format( 'no' if targets or checks else 'yes' ),
     ) )
@@ -379,13 +380,16 @@ def lint_semgrep( version = None ):
     from ..environments import test_package_executable
     if not test_package_executable( 'semgrep', process_environment ): return
     files = _lint_targets_default
-    files_str = ' '.join( map( str, files ) )
-    sgconfig_path = __.paths.scm_modules.aux.joinpath(
-        'semgrep-rules', 'python', 'lang' )
+    files_str = ' '.join( map( lambda path: str( path.resolve( ) ), files ) )
+    sgconfig_base_path = __.paths.scm_modules.aux / 'semgrep-rules'
+    sgconfig_python_path = ( sgconfig_base_path / 'python/lang' ).resolve( )
     __.execute_external(
         #f"strace -ff -tt --string-limit=120 --output=strace/semgrep "
-        f"semgrep --config {sgconfig_path} --error --use-git-ignore "
-        f"{files_str}", capture_output = False, env = process_environment )
+        f"semgrep --config {sgconfig_python_path} --error --use-git-ignore "
+        f"{files_str}",
+        capture_output = False,
+        cwd = sgconfig_base_path,
+        env = process_environment )
 
 
 _lint_targets_default = (
@@ -414,14 +418,15 @@ def lint( version = None ):
 def report_coverage( ):
     ''' Combines multiple code coverage results into a single report. '''
     process_environment = __.derive_venv_variables( )
-    __.execute_external(
-        'coverage combine', capture_output = False, env = process_environment )
-    __.execute_external(
-        'coverage report', capture_output = False, env = process_environment )
-    __.execute_external(
-        'coverage html', capture_output = False, env = process_environment )
-    __.execute_external(
-        'coverage xml', capture_output = False, env = process_environment )
+    execution_options = dict(
+        capture_output = False,
+        cwd = __.paths.project,
+        env = process_environment,
+    )
+    __.execute_external( f"coverage combine", **execution_options )
+    __.execute_external( f"coverage report", **execution_options )
+    __.execute_external( f"coverage html", **execution_options )
+    __.execute_external( f"coverage xml", **execution_options )
 
 
 @__.task(
@@ -440,7 +445,9 @@ def test( ensure_sanity = True, version = None ):
     ) )
     __.execute_external(
         f"coverage run --source {__.project_name}",
-        capture_output = False, env = process_environment )
+        capture_output = False,
+        cwd = __.paths.project,
+        env = process_environment )
 
 
 @__.task( 'Test: Documentation URLs' )
@@ -450,7 +457,9 @@ def check_urls( ):
     __.execute_external(
         f"sphinx-build -b linkcheck {_sphinx_options} "
         f"{__.paths.sources.prj.sphinx} {__.paths.artifacts.sphinx_linkcheck}",
-        capture_output = False, env = process_environment )
+        capture_output = False,
+        cwd = __.paths.project,
+        env = process_environment )
 
 
 @__.task( 'Test: README Render' )
@@ -460,7 +469,9 @@ def check_readme( ):
     process_environment = __.derive_venv_variables( )
     __.execute_external(
         f"twine check {path}",
-        capture_output = False, env = process_environment )
+        capture_output = False,
+        cwd = __.paths.project,
+        env = process_environment )
 
 
 @__.task(
@@ -477,7 +488,9 @@ def make_sdist( ensure_sanity = True, signature = True ):
     process_environment = __.derive_venv_variables( )
     __.execute_external(
         f"python3 -m build --sdist --outdir {__.paths.artifacts.sdists}",
-        capture_output = False, env = process_environment )
+        capture_output = False,
+        cwd = __.paths.project,
+        env = process_environment )
     if signature:
         from ..file_utilities import gpg_sign_file
         gpg_sign_file( path )
@@ -499,7 +512,9 @@ def make_wheel( ensure_sanity = True, signature = True ):
     process_environment = __.derive_venv_variables( )
     __.execute_external(
         f"python3 -m build --wheel --outdir {__.paths.artifacts.wheels}",
-        capture_output = False, env = process_environment )
+        capture_output = False,
+        cwd = __.paths.project,
+        env = process_environment )
     if signature:
         from ..file_utilities import gpg_sign_file
         gpg_sign_file( path )
@@ -523,7 +538,9 @@ def make_html( ):
     __.execute_external(
         f"sphinx-build -b html {_sphinx_options} "
         f"{__.paths.sources.prj.sphinx} {__.paths.artifacts.sphinx_html}",
-        capture_output = False, env = process_environment )
+        capture_output = False,
+        cwd = __.paths.project,
+        env = process_environment )
 
 
 @__.task( task_nomargs = dict( pre = ( clean, make_wheel, make_html, ), ), )
@@ -560,7 +577,10 @@ def bump( piece ):
         f"bumpversion --config-file={__.paths.configuration.bumpversion}"
         f" --current-version {current_version}"
         f" --new-version {new_version}"
-        f" {part}", capture_output = False, env = process_environment )
+        f" {part}",
+        capture_output = False,
+        cwd = __.paths.project,
+        env = process_environment )
 
 
 @__.task(
@@ -615,11 +635,11 @@ def check_code_style( write_changes = False ):
     from subprocess import Popen, PIPE # nosec B404
     process_environment = __.derive_venv_variables( )
     contexts = ContextStack( )
-    # nosemgrep: scm-modules.semgrep-rules.python.lang.security.audit.dangerous-subprocess-use-audit
+    # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-audit
     git_diff_process = contexts.enter_context( Popen( # nosec B603
         ( *split_command("git diff --unified=0 --no-color --"),
           *_lint_targets_default ), stdout = PIPE, text = True ) )
-    # nosemgrep: scm-modules.semgrep-rules.python.lang.security.audit.dangerous-subprocess-use-audit
+    # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-audit
     yapf_diff_process = contexts.enter_context( Popen( # nosec B603
         split_command( f"yapf-diff {yapf_options_string}" ),
         env = process_environment,
@@ -727,11 +747,11 @@ def check_pypi_package( package_url ): # pylint: disable=too-many-locals
         attempts_count_max = 2
         for attempts_count in range( attempts_count_max + 1 ):
             try:
-                # nosemgrep: scm-modules.semgrep-rules.python.lang.security.audit.dynamic-urllib-use-detected
+                # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected
                 with access_url( package_url ) as http_reader:
                     with package_path.open( 'wb' ) as file:
                         file.write( http_reader.read( ) )
-                # nosemgrep: scm-modules.semgrep-rules.python.lang.security.audit.dynamic-urllib-use-detected
+                # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected
                 with access_url( f"{package_url}.asc" ) as http_reader:
                     with signature_path.open( 'wb' ) as file:
                         file.write( http_reader.read( ) )
@@ -790,7 +810,10 @@ def _upload_pypi( repository_name = '' ):
     process_environment.update( _get_pypi_credentials( repository_name ) )
     __.execute_external(
         f"twine upload --skip-existing --verbose {repository_option} "
-        f"{artifacts}", capture_output = False, env = process_environment )
+        f"{artifacts}",
+        capture_output = False,
+        cwd = __.paths.project,
+        env = process_environment )
 
 
 def _get_pypi_artifacts( ):

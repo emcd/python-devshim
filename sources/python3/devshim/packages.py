@@ -251,7 +251,7 @@ def ensure_import_package( name ):
     name = _package_aliases.get( name, name )
     _ensure_python_packages( ( name, ) )
     from importlib import import_module
-    # nosemgrep: scm-modules.semgrep-rules.python.lang.security.audit.non-literal-import
+    # nosemgrep: python.lang.security.audit.non-literal-import
     return import_module( name )
 
 
@@ -427,7 +427,7 @@ def retrieve_pypi_release_information( name, version, index_url = '' ): # pylint
     attempts_count_max = 2
     for attempts_count in range( attempts_count_max + 1 ):
         try:
-            with access_url( request ) as http_reader: # nosemgrep: scm-modules.semgrep-rules.python.lang.security.audit.dynamic-urllib-use-detected
+            with access_url( request ) as http_reader: # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected
                 return load( http_reader )[ 'releases' ][ version ]
         except ( KeyError, UrlError, ):
             if attempts_count_max == attempts_count: raise

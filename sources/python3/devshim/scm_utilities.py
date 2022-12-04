@@ -44,7 +44,7 @@ def github_retrieve_tarball( repository_qname, git_ref, destination ):
     # TODO: Handle retries for some error conditions.
     # TODO: Place this as generalized logic in a separate utilities module.
     with contexts:
-        http_reader = contexts.enter_context( access_url( http_request ) ) # nosemgrep: scm-modules.semgrep-rules.python.lang.security.audit.dynamic-urllib-use-detected
+        http_reader = contexts.enter_context( access_url( http_request ) ) # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected
         if isinstance( destination, ( str, Path ) ):
             tarball_path = Path( destination )
             if not tarball_path.parent.exists( ):

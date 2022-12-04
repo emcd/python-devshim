@@ -60,7 +60,7 @@ def _invoke( name ):
     ''' Imports and executes invocable. '''
     module_name, invocable_name = name.rsplit( sep = '.', maxsplit = 1 )
     from importlib import import_module
-    # nosemgrep: scm-modules.semgrep-rules.python.lang.security.audit.non-literal-import
+    # nosemgrep: python.lang.security.audit.non-literal-import
     module = import_module( module_name, package = __package__ )
     return getattr( module, invocable_name )( )
 

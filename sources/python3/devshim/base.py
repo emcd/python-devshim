@@ -106,7 +106,7 @@ def execute_external( command_specification, **nomargs ):
         command_specification = split_command( command_specification )
     # TODO? Handle pseudo-TTY requests with 'ptyprocess.PtyProcess'.
     # TODO? Intercept 'subprocess.SubprocessError'.
-    # nosemgrep: scm-modules.semgrep-rules.python.lang.security.audit.dangerous-subprocess-use-audit
+    # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-audit
     return run( command_specification, check = True, **options ) # nosec B603
 
 
