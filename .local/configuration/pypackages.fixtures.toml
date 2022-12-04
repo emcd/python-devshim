@@ -394,10 +394,10 @@ digests = [
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "hypothesis"
-version = "6.58.2"
+version = "6.60.0"
 digests = [
-    "sha256:6e235b71455ef7e329b8214e75bad3f5195caf4ee708c571f20a76c6f5c18814",
-    "sha256:6108f8f692fa6554c8cb10b3516d97d2609fa063745ecaf36f1878d007c51d8f",
+    "sha256:3e8a1e061a6bfa3d8c282dafec100f2c8c527ea50b6560e9a33adf0e2e5fef8f",
+    "sha256:39c06cd49f491204380d7c7aa45389d3fb84ee80ea1e3f10afc744044aceb751",
 ]
 
 [["cpython-3.10.8--linux--x86_64"]]
@@ -1718,10 +1718,10 @@ digests = [
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "hypothesis"
-version = "6.58.2"
+version = "6.60.0"
 digests = [
-    "sha256:6e235b71455ef7e329b8214e75bad3f5195caf4ee708c571f20a76c6f5c18814",
-    "sha256:6108f8f692fa6554c8cb10b3516d97d2609fa063745ecaf36f1878d007c51d8f",
+    "sha256:3e8a1e061a6bfa3d8c282dafec100f2c8c527ea50b6560e9a33adf0e2e5fef8f",
+    "sha256:39c06cd49f491204380d7c7aa45389d3fb84ee80ea1e3f10afc744044aceb751",
 ]
 
 [["cpython-3.11.0--linux--x86_64"]]
@@ -3011,10 +3011,10 @@ digests = [
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "hypothesis"
-version = "6.58.2"
+version = "6.60.0"
 digests = [
-    "sha256:6e235b71455ef7e329b8214e75bad3f5195caf4ee708c571f20a76c6f5c18814",
-    "sha256:6108f8f692fa6554c8cb10b3516d97d2609fa063745ecaf36f1878d007c51d8f",
+    "sha256:3e8a1e061a6bfa3d8c282dafec100f2c8c527ea50b6560e9a33adf0e2e5fef8f",
+    "sha256:39c06cd49f491204380d7c7aa45389d3fb84ee80ea1e3f10afc744044aceb751",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
@@ -4389,10 +4389,10 @@ digests = [
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "hypothesis"
-version = "6.58.2"
+version = "6.60.0"
 digests = [
-    "sha256:6e235b71455ef7e329b8214e75bad3f5195caf4ee708c571f20a76c6f5c18814",
-    "sha256:6108f8f692fa6554c8cb10b3516d97d2609fa063745ecaf36f1878d007c51d8f",
+    "sha256:3e8a1e061a6bfa3d8c282dafec100f2c8c527ea50b6560e9a33adf0e2e5fef8f",
+    "sha256:39c06cd49f491204380d7c7aa45389d3fb84ee80ea1e3f10afc744044aceb751",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
@@ -5737,10 +5737,10 @@ digests = [
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "hypothesis"
-version = "6.58.2"
+version = "6.60.0"
 digests = [
-    "sha256:6e235b71455ef7e329b8214e75bad3f5195caf4ee708c571f20a76c6f5c18814",
-    "sha256:6108f8f692fa6554c8cb10b3516d97d2609fa063745ecaf36f1878d007c51d8f",
+    "sha256:3e8a1e061a6bfa3d8c282dafec100f2c8c527ea50b6560e9a33adf0e2e5fef8f",
+    "sha256:39c06cd49f491204380d7c7aa45389d3fb84ee80ea1e3f10afc744044aceb751",
 ]
 
 [["cpython-3.9.15--linux--x86_64"]]
@@ -7070,10 +7070,10 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "hypothesis"
-version = "6.58.2"
+version = "6.60.0"
 digests = [
-    "sha256:6e235b71455ef7e329b8214e75bad3f5195caf4ee708c571f20a76c6f5c18814",
-    "sha256:6108f8f692fa6554c8cb10b3516d97d2609fa063745ecaf36f1878d007c51d8f",
+    "sha256:3e8a1e061a6bfa3d8c282dafec100f2c8c527ea50b6560e9a33adf0e2e5fef8f",
+    "sha256:39c06cd49f491204380d7c7aa45389d3fb84ee80ea1e3f10afc744044aceb751",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -8227,10 +8227,10 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "hypothesis"
-version = "6.58.2"
+version = "6.60.0"
 digests = [
-    "sha256:6e235b71455ef7e329b8214e75bad3f5195caf4ee708c571f20a76c6f5c18814",
-    "sha256:6108f8f692fa6554c8cb10b3516d97d2609fa063745ecaf36f1878d007c51d8f",
+    "sha256:3e8a1e061a6bfa3d8c282dafec100f2c8c527ea50b6560e9a33adf0e2e5fef8f",
+    "sha256:39c06cd49f491204380d7c7aa45389d3fb84ee80ea1e3f10afc744044aceb751",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -9555,10 +9555,10 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "hypothesis"
-version = "6.58.2"
+version = "6.60.0"
 digests = [
-    "sha256:6e235b71455ef7e329b8214e75bad3f5195caf4ee708c571f20a76c6f5c18814",
-    "sha256:6108f8f692fa6554c8cb10b3516d97d2609fa063745ecaf36f1878d007c51d8f",
+    "sha256:3e8a1e061a6bfa3d8c282dafec100f2c8c527ea50b6560e9a33adf0e2e5fef8f",
+    "sha256:39c06cd49f491204380d7c7aa45389d3fb84ee80ea1e3f10afc744044aceb751",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
