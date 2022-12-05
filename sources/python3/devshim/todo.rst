@@ -14,6 +14,10 @@ Fixes and Minor Improvements
 
 * Suppress Setuptools warning when running Pylint.
 
+* Python language provider features for Cinder VM and Pyston Lite.
+  Install 'sitecustomize.py' files for module auto-loading.
+  https://docs.python.org/3/library/site.html
+
 Remove Dependency on System ``pip``
 ===============================================================================
 

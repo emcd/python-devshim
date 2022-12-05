@@ -46,6 +46,12 @@ class LanguageProvider( metaclass = ABCFactory ):
         # TODO: Use exception factory.
         raise NotImplementedError
 
+    @abstract_function
+    def attempt_version_data_update( self ):
+        ''' Attempts to update version data for version of language. '''
+        # TODO: Use exception factory.
+        raise NotImplementedError
+
     @classmethod
     @abstract_function
     def is_supportable_feature( class_, feature ):

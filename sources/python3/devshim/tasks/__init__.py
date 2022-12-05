@@ -35,6 +35,16 @@ def list_python_versions( ):
     for version in survey_support( ).keys( ): print( version )
 
 
+@__.task(
+    'Freshen: Python Version',
+    version_expansion = 'declared Python versions',
+)
+def freshen_python_new( version = None ):
+    ''' Updates requested Python version, if newer one available. '''
+    from ..languages.python import update_version
+    update_version( version )
+
+
 @__.task( )
 def ease(
     shell_name = None,
@@ -923,4 +933,8 @@ namespace.add_collection( __.TaskCollection(
 namespace.add_collection( __.TaskCollection(
     'show',
     pythons = list_python_versions,
+) )
+namespace.add_collection( __.TaskCollection(
+    'xp',
+    freshen_python = freshen_python_new,
 ) )

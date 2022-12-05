@@ -22,6 +22,8 @@
 
 
 # pylint: disable=unused-import
+import re
+
 from collections.abc import Mapping as AbstractDictionary
 from types import MappingProxyType as DictionaryProxy
 

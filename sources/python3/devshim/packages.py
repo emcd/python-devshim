@@ -248,9 +248,10 @@ def ensure_import_package( name ):
         Translates aliases for forward compatibility. '''
     name = _package_aliases.get( name, name )
     _ensure_python_packages( ( name, ) )
+    legal_name = name.replace( '-', '_' )
     from importlib import import_module
     # nosemgrep: python.lang.security.audit.non-literal-import
-    return import_module( name )
+    return import_module( legal_name )
 
 
 _package_aliases = _DictionaryProxy( {

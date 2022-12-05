@@ -1,32 +1,36 @@
 format-version = 1
 
-[versions.'Python 3.7']
-base-version = '3.7'
-implementation = 'cpython'
-implementation-version = '3.7.15'
-providers = [ 'python-build', ]
+[versions."Python 3.7"]
+base-version = "3.7"
+implementation = "cpython"
+implementation-version = "3.7.15"
+providers = [
+    "python-build",
+]
 
-[versions.'Python 3.8']
-base-version = '3.8'
-implementation = 'cpython'
-implementation-version = '3.8.15'
-providers = [ 'python-build', ]
+[versions."Python 3.8"]
+base-version = "3.8"
+implementation = "cpython"
+implementation-version = "3.8.15"
+providers = [
+    "python-build",
+]
 
-[versions.'Python 3.8 [TRACEREFS]']
-base-version = '3.8'
-implementation = 'cpython'
-implementation-version = '3.8.15'
+[versions."Python 3.8 [TRACEREFS]"]
+base-version = "3.8"
+implementation = "cpython"
+implementation-version = "3.8.15"
 
-[[versions.'Python 3.8 [TRACEREFS]'.providers]]
-name = 'python-build'
-features = [ 'cpython-tracerefs' ]
+[[versions."Python 3.8 [TRACEREFS]".providers]]
+name = "python-build"
+features = [
+    "cpython-tracerefs",
+]
 
-# TODO: Features for Cinder VM and Pyston Lite.
-#       Could install 'sitecustomize.py' files for module auto-loading.
-#       https://docs.python.org/3/library/site.html
-
-[versions.'PyPy 3.7']
-base-version = '3.7'
-implementation = 'pypy3'
-implementation-version = '7.3.9'
-providers = [ 'python-build', ]
+[versions."PyPy 3.7"]
+base-version = "3.7"
+implementation = "pypy3"
+implementation-version = "7.3.9"
+providers = [
+    "python-build",
+]
