@@ -9,6 +9,13 @@ Prefer Prebuilt Python Executables
   that platform. Download from official Python "FTP" server:
   https://www.python.org/ftp/python/.
 
+Cache Python Installations in User Home
+===============================================================================
+
+* Use `platformdirs <https://github.com/platformdirs/platformdirs>`_ to not
+  reinvent the wheel. (Could revive old ``utilia`` code which also does this,
+  but ``platformdirs`` is more up-to-date.)
+
 Fixes and Minor Improvements
 ===============================================================================
 
@@ -17,6 +24,17 @@ Fixes and Minor Improvements
 * Python language provider features for Cinder VM and Pyston Lite.
   Install 'sitecustomize.py' files for module auto-loading.
   https://docs.python.org/3/library/site.html
+
+* Collapse exit codes dictionary down to BSD sysexits, using literal values as
+  the symbolic names do not exist on all systems, and custom codes in the range
+  from 1 to 63, inclusive, for all operating systems. Not worth mapping to
+  `Windows System Error Codes
+  <https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes?redirectedfrom=MSDN#system-error-codes>`_
+  on Windows systems as those are error codes for the OS and not applications.
+  Maybe consider `Advanced Bash Scripting Guide
+  <https://tldp.org/LDP/abs/html/exitcodes.html>`_.
+
+* Finish hooking up logging.
 
 Remove Dependency on System ``pip``
 ===============================================================================
