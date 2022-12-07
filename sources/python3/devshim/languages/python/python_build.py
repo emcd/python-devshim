@@ -41,6 +41,9 @@ class PythonBuild( __.LanguageProvider ):
     ''' Works with ``python-build`` program from Pyenv. '''
 
     name = 'python-build'
+    supportable_features = (
+        'cindervm', 'cpython-tracerefs', 'pyston-lite',
+    )
     from ...data import paths
     # TODO: Installation paths should be relative to home directory of user
     #       and not relative to the current repository.
@@ -70,31 +73,33 @@ class PythonBuild( __.LanguageProvider ):
     def attempt_version_data_update( self ):
         ''' Detects new Python version and returns version data update. '''
         self._ensure_installer( )
-        # TODO: Form pb_definition_base
         pb_definition_name_base = self._calculate_pb_definition_name_base( )
         from ...base import execute_external
         pb_definition_names = execute_external(
             ( self.our_installer_path, '--definitions' ),
             capture_output = True ).stdout.strip( ).split( '\n' )
-        pb_definition_name = [
+        pb_definition_name_candidates = [
             pb_definition_name for pb_definition_name in pb_definition_names
-            if pb_definition_name.startswith( pb_definition_name_base ) ][ -1 ]
+            if pb_definition_name.startswith( pb_definition_name_base ) ]
+        if not pb_definition_name_candidates:
+            # TODO: Log warning about no valid definitions matching base.
+            #       Or, consider raising error.
+            return self.version_data
+        pb_definition_name = pb_definition_name_candidates[ -1 ]
         implementation_version = _parse_implementation_version(
             pb_definition_name )
         version_data = self.version_data.copy( )
         version_data[ 'implementation-version' ] = implementation_version
         return version_data
 
-
     @classmethod
     def is_supportable_feature( class_, feature ):
-        # TODO: Implement.
-        pass
+        return feature in class_.supportable_features
 
     @classmethod
     def is_supportable_platform( class_, platform ):
-        # TODO: Implement.
-        pass
+        import os
+        return 'posix' == os.name
 
     def _calculate_pb_definition_name( self ):
         base_version = self.version_data[ 'base-version' ]

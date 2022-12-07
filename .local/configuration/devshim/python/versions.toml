@@ -29,7 +29,7 @@ features = [
 
 [versions."PyPy 3.7"]
 base-version = "3.7"
-implementation = "pypy3"
+implementation = "pypy"
 implementation-version = "7.3.9"
 providers = [
     "python-build",
