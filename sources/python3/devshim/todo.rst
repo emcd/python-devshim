@@ -19,8 +19,6 @@ Cache Python Installations in User Home
 Fixes and Minor Improvements
 ===============================================================================
 
-* Suppress Setuptools warning when running Pylint.
-
 * Python language provider features for Cinder VM and Pyston Lite.
   Install 'sitecustomize.py' files for module auto-loading.
   https://docs.python.org/3/library/site.html
@@ -34,7 +32,7 @@ Fixes and Minor Improvements
   Maybe consider `Advanced Bash Scripting Guide
   <https://tldp.org/LDP/abs/html/exitcodes.html>`_.
 
-* Finish hooking up logging.
+* Finish hookup of logging.
 
 Remove Dependency on System ``pip``
 ===============================================================================
@@ -163,14 +161,6 @@ Remove Dependency on ``pip``
   code maintenance to keep up with latest PEPs and bug fixes. Unless we can
   pull ``*.pyz`` files for helper packages, like a dependency resolver and a
   wheel cache manager.
-
-Upstream Bug Reports
-===============================================================================
-
-* Pylint: Does not detect valid tuple of exceptions given to ``except`` arm.
-
-* Pylint: Does not understand re-raising of specific exceptions before
-  BaseException is handled.
 
 PyPA Discussions of Interest
 ===============================================================================

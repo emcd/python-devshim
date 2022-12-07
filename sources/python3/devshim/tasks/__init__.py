@@ -366,7 +366,7 @@ def lint_pylint( targets, checks, report = False, version = None ):
         "--disable=all --enable={}".format( ','.join( checks ) )
         if checks else '' )
     __.project_execute_external(
-        f"pylint {options_str} {checks_str} --recursive yes {targets_str}",
+        f"pylint {options_str} {checks_str} --recursive=yes {targets_str}",
         env = process_environment )
 
 
