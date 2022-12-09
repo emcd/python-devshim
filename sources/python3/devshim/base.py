@@ -112,42 +112,41 @@ def execute_external( command_specification, **nomargs ):
 
 
 def _enumerate_exit_codes( ):
-    from sys import platform
-    # TODO: Python 3.10: Use 'match' keyword.
-    if platform in ( 'emscripten', 'windows', ):
-        return _enumerate_ununixlike_exit_codes( )
-    return _enumerate_unixlike_exit_codes( )
-
-def _enumerate_unixlike_exit_codes( ):
-    import os
+    # Standardized on recommended BSD exit codes across all platforms.
+    # Windows seems to have no standard for application exit codes
+    # and its list of system error codes is massive. (And error codes are not
+    # necessarily exit codes.) Cannot rely on "constants" from Python standard
+    # library 'os' modules as they are mostly not cross-platform.
+    # Can also use custom codes between 1 and 63 for failures, as necessary.
+    # References:
+    #   https://docs.python.org/3/library/os.html#os.EX_OK
+    #   https://www.freebsd.org/cgi/man.cgi?query=sysexits&apropos=0&sektion=0&manpath=FreeBSD+4.3-RELEASE&format=html
+    #   https://tldp.org/LDP/abs/html/exitcodes.html
+    #   https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes?redirectedfrom=MSDN#system-error-codes
     return {
         'general failure':      1,
-        'invalid data':         os.EX_DATAERR,
-        'invalid state':        os.EX_SOFTWARE,
-        'success':              os.EX_OK,
-    }
-
-def _enumerate_ununixlike_exit_codes( ):
-    return {
-        'general failure':      1,
-        'invalid data':         11,
-        'invalid state':        31,
-        'success':              0,
+        'invalid data':         65, # EX_DATAERR
+        'invalid state':        70, # EX_SOFTWARE
+        'invalid usage':        64, # EX_USAGE
+        'success':              0,  # EX_OK
     }
 
 _exit_codes = _enumerate_exit_codes( )
 
 
-def expire( exit_name, message ) -> _typ.NoReturn:
+def expire( exit_specifier, message ) -> _typ.NoReturn:
     # Preferred name would be 'exit' or 'quit' but those are Python builtins.
     # Could have named it 'die', which is short, sweet, and old school,
     # but other function names are Latin-based whereas 'die' is Germanic.
     # Pet peeve about linguistic consistency....
     ''' Logs message and exits current process. '''
-    if exit_name not in _exit_codes:
-        scribe.warning( f"Invalid exit code name {exit_name!r}." )
+    from numbers import Integral
+    if isinstance( exit_specifier, Integral ):
+        exit_code = int( exit_specifier )
+    elif exit_specifier not in _exit_codes:
+        scribe.warning( f"Invalid exit code name {exit_specifier!r}." )
         exit_code = _exit_codes[ 'general failure' ]
-    else: exit_code = _exit_codes[ exit_name ]
+    else: exit_code = _exit_codes[ exit_specifier ]
     message = str( message )
     if 0 == exit_code: scribe.info( message )
     # TODO: Python 3.8: stacklevel = 2

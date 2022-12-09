@@ -23,16 +23,15 @@ Fixes and Minor Improvements
   Install 'sitecustomize.py' files for module auto-loading.
   https://docs.python.org/3/library/site.html
 
-* Collapse exit codes dictionary down to BSD sysexits, using literal values as
-  the symbolic names do not exist on all systems, and custom codes in the range
-  from 1 to 63, inclusive, for all operating systems. Not worth mapping to
-  `Windows System Error Codes
-  <https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes?redirectedfrom=MSDN#system-error-codes>`_
-  on Windows systems as those are error codes for the OS and not applications.
-  Maybe consider `Advanced Bash Scripting Guide
-  <https://tldp.org/LDP/abs/html/exitcodes.html>`_.
+* Finish hookup of logging. May include installation of the Rich handler after
+  early package bootstrap.
 
-* Finish hookup of logging.
+* Download tarball from Github for ``semgrep-rules`` rather than relying on a
+  Git submodule.
+
+* Add hook functions to make all package modules immutable via
+  :py:mod:`lockup`. Similarly to reparent classes to an immutability-enforcing
+  class factory class.
 
 Remove Dependency on System ``pip``
 ===============================================================================
@@ -53,8 +52,8 @@ Remove Dependency on System ``pip``
 Remove Dependency on ``git``
 ===============================================================================
 
-* Will not have to handle Git variants, like TortoiseGit, or Git bridges to
-  other SCM systems.
+* Will not have to handle Git variants, like Sourcetree or TortoiseGit, or Git
+  bridges for other SCM systems, like `hg-git <https://hg-git.github.io/>`_.
 
 * Can use `Dulwich <https://www.dulwich.io/apidocs/>`_, which does not rely on
   Git executable. Will also be more efficient to eliminate subprocess fork-exec
