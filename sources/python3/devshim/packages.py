@@ -107,9 +107,14 @@ def generate_pip_requirements_text( identifier = None ):
 
 def ensure_python_packages( domain = '*', excludes = ( ) ):
     ''' Ensures availability of packages from domain in cache. '''
+    from .base import scribe
+    domains = _canonicalize_pypackages_domain( domain )
+    scribe.info(
+        "Ensuring packages for domains: {domains}".format(
+            domains = ', '.join( domains.keys( ) ) ) )
     _ensure_essential_python_packages( )
     requirements = extract_python_package_requirements(
-        indicate_python_packages( )[ 0 ], domain )
+        indicate_python_packages( )[ 0 ], domains )
     from collections.abc import Sequence as AbstractSequence
     if not isinstance( excludes, AbstractSequence ):
         _expire(
@@ -129,7 +134,9 @@ def extract_python_package_requirements( specifications, domain = '*' ):
         are extracted. '''
     from .base import scribe
     _validate_pypackages_format_version( specifications )
-    domains = _canonicalize_pypackages_domain( domain )
+    from collections.abc import Mapping as AbstractDictionary
+    if isinstance( domain, AbstractDictionary ): domains = domain
+    else: domains = _canonicalize_pypackages_domain( domain )
     from itertools import chain
     requirements = [ ]
     for domain_, subdomain_components_maximum in domains.items( ):

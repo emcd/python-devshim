@@ -45,20 +45,37 @@ assert_minimum_python_version( )
 
 def initialize( ):
     ''' Initializes development support executor. '''
-    from logging import (
-        INFO as record_level_info,
-        basicConfig as simple_setup_logging,
-        captureWarnings as capture_admonitions,
-        getLogger as get_logger,
-    )
-    simple_setup_logging( level = record_level_info )
-    capture_admonitions( True )
+    _configure_base_scribe( )
     from pathlib import Path
     project_path = Path( __file__ ).parent
     ensure_scm_modules( project_path )
     configure_auxiliary( project_path )
+    from logging import getLogger as acquire_scribe
     from devshim import complete_initialization
-    complete_initialization( scribe = get_logger( ) )
+    complete_initialization( scribe = acquire_scribe( ) )
+
+
+def _configure_base_scribe( ):
+    ''' Configures logging system and root logger. '''
+    import logging
+    from os import environ as current_process_environment
+    record_level_name_default = 'INFO'
+    record_level_name = current_process_environment.get(
+        'DEVSHIM_RECORD_LEVEL', record_level_name_default )
+    valid_record_level = hasattr( logging, record_level_name )
+    record_level = getattr(
+        logging,
+        record_level_name if valid_record_level
+        else record_level_name_default )
+    logging.basicConfig(
+        format = "%(levelname)s\t%(message)s", level = record_level )
+    logging.captureWarnings( True )
+    scribe = logging.getLogger( )
+    scribe.debug( 'Logging initialized.' )
+    if not valid_record_level:
+        scribe.warning(
+            f"Invalid log level name, {record_level_name!r}. "
+            f"Using {record_level_name_default!r} instead." )
 
 
 def ensure_scm_modules( project_path ):
@@ -82,6 +99,7 @@ def ensure_scm_modules( project_path ):
 
 def _attempt_clone_scm_modules( project_path ):
     ''' Attempts to clone SCM modules. '''
+    # TODO: Bootstrap Dulwich and remove Git dependency.
     from shutil import which
     git_path = which( 'git' )
     if None is git_path:
@@ -89,12 +107,12 @@ def _attempt_clone_scm_modules( project_path ):
             _EX_UNAVAILABLE,
             'Git must be installed to use development support tools.' )
     from logging import info
-    info( 'Cloning SCM modules to get development support tools.' )
+    info( 'Cloning or updating Git modules.' )
     from subprocess import run # nosec: B404
     # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-audit
     run( # nosec: B603
         ( git_path, *'submodule update --init --recursive'.split( ' ' ) ),
-        capture_output = True, check = True, cwd = project_path, text = True )
+        check = True, cwd = project_path, text = True )
 
 
 def configure_auxiliary( project_path ):
