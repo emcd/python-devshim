@@ -18,15 +18,10 @@
 #============================================================================#
 
 
-''' Provides shell functions to facilitate use of development shim. '''
+''' Provides user interface for development support activity. '''
 
 
-from lockup import NamespaceClass as _NamespaceClass
-class __( metaclass = _NamespaceClass ):
-
-    from types import MappingProxyType as DictionaryProxy
-
-    from lockup import reclassify_module
+from types import MappingProxyType as _DictionaryProxy
 
 
 def render_boxed_title( title, supplement = None ):
@@ -94,13 +89,13 @@ def _provide_default_shell_name( ):
 
 
 # TODO? Detect when outside of the project directory tree.
-invocation_code_table = __.DictionaryProxy( {
+invocation_code_table = _DictionaryProxy( {
     'bash': '''
         function {function_name} {{
             "{python_path}" "{shim_path}" "$@"
         }}''',
     'fish': '''
-		function {function_name}
+        function {function_name}
             "{python_path}" "{shim_path}" $argv
         end''',
     'zsh': '''
@@ -109,12 +104,9 @@ invocation_code_table = __.DictionaryProxy( {
         }}''',
 } )
 
-completion_code_table = __.DictionaryProxy( {
+completion_code_table = _DictionaryProxy( {
     # TODO: Implement.
 } )
 
 # TODO? direnv configuration snippets to allow devshim to operate
 #       in any supported directory.
-
-
-__.reclassify_module( __name__ )

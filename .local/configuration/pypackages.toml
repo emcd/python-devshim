@@ -78,6 +78,9 @@ requirement = 'invoke'
 requirement = 'pre-commit'
 
 [[development.user-interface]]
+requirement = 'rich'
+
+[[development.user-interface]]
 requirement = 'shellingham'
 
 [[development.user-interface]]

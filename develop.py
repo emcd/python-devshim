@@ -43,25 +43,29 @@ def assert_minimum_python_version( ):
 assert_minimum_python_version( )
 
 
-def configure( ):
-    ''' Configures development support executor. '''
+def initialize( ):
+    ''' Initializes development support executor. '''
     from logging import (
+        INFO as record_level_info,
         basicConfig as simple_setup_logging,
         captureWarnings as capture_admonitions,
+        getLogger as get_logger,
     )
-    simple_setup_logging( )
+    simple_setup_logging( level = record_level_info )
     capture_admonitions( True )
     from pathlib import Path
     project_path = Path( __file__ ).parent
     ensure_scm_modules( project_path )
     configure_auxiliary( project_path )
-    from devshim.packages import ensure_python_packages
-    ensure_python_packages(
-        domain = ( 'construction', 'development.user-interface', ) )
+    from devshim import complete_initialization
+    complete_initialization( scribe = get_logger( ) )
 
 
 def ensure_scm_modules( project_path ):
     ''' Ensures SCM modules have been cloned. '''
+    # TODO: Do not hard-code SCM modules paths.
+    #       Instead, bootstrap Dulwich first and then scan the registered
+    #       submodules of the repository.
     # TODO: Use '.local/scm-modules' only.
     #       Top-level project should not care about 'devshim' SCM modules.
     for modules_path in (
@@ -104,7 +108,7 @@ def configure_auxiliary( project_path ):
     python_search_paths.insert( 0, str( packages_path ) )
     from os import environ as current_process_environment
     current_process_environment.update( dict(
-        _DEVSHIM_PROJECT_PATH = str( project_path )
+        _DEVSHIM_PROJECT_PATH = str( project_path ),
     ) )
     from devshim.base import assert_sanity
     assert_sanity( )
@@ -119,11 +123,10 @@ def _die( exit_code, message ):
 
 def main( ):
     ''' Entrypoint for development activity. '''
-    configure( )
+    initialize( )
     from invoke import Collection, Program
     from devshim import tasks
-    program = Program( namespace = Collection.from_module( tasks ) )
-    program.run( )
+    Program( namespace = Collection.from_module( tasks ) ).run( )
 
 
 if '__main__' == __name__: main( )
