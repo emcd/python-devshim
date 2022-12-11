@@ -28,6 +28,7 @@ from collections.abc import Mapping as AbstractDictionary
 from types import MappingProxyType as DictionaryProxy
 
 from ...base import expire, scribe
+from ...exceptions import provide_exception_factory
 # pylint: enable=unused-import
 from .. import _base as __
 

@@ -45,11 +45,13 @@ assert_minimum_python_version( )
 
 def initialize( ):
     ''' Initializes development support executor. '''
-    _configure_base_scribe( )
+    additional_environment = { }
+    additional_environment.update( _configure_base_scribe( ) )
     from pathlib import Path
     project_path = Path( __file__ ).parent
     ensure_scm_modules( project_path )
-    configure_auxiliary( project_path )
+    configure_auxiliary(
+        project_path, additional_environment = additional_environment )
     from logging import getLogger as acquire_scribe
     from devshim import complete_initialization
     complete_initialization( scribe = acquire_scribe( ) )
@@ -76,6 +78,8 @@ def _configure_base_scribe( ):
         scribe.warning(
             f"Invalid log level name, {record_level_name!r}. "
             f"Using {record_level_name_default!r} instead." )
+    from types import MappingProxyType as DictionaryProxy
+    return DictionaryProxy( dict( _DEVSHIM_RECORD_LEVEL = record_level_name ) )
 
 
 def ensure_scm_modules( project_path ):
@@ -115,7 +119,7 @@ def _attempt_clone_scm_modules( project_path ):
         check = True, cwd = project_path, text = True )
 
 
-def configure_auxiliary( project_path ):
+def configure_auxiliary( project_path, additional_environment = None ):
     ''' Locates and configures development support modules. '''
     auxiliary_path = project_path.joinpath(
         '.local', 'scm-modules', 'python-devshim' )
@@ -127,7 +131,7 @@ def configure_auxiliary( project_path ):
     from os import environ as current_process_environment
     current_process_environment.update( dict(
         _DEVSHIM_PROJECT_PATH = str( project_path ),
-    ) )
+        **( additional_environment or { } ) ) )
     from devshim.base import assert_sanity
     assert_sanity( )
 

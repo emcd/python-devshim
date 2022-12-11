@@ -97,28 +97,28 @@ def _update_version_data( version, data ):
 def _create_context( version ):
     versions = survey_support( )
     if not versions:
-        __.expire( 'invalid data', "No relevant support declarations." )
+        raise __.provide_exception_factory( 'invalid data' )(
+            "No relevant support declarations." )
     if None is version: version = next( iter( versions ) )
     version_data = versions.get( version )
     context = __.LanguageContext( version )
-    # TODO: Ensure exception factories are loaded and use them instead.
     # TODO: Use context information in error messages.
     if None is version_data:
-        __.expire( 'invalid data', f"No support declaration for {version!r}." )
+        raise __.provide_exception_factory( 'invalid data' )(
+            f"No support declaration for {version!r}." )
     if 'providers' not in version_data:
-        __.expire( 'invalid data', f"No providers for {version!r}." )
+        raise __.provide_exception_factory( 'invalid data' )(
+            f"No providers for {version!r}." )
     return context, version_data
 
 
 def _normalize_provider_entry( context, entry ):
-    # TODO: Ensure exception factories are loaded and use them instead.
     # TODO: Use context information in error messages.
     if isinstance( entry, str ):
         return __.DictionaryProxy( { 'name' : entry } )
     if isinstance( entry, __.AbstractDictionary ):
         if 'name' in entry: return entry
-    __.expire(
-        'invalid data',
+    raise __.provide_exception_factory( 'invalid data' )(
         f"Invalid provider entry, {entry!r}, for {context.version!r}." )
 
 

@@ -245,8 +245,7 @@ def assert_python_packages( requirements ):
     from .base import expire
     names = ', '.join(
         map( _pep508_requirement_to_name, installable_requirements ) )
-    expire( 'invalid state',
-            f"Packages absent from local cache: {names!r}" )
+    expire( 'invalid state', f"Packages absent from local cache: {names}" )
 
 
 def ensure_import_package( name ):
