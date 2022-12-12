@@ -84,10 +84,10 @@ digests = [
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "certifi"
-version = "2022.9.24"
+version = "2022.12.7"
 digests = [
-    "sha256:90c1a32f1d68f940488354e36370f6cca89f0f106db09518524c88d6ed83f382",
-    "sha256:0d9c601124e5a6ba9712dbc60d9c53c21e34f5f641fe83002317394311bdce14",
+    "sha256:4ad3232f5e926d6718ec31cfc1fcadfde020920e278684144551c91769c7bc18",
+    "sha256:35824b4c3a97115964b408844d64aa14db1cc518f6562e8d7261699d1350a9e3",
 ]
 
 [["cpython-3.10.8--linux--x86_64"]]
@@ -354,18 +354,18 @@ digests = [
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "filelock"
-version = "3.8.0"
+version = "3.8.2"
 digests = [
-    "sha256:617eb4e5eedc82fc5f47b6d61e4d11cb837c56cb4544e39081099fa17ad109d4",
-    "sha256:55447caa666f2198c5b6b13a26d2084d26fa5b115c00d065664b2124680c4edc",
+    "sha256:8df285554452285f79c035efb0c861eb33a4bcfa5b7a137016e32e6a90f9792c",
+    "sha256:7565f628ea56bfcd8e54e42bdc55da899c85c1abfe1b5bcfd147e9188cebb3b2",
 ]
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "furo"
-version = "2022.9.29"
+version = "2022.12.7"
 digests = [
-    "sha256:559ee17999c0f52728481dcf6b1b0cf8c9743e68c5e3a18cb45a7992747869a9",
-    "sha256:d4238145629c623609c2deb5384f8d036e2a1ee2a101d64b67b4348112470dbd",
+    "sha256:7cb76c12a25ef65db85ab0743df907573d03027a33631f17d267e598ebb191f7",
+    "sha256:d8008f8efbe7587a97ba533c8b2df1f9c21ee9b3e5cad0d27f61193d38b1a986",
 ]
 
 [["cpython-3.10.8--linux--x86_64"]]
@@ -394,10 +394,10 @@ digests = [
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "hypothesis"
-version = "6.60.0"
+version = "6.61.0"
 digests = [
-    "sha256:3e8a1e061a6bfa3d8c282dafec100f2c8c527ea50b6560e9a33adf0e2e5fef8f",
-    "sha256:39c06cd49f491204380d7c7aa45389d3fb84ee80ea1e3f10afc744044aceb751",
+    "sha256:7bb22d22e35db99d5724bbf5bdc686b46add94a0f228bf1be249c47ec46b9c7f",
+    "sha256:fbf7da30aea839d88898f74bcc027f0f997060498a8a7605880688c8a2166215",
 ]
 
 [["cpython-3.10.8--linux--x86_64"]]
@@ -684,10 +684,10 @@ digests = [
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "platformdirs"
-version = "2.5.4"
+version = "2.6.0"
 digests = [
-    "sha256:af0276409f9a02373d540bf8480021a048711d572745aef4b7842dad245eba10",
-    "sha256:1006647646d80f16130f052404c6b901e80ee4ed6bef6792e1f238a8969106f7",
+    "sha256:1a89a12377800c81983db6be069ec068eee989748799b946cce2a6e80dcc54ca",
+    "sha256:b46ffafa316e6b83b47489d240ce17173f123a9b9c83282141c3daf26ad9ac2e",
 ]
 
 [["cpython-3.10.8--linux--x86_64"]]
@@ -724,10 +724,10 @@ digests = [
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "pylint"
-version = "2.15.7"
+version = "2.15.8"
 digests = [
-    "sha256:1d561d1d3e8be9dd880edc685162fbdaa0409c88b9b7400873c0cf345602e326",
-    "sha256:91e4776dbcb4b4d921a3e4b6fec669551107ba11f29d9199154a01622e460a57",
+    "sha256:ea82cd6a1e11062dc86d555d07c021b0fb65afe39becbe6fe692efd6c4a67443",
+    "sha256:ec4a87c33da054ab86a6c79afa6771dc8765cb5631620053e727fcf3ef8cbed7",
 ]
 
 [["cpython-3.10.8--linux--x86_64"]]
@@ -896,6 +896,7 @@ digests = [
     "sha256:d000f258cf42fec2b1bbf2863c61d7b8918d31ffee905da62dede869254d3b8a",
     "sha256:045e0626baf1c52e5527bd5db361bc83180faaba2ff586e763d3d5982a876a9e",
     "sha256:721bc4ba4525f53f6a611ec0967bdcee61b31df5a56801281027a3a6d1c2daf5",
+    "sha256:41d0f1fa4c6830176eef5b276af04c89320ea616655d01327d5ce65e50575c94",
     "sha256:4b3a93bb9bc662fc1f99c5c3ea8e623d8b23ad22f861eb6fce9377ac07ad6072",
     "sha256:a234a20ae07e8469da311e182e70ef6b199d0fbeb6c6cc2901204dd87fb867e8",
     "sha256:15910ef4f3e537eea7fe45f8a5d19997479940d9196f357152a09031c5be59f3",
@@ -925,10 +926,10 @@ digests = [
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "safety"
-version = "2.3.3"
+version = "2.3.5"
 digests = [
-    "sha256:c12b2aaf3495faf42951fdd91d3c5ce6ecffd05efa423a29244408b72c556744",
-    "sha256:2e17cf127472ca720cdcc65f834008b555a10fe56627646009ab7565dd2459cf",
+    "sha256:2227fcac1b22b53c1615af78872b48348661691450aa25d6704a5504dbd1f7e2",
+    "sha256:a60c11f8952f412cbb165d70cb1f673a3b43a2ba9a93ce11f97e6a4de834aa3a",
 ]
 
 [["cpython-3.10.8--linux--x86_64"]]
@@ -941,12 +942,12 @@ digests = [
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "semgrep"
-version = "1.0.0"
+version = "1.1.0"
 digests = [
-    "sha256:000bd2ac5923132a9112633451aa5b028fc723dcfde73a983d10f20dea3dce44",
-    "sha256:5769236dc60587ae86638272b968330d0e3334df1db30ea7ec81e237e9d63b36",
-    "sha256:3f4cdbfbf2c55402fdee39758bdeeb3d21e9cda22b8b3bd0401d33dcca89a52f",
-    "sha256:5b5119b694f9336f1c8d68bfaceee3ff51581a0bc1a6c21a6933cd5c1879c8c3",
+    "sha256:d555758796f9a5da88ec9a1fa2aeed1575ce73833908e50327ff24ce51cc9c17",
+    "sha256:0c96f26394a551b94def440a2746227d7e4d2bdb6f306f1faaea68b27015ed8c",
+    "sha256:0f8f007ad76086b4a1890e8326eb5b9949ce499c9732970c623133e030317ffa",
+    "sha256:608b1406a6772b2ecba03f71ec4eeeb0a8003bd19aac27c40b960c76a3251ece",
 ]
 
 [["cpython-3.10.8--linux--x86_64"]]
@@ -1222,10 +1223,10 @@ digests = [
 
 [["cpython-3.10.8--linux--x86_64"]]
 name = "virtualenv"
-version = "20.17.0"
+version = "20.17.1"
 digests = [
-    "sha256:40a7e06a98728fd5769e1af6fd1a706005b4bb7e16176a272ed4292473180389",
-    "sha256:7d6a8d55b2f73b617f684ee40fd85740f062e1f2e379412cb1879c7136f05902",
+    "sha256:ce3b1684d6e1a20a3e5ed36795a97dfc6af29bc3970ca8dab93e11ac6094b3c4",
+    "sha256:f8b927684efc6f1cc206c9db297a570ab9ad0e51c16fa9e45487d36d1905c058",
 ]
 
 [["cpython-3.10.8--linux--x86_64"]]
@@ -1416,10 +1417,10 @@ digests = [
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "certifi"
-version = "2022.9.24"
+version = "2022.12.7"
 digests = [
-    "sha256:90c1a32f1d68f940488354e36370f6cca89f0f106db09518524c88d6ed83f382",
-    "sha256:0d9c601124e5a6ba9712dbc60d9c53c21e34f5f641fe83002317394311bdce14",
+    "sha256:4ad3232f5e926d6718ec31cfc1fcadfde020920e278684144551c91769c7bc18",
+    "sha256:35824b4c3a97115964b408844d64aa14db1cc518f6562e8d7261699d1350a9e3",
 ]
 
 [["cpython-3.11.0--linux--x86_64"]]
@@ -1678,18 +1679,18 @@ digests = [
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "filelock"
-version = "3.8.0"
+version = "3.8.2"
 digests = [
-    "sha256:617eb4e5eedc82fc5f47b6d61e4d11cb837c56cb4544e39081099fa17ad109d4",
-    "sha256:55447caa666f2198c5b6b13a26d2084d26fa5b115c00d065664b2124680c4edc",
+    "sha256:8df285554452285f79c035efb0c861eb33a4bcfa5b7a137016e32e6a90f9792c",
+    "sha256:7565f628ea56bfcd8e54e42bdc55da899c85c1abfe1b5bcfd147e9188cebb3b2",
 ]
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "furo"
-version = "2022.9.29"
+version = "2022.12.7"
 digests = [
-    "sha256:559ee17999c0f52728481dcf6b1b0cf8c9743e68c5e3a18cb45a7992747869a9",
-    "sha256:d4238145629c623609c2deb5384f8d036e2a1ee2a101d64b67b4348112470dbd",
+    "sha256:7cb76c12a25ef65db85ab0743df907573d03027a33631f17d267e598ebb191f7",
+    "sha256:d8008f8efbe7587a97ba533c8b2df1f9c21ee9b3e5cad0d27f61193d38b1a986",
 ]
 
 [["cpython-3.11.0--linux--x86_64"]]
@@ -1718,10 +1719,10 @@ digests = [
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "hypothesis"
-version = "6.60.0"
+version = "6.61.0"
 digests = [
-    "sha256:3e8a1e061a6bfa3d8c282dafec100f2c8c527ea50b6560e9a33adf0e2e5fef8f",
-    "sha256:39c06cd49f491204380d7c7aa45389d3fb84ee80ea1e3f10afc744044aceb751",
+    "sha256:7bb22d22e35db99d5724bbf5bdc686b46add94a0f228bf1be249c47ec46b9c7f",
+    "sha256:fbf7da30aea839d88898f74bcc027f0f997060498a8a7605880688c8a2166215",
 ]
 
 [["cpython-3.11.0--linux--x86_64"]]
@@ -2008,10 +2009,10 @@ digests = [
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "platformdirs"
-version = "2.5.4"
+version = "2.6.0"
 digests = [
-    "sha256:af0276409f9a02373d540bf8480021a048711d572745aef4b7842dad245eba10",
-    "sha256:1006647646d80f16130f052404c6b901e80ee4ed6bef6792e1f238a8969106f7",
+    "sha256:1a89a12377800c81983db6be069ec068eee989748799b946cce2a6e80dcc54ca",
+    "sha256:b46ffafa316e6b83b47489d240ce17173f123a9b9c83282141c3daf26ad9ac2e",
 ]
 
 [["cpython-3.11.0--linux--x86_64"]]
@@ -2048,10 +2049,10 @@ digests = [
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "pylint"
-version = "2.15.7"
+version = "2.15.8"
 digests = [
-    "sha256:1d561d1d3e8be9dd880edc685162fbdaa0409c88b9b7400873c0cf345602e326",
-    "sha256:91e4776dbcb4b4d921a3e4b6fec669551107ba11f29d9199154a01622e460a57",
+    "sha256:ea82cd6a1e11062dc86d555d07c021b0fb65afe39becbe6fe692efd6c4a67443",
+    "sha256:ec4a87c33da054ab86a6c79afa6771dc8765cb5631620053e727fcf3ef8cbed7",
 ]
 
 [["cpython-3.11.0--linux--x86_64"]]
@@ -2210,10 +2211,10 @@ digests = [
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "safety"
-version = "2.3.3"
+version = "2.3.5"
 digests = [
-    "sha256:c12b2aaf3495faf42951fdd91d3c5ce6ecffd05efa423a29244408b72c556744",
-    "sha256:2e17cf127472ca720cdcc65f834008b555a10fe56627646009ab7565dd2459cf",
+    "sha256:2227fcac1b22b53c1615af78872b48348661691450aa25d6704a5504dbd1f7e2",
+    "sha256:a60c11f8952f412cbb165d70cb1f673a3b43a2ba9a93ce11f97e6a4de834aa3a",
 ]
 
 [["cpython-3.11.0--linux--x86_64"]]
@@ -2226,12 +2227,12 @@ digests = [
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "semgrep"
-version = "1.0.0"
+version = "1.1.0"
 digests = [
-    "sha256:000bd2ac5923132a9112633451aa5b028fc723dcfde73a983d10f20dea3dce44",
-    "sha256:5769236dc60587ae86638272b968330d0e3334df1db30ea7ec81e237e9d63b36",
-    "sha256:3f4cdbfbf2c55402fdee39758bdeeb3d21e9cda22b8b3bd0401d33dcca89a52f",
-    "sha256:5b5119b694f9336f1c8d68bfaceee3ff51581a0bc1a6c21a6933cd5c1879c8c3",
+    "sha256:d555758796f9a5da88ec9a1fa2aeed1575ce73833908e50327ff24ce51cc9c17",
+    "sha256:0c96f26394a551b94def440a2746227d7e4d2bdb6f306f1faaea68b27015ed8c",
+    "sha256:0f8f007ad76086b4a1890e8326eb5b9949ce499c9732970c623133e030317ffa",
+    "sha256:608b1406a6772b2ecba03f71ec4eeeb0a8003bd19aac27c40b960c76a3251ece",
 ]
 
 [["cpython-3.11.0--linux--x86_64"]]
@@ -2507,10 +2508,10 @@ digests = [
 
 [["cpython-3.11.0--linux--x86_64"]]
 name = "virtualenv"
-version = "20.17.0"
+version = "20.17.1"
 digests = [
-    "sha256:40a7e06a98728fd5769e1af6fd1a706005b4bb7e16176a272ed4292473180389",
-    "sha256:7d6a8d55b2f73b617f684ee40fd85740f062e1f2e379412cb1879c7136f05902",
+    "sha256:ce3b1684d6e1a20a3e5ed36795a97dfc6af29bc3970ca8dab93e11ac6094b3c4",
+    "sha256:f8b927684efc6f1cc206c9db297a570ab9ad0e51c16fa9e45487d36d1905c058",
 ]
 
 [["cpython-3.11.0--linux--x86_64"]]
@@ -2701,10 +2702,10 @@ digests = [
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "certifi"
-version = "2022.9.24"
+version = "2022.12.7"
 digests = [
-    "sha256:90c1a32f1d68f940488354e36370f6cca89f0f106db09518524c88d6ed83f382",
-    "sha256:0d9c601124e5a6ba9712dbc60d9c53c21e34f5f641fe83002317394311bdce14",
+    "sha256:4ad3232f5e926d6718ec31cfc1fcadfde020920e278684144551c91769c7bc18",
+    "sha256:35824b4c3a97115964b408844d64aa14db1cc518f6562e8d7261699d1350a9e3",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
@@ -2971,18 +2972,18 @@ digests = [
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "filelock"
-version = "3.8.0"
+version = "3.8.2"
 digests = [
-    "sha256:617eb4e5eedc82fc5f47b6d61e4d11cb837c56cb4544e39081099fa17ad109d4",
-    "sha256:55447caa666f2198c5b6b13a26d2084d26fa5b115c00d065664b2124680c4edc",
+    "sha256:8df285554452285f79c035efb0c861eb33a4bcfa5b7a137016e32e6a90f9792c",
+    "sha256:7565f628ea56bfcd8e54e42bdc55da899c85c1abfe1b5bcfd147e9188cebb3b2",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "furo"
-version = "2022.9.29"
+version = "2022.12.7"
 digests = [
-    "sha256:559ee17999c0f52728481dcf6b1b0cf8c9743e68c5e3a18cb45a7992747869a9",
-    "sha256:d4238145629c623609c2deb5384f8d036e2a1ee2a101d64b67b4348112470dbd",
+    "sha256:7cb76c12a25ef65db85ab0743df907573d03027a33631f17d267e598ebb191f7",
+    "sha256:d8008f8efbe7587a97ba533c8b2df1f9c21ee9b3e5cad0d27f61193d38b1a986",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
@@ -3011,10 +3012,10 @@ digests = [
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "hypothesis"
-version = "6.60.0"
+version = "6.61.0"
 digests = [
-    "sha256:3e8a1e061a6bfa3d8c282dafec100f2c8c527ea50b6560e9a33adf0e2e5fef8f",
-    "sha256:39c06cd49f491204380d7c7aa45389d3fb84ee80ea1e3f10afc744044aceb751",
+    "sha256:7bb22d22e35db99d5724bbf5bdc686b46add94a0f228bf1be249c47ec46b9c7f",
+    "sha256:fbf7da30aea839d88898f74bcc027f0f997060498a8a7605880688c8a2166215",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
@@ -3051,10 +3052,10 @@ digests = [
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "importlib-resources"
-version = "5.10.0"
+version = "5.10.1"
 digests = [
-    "sha256:ee17ec648f85480d523596ce49eae8ead87d5631ae1551f913c0100b5edd3437",
-    "sha256:c01b1b94210d9849f286b86bb51bcea7cd56dde0600d8db721d7b81330711668",
+    "sha256:c09b067d82e72c66f4f8eb12332f5efbebc9b007c0b6c40818108c9870adc363",
+    "sha256:32bb095bda29741f6ef0e5278c42df98d135391bee5f932841efc0041f748dc3",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
@@ -3317,10 +3318,10 @@ digests = [
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "platformdirs"
-version = "2.5.4"
+version = "2.6.0"
 digests = [
-    "sha256:af0276409f9a02373d540bf8480021a048711d572745aef4b7842dad245eba10",
-    "sha256:1006647646d80f16130f052404c6b901e80ee4ed6bef6792e1f238a8969106f7",
+    "sha256:1a89a12377800c81983db6be069ec068eee989748799b946cce2a6e80dcc54ca",
+    "sha256:b46ffafa316e6b83b47489d240ce17173f123a9b9c83282141c3daf26ad9ac2e",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
@@ -3357,10 +3358,10 @@ digests = [
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "pylint"
-version = "2.15.7"
+version = "2.15.8"
 digests = [
-    "sha256:1d561d1d3e8be9dd880edc685162fbdaa0409c88b9b7400873c0cf345602e326",
-    "sha256:91e4776dbcb4b4d921a3e4b6fec669551107ba11f29d9199154a01622e460a57",
+    "sha256:ea82cd6a1e11062dc86d555d07c021b0fb65afe39becbe6fe692efd6c4a67443",
+    "sha256:ec4a87c33da054ab86a6c79afa6771dc8765cb5631620053e727fcf3ef8cbed7",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
@@ -3529,6 +3530,7 @@ digests = [
     "sha256:d000f258cf42fec2b1bbf2863c61d7b8918d31ffee905da62dede869254d3b8a",
     "sha256:045e0626baf1c52e5527bd5db361bc83180faaba2ff586e763d3d5982a876a9e",
     "sha256:721bc4ba4525f53f6a611ec0967bdcee61b31df5a56801281027a3a6d1c2daf5",
+    "sha256:41d0f1fa4c6830176eef5b276af04c89320ea616655d01327d5ce65e50575c94",
     "sha256:4b3a93bb9bc662fc1f99c5c3ea8e623d8b23ad22f861eb6fce9377ac07ad6072",
     "sha256:a234a20ae07e8469da311e182e70ef6b199d0fbeb6c6cc2901204dd87fb867e8",
     "sha256:15910ef4f3e537eea7fe45f8a5d19997479940d9196f357152a09031c5be59f3",
@@ -3558,10 +3560,10 @@ digests = [
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "safety"
-version = "2.3.3"
+version = "2.3.5"
 digests = [
-    "sha256:c12b2aaf3495faf42951fdd91d3c5ce6ecffd05efa423a29244408b72c556744",
-    "sha256:2e17cf127472ca720cdcc65f834008b555a10fe56627646009ab7565dd2459cf",
+    "sha256:2227fcac1b22b53c1615af78872b48348661691450aa25d6704a5504dbd1f7e2",
+    "sha256:a60c11f8952f412cbb165d70cb1f673a3b43a2ba9a93ce11f97e6a4de834aa3a",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
@@ -3574,12 +3576,12 @@ digests = [
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "semgrep"
-version = "1.0.0"
+version = "1.1.0"
 digests = [
-    "sha256:000bd2ac5923132a9112633451aa5b028fc723dcfde73a983d10f20dea3dce44",
-    "sha256:5769236dc60587ae86638272b968330d0e3334df1db30ea7ec81e237e9d63b36",
-    "sha256:3f4cdbfbf2c55402fdee39758bdeeb3d21e9cda22b8b3bd0401d33dcca89a52f",
-    "sha256:5b5119b694f9336f1c8d68bfaceee3ff51581a0bc1a6c21a6933cd5c1879c8c3",
+    "sha256:d555758796f9a5da88ec9a1fa2aeed1575ce73833908e50327ff24ce51cc9c17",
+    "sha256:0c96f26394a551b94def440a2746227d7e4d2bdb6f306f1faaea68b27015ed8c",
+    "sha256:0f8f007ad76086b4a1890e8326eb5b9949ce499c9732970c623133e030317ffa",
+    "sha256:608b1406a6772b2ecba03f71ec4eeeb0a8003bd19aac27c40b960c76a3251ece",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
@@ -3885,10 +3887,10 @@ digests = [
 
 [["cpython-3.7.15--linux--x86_64"]]
 name = "virtualenv"
-version = "20.17.0"
+version = "20.17.1"
 digests = [
-    "sha256:40a7e06a98728fd5769e1af6fd1a706005b4bb7e16176a272ed4292473180389",
-    "sha256:7d6a8d55b2f73b617f684ee40fd85740f062e1f2e379412cb1879c7136f05902",
+    "sha256:ce3b1684d6e1a20a3e5ed36795a97dfc6af29bc3970ca8dab93e11ac6094b3c4",
+    "sha256:f8b927684efc6f1cc206c9db297a570ab9ad0e51c16fa9e45487d36d1905c058",
 ]
 
 [["cpython-3.7.15--linux--x86_64"]]
@@ -4079,10 +4081,10 @@ digests = [
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "certifi"
-version = "2022.9.24"
+version = "2022.12.7"
 digests = [
-    "sha256:90c1a32f1d68f940488354e36370f6cca89f0f106db09518524c88d6ed83f382",
-    "sha256:0d9c601124e5a6ba9712dbc60d9c53c21e34f5f641fe83002317394311bdce14",
+    "sha256:4ad3232f5e926d6718ec31cfc1fcadfde020920e278684144551c91769c7bc18",
+    "sha256:35824b4c3a97115964b408844d64aa14db1cc518f6562e8d7261699d1350a9e3",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
@@ -4349,18 +4351,18 @@ digests = [
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "filelock"
-version = "3.8.0"
+version = "3.8.2"
 digests = [
-    "sha256:617eb4e5eedc82fc5f47b6d61e4d11cb837c56cb4544e39081099fa17ad109d4",
-    "sha256:55447caa666f2198c5b6b13a26d2084d26fa5b115c00d065664b2124680c4edc",
+    "sha256:8df285554452285f79c035efb0c861eb33a4bcfa5b7a137016e32e6a90f9792c",
+    "sha256:7565f628ea56bfcd8e54e42bdc55da899c85c1abfe1b5bcfd147e9188cebb3b2",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "furo"
-version = "2022.9.29"
+version = "2022.12.7"
 digests = [
-    "sha256:559ee17999c0f52728481dcf6b1b0cf8c9743e68c5e3a18cb45a7992747869a9",
-    "sha256:d4238145629c623609c2deb5384f8d036e2a1ee2a101d64b67b4348112470dbd",
+    "sha256:7cb76c12a25ef65db85ab0743df907573d03027a33631f17d267e598ebb191f7",
+    "sha256:d8008f8efbe7587a97ba533c8b2df1f9c21ee9b3e5cad0d27f61193d38b1a986",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
@@ -4389,10 +4391,10 @@ digests = [
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "hypothesis"
-version = "6.60.0"
+version = "6.61.0"
 digests = [
-    "sha256:3e8a1e061a6bfa3d8c282dafec100f2c8c527ea50b6560e9a33adf0e2e5fef8f",
-    "sha256:39c06cd49f491204380d7c7aa45389d3fb84ee80ea1e3f10afc744044aceb751",
+    "sha256:7bb22d22e35db99d5724bbf5bdc686b46add94a0f228bf1be249c47ec46b9c7f",
+    "sha256:fbf7da30aea839d88898f74bcc027f0f997060498a8a7605880688c8a2166215",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
@@ -4429,10 +4431,10 @@ digests = [
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "importlib-resources"
-version = "5.10.0"
+version = "5.10.1"
 digests = [
-    "sha256:ee17ec648f85480d523596ce49eae8ead87d5631ae1551f913c0100b5edd3437",
-    "sha256:c01b1b94210d9849f286b86bb51bcea7cd56dde0600d8db721d7b81330711668",
+    "sha256:c09b067d82e72c66f4f8eb12332f5efbebc9b007c0b6c40818108c9870adc363",
+    "sha256:32bb095bda29741f6ef0e5278c42df98d135391bee5f932841efc0041f748dc3",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
@@ -4695,10 +4697,10 @@ digests = [
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "platformdirs"
-version = "2.5.4"
+version = "2.6.0"
 digests = [
-    "sha256:af0276409f9a02373d540bf8480021a048711d572745aef4b7842dad245eba10",
-    "sha256:1006647646d80f16130f052404c6b901e80ee4ed6bef6792e1f238a8969106f7",
+    "sha256:1a89a12377800c81983db6be069ec068eee989748799b946cce2a6e80dcc54ca",
+    "sha256:b46ffafa316e6b83b47489d240ce17173f123a9b9c83282141c3daf26ad9ac2e",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
@@ -4735,10 +4737,10 @@ digests = [
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "pylint"
-version = "2.15.7"
+version = "2.15.8"
 digests = [
-    "sha256:1d561d1d3e8be9dd880edc685162fbdaa0409c88b9b7400873c0cf345602e326",
-    "sha256:91e4776dbcb4b4d921a3e4b6fec669551107ba11f29d9199154a01622e460a57",
+    "sha256:ea82cd6a1e11062dc86d555d07c021b0fb65afe39becbe6fe692efd6c4a67443",
+    "sha256:ec4a87c33da054ab86a6c79afa6771dc8765cb5631620053e727fcf3ef8cbed7",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
@@ -4907,6 +4909,7 @@ digests = [
     "sha256:d000f258cf42fec2b1bbf2863c61d7b8918d31ffee905da62dede869254d3b8a",
     "sha256:045e0626baf1c52e5527bd5db361bc83180faaba2ff586e763d3d5982a876a9e",
     "sha256:721bc4ba4525f53f6a611ec0967bdcee61b31df5a56801281027a3a6d1c2daf5",
+    "sha256:41d0f1fa4c6830176eef5b276af04c89320ea616655d01327d5ce65e50575c94",
     "sha256:4b3a93bb9bc662fc1f99c5c3ea8e623d8b23ad22f861eb6fce9377ac07ad6072",
     "sha256:a234a20ae07e8469da311e182e70ef6b199d0fbeb6c6cc2901204dd87fb867e8",
     "sha256:15910ef4f3e537eea7fe45f8a5d19997479940d9196f357152a09031c5be59f3",
@@ -4936,10 +4939,10 @@ digests = [
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "safety"
-version = "2.3.3"
+version = "2.3.5"
 digests = [
-    "sha256:c12b2aaf3495faf42951fdd91d3c5ce6ecffd05efa423a29244408b72c556744",
-    "sha256:2e17cf127472ca720cdcc65f834008b555a10fe56627646009ab7565dd2459cf",
+    "sha256:2227fcac1b22b53c1615af78872b48348661691450aa25d6704a5504dbd1f7e2",
+    "sha256:a60c11f8952f412cbb165d70cb1f673a3b43a2ba9a93ce11f97e6a4de834aa3a",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
@@ -4952,12 +4955,12 @@ digests = [
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "semgrep"
-version = "1.0.0"
+version = "1.1.0"
 digests = [
-    "sha256:000bd2ac5923132a9112633451aa5b028fc723dcfde73a983d10f20dea3dce44",
-    "sha256:5769236dc60587ae86638272b968330d0e3334df1db30ea7ec81e237e9d63b36",
-    "sha256:3f4cdbfbf2c55402fdee39758bdeeb3d21e9cda22b8b3bd0401d33dcca89a52f",
-    "sha256:5b5119b694f9336f1c8d68bfaceee3ff51581a0bc1a6c21a6933cd5c1879c8c3",
+    "sha256:d555758796f9a5da88ec9a1fa2aeed1575ce73833908e50327ff24ce51cc9c17",
+    "sha256:0c96f26394a551b94def440a2746227d7e4d2bdb6f306f1faaea68b27015ed8c",
+    "sha256:0f8f007ad76086b4a1890e8326eb5b9949ce499c9732970c623133e030317ffa",
+    "sha256:608b1406a6772b2ecba03f71ec4eeeb0a8003bd19aac27c40b960c76a3251ece",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
@@ -5233,10 +5236,10 @@ digests = [
 
 [["cpython-3.8.15--linux--x86_64"]]
 name = "virtualenv"
-version = "20.17.0"
+version = "20.17.1"
 digests = [
-    "sha256:40a7e06a98728fd5769e1af6fd1a706005b4bb7e16176a272ed4292473180389",
-    "sha256:7d6a8d55b2f73b617f684ee40fd85740f062e1f2e379412cb1879c7136f05902",
+    "sha256:ce3b1684d6e1a20a3e5ed36795a97dfc6af29bc3970ca8dab93e11ac6094b3c4",
+    "sha256:f8b927684efc6f1cc206c9db297a570ab9ad0e51c16fa9e45487d36d1905c058",
 ]
 
 [["cpython-3.8.15--linux--x86_64"]]
@@ -5427,10 +5430,10 @@ digests = [
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "certifi"
-version = "2022.9.24"
+version = "2022.12.7"
 digests = [
-    "sha256:90c1a32f1d68f940488354e36370f6cca89f0f106db09518524c88d6ed83f382",
-    "sha256:0d9c601124e5a6ba9712dbc60d9c53c21e34f5f641fe83002317394311bdce14",
+    "sha256:4ad3232f5e926d6718ec31cfc1fcadfde020920e278684144551c91769c7bc18",
+    "sha256:35824b4c3a97115964b408844d64aa14db1cc518f6562e8d7261699d1350a9e3",
 ]
 
 [["cpython-3.9.15--linux--x86_64"]]
@@ -5697,18 +5700,18 @@ digests = [
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "filelock"
-version = "3.8.0"
+version = "3.8.2"
 digests = [
-    "sha256:617eb4e5eedc82fc5f47b6d61e4d11cb837c56cb4544e39081099fa17ad109d4",
-    "sha256:55447caa666f2198c5b6b13a26d2084d26fa5b115c00d065664b2124680c4edc",
+    "sha256:8df285554452285f79c035efb0c861eb33a4bcfa5b7a137016e32e6a90f9792c",
+    "sha256:7565f628ea56bfcd8e54e42bdc55da899c85c1abfe1b5bcfd147e9188cebb3b2",
 ]
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "furo"
-version = "2022.9.29"
+version = "2022.12.7"
 digests = [
-    "sha256:559ee17999c0f52728481dcf6b1b0cf8c9743e68c5e3a18cb45a7992747869a9",
-    "sha256:d4238145629c623609c2deb5384f8d036e2a1ee2a101d64b67b4348112470dbd",
+    "sha256:7cb76c12a25ef65db85ab0743df907573d03027a33631f17d267e598ebb191f7",
+    "sha256:d8008f8efbe7587a97ba533c8b2df1f9c21ee9b3e5cad0d27f61193d38b1a986",
 ]
 
 [["cpython-3.9.15--linux--x86_64"]]
@@ -5737,10 +5740,10 @@ digests = [
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "hypothesis"
-version = "6.60.0"
+version = "6.61.0"
 digests = [
-    "sha256:3e8a1e061a6bfa3d8c282dafec100f2c8c527ea50b6560e9a33adf0e2e5fef8f",
-    "sha256:39c06cd49f491204380d7c7aa45389d3fb84ee80ea1e3f10afc744044aceb751",
+    "sha256:7bb22d22e35db99d5724bbf5bdc686b46add94a0f228bf1be249c47ec46b9c7f",
+    "sha256:fbf7da30aea839d88898f74bcc027f0f997060498a8a7605880688c8a2166215",
 ]
 
 [["cpython-3.9.15--linux--x86_64"]]
@@ -6027,10 +6030,10 @@ digests = [
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "platformdirs"
-version = "2.5.4"
+version = "2.6.0"
 digests = [
-    "sha256:af0276409f9a02373d540bf8480021a048711d572745aef4b7842dad245eba10",
-    "sha256:1006647646d80f16130f052404c6b901e80ee4ed6bef6792e1f238a8969106f7",
+    "sha256:1a89a12377800c81983db6be069ec068eee989748799b946cce2a6e80dcc54ca",
+    "sha256:b46ffafa316e6b83b47489d240ce17173f123a9b9c83282141c3daf26ad9ac2e",
 ]
 
 [["cpython-3.9.15--linux--x86_64"]]
@@ -6067,10 +6070,10 @@ digests = [
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "pylint"
-version = "2.15.7"
+version = "2.15.8"
 digests = [
-    "sha256:1d561d1d3e8be9dd880edc685162fbdaa0409c88b9b7400873c0cf345602e326",
-    "sha256:91e4776dbcb4b4d921a3e4b6fec669551107ba11f29d9199154a01622e460a57",
+    "sha256:ea82cd6a1e11062dc86d555d07c021b0fb65afe39becbe6fe692efd6c4a67443",
+    "sha256:ec4a87c33da054ab86a6c79afa6771dc8765cb5631620053e727fcf3ef8cbed7",
 ]
 
 [["cpython-3.9.15--linux--x86_64"]]
@@ -6239,6 +6242,7 @@ digests = [
     "sha256:d000f258cf42fec2b1bbf2863c61d7b8918d31ffee905da62dede869254d3b8a",
     "sha256:045e0626baf1c52e5527bd5db361bc83180faaba2ff586e763d3d5982a876a9e",
     "sha256:721bc4ba4525f53f6a611ec0967bdcee61b31df5a56801281027a3a6d1c2daf5",
+    "sha256:41d0f1fa4c6830176eef5b276af04c89320ea616655d01327d5ce65e50575c94",
     "sha256:4b3a93bb9bc662fc1f99c5c3ea8e623d8b23ad22f861eb6fce9377ac07ad6072",
     "sha256:a234a20ae07e8469da311e182e70ef6b199d0fbeb6c6cc2901204dd87fb867e8",
     "sha256:15910ef4f3e537eea7fe45f8a5d19997479940d9196f357152a09031c5be59f3",
@@ -6268,10 +6272,10 @@ digests = [
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "safety"
-version = "2.3.3"
+version = "2.3.5"
 digests = [
-    "sha256:c12b2aaf3495faf42951fdd91d3c5ce6ecffd05efa423a29244408b72c556744",
-    "sha256:2e17cf127472ca720cdcc65f834008b555a10fe56627646009ab7565dd2459cf",
+    "sha256:2227fcac1b22b53c1615af78872b48348661691450aa25d6704a5504dbd1f7e2",
+    "sha256:a60c11f8952f412cbb165d70cb1f673a3b43a2ba9a93ce11f97e6a4de834aa3a",
 ]
 
 [["cpython-3.9.15--linux--x86_64"]]
@@ -6284,12 +6288,12 @@ digests = [
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "semgrep"
-version = "1.0.0"
+version = "1.1.0"
 digests = [
-    "sha256:000bd2ac5923132a9112633451aa5b028fc723dcfde73a983d10f20dea3dce44",
-    "sha256:5769236dc60587ae86638272b968330d0e3334df1db30ea7ec81e237e9d63b36",
-    "sha256:3f4cdbfbf2c55402fdee39758bdeeb3d21e9cda22b8b3bd0401d33dcca89a52f",
-    "sha256:5b5119b694f9336f1c8d68bfaceee3ff51581a0bc1a6c21a6933cd5c1879c8c3",
+    "sha256:d555758796f9a5da88ec9a1fa2aeed1575ce73833908e50327ff24ce51cc9c17",
+    "sha256:0c96f26394a551b94def440a2746227d7e4d2bdb6f306f1faaea68b27015ed8c",
+    "sha256:0f8f007ad76086b4a1890e8326eb5b9949ce499c9732970c623133e030317ffa",
+    "sha256:608b1406a6772b2ecba03f71ec4eeeb0a8003bd19aac27c40b960c76a3251ece",
 ]
 
 [["cpython-3.9.15--linux--x86_64"]]
@@ -6565,10 +6569,10 @@ digests = [
 
 [["cpython-3.9.15--linux--x86_64"]]
 name = "virtualenv"
-version = "20.17.0"
+version = "20.17.1"
 digests = [
-    "sha256:40a7e06a98728fd5769e1af6fd1a706005b4bb7e16176a272ed4292473180389",
-    "sha256:7d6a8d55b2f73b617f684ee40fd85740f062e1f2e379412cb1879c7136f05902",
+    "sha256:ce3b1684d6e1a20a3e5ed36795a97dfc6af29bc3970ca8dab93e11ac6094b3c4",
+    "sha256:f8b927684efc6f1cc206c9db297a570ab9ad0e51c16fa9e45487d36d1905c058",
 ]
 
 [["cpython-3.9.15--linux--x86_64"]]
@@ -6751,10 +6755,10 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "certifi"
-version = "2022.9.24"
+version = "2022.12.7"
 digests = [
-    "sha256:90c1a32f1d68f940488354e36370f6cca89f0f106db09518524c88d6ed83f382",
-    "sha256:0d9c601124e5a6ba9712dbc60d9c53c21e34f5f641fe83002317394311bdce14",
+    "sha256:4ad3232f5e926d6718ec31cfc1fcadfde020920e278684144551c91769c7bc18",
+    "sha256:35824b4c3a97115964b408844d64aa14db1cc518f6562e8d7261699d1350a9e3",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -6999,18 +7003,18 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "filelock"
-version = "3.8.0"
+version = "3.8.2"
 digests = [
-    "sha256:617eb4e5eedc82fc5f47b6d61e4d11cb837c56cb4544e39081099fa17ad109d4",
-    "sha256:55447caa666f2198c5b6b13a26d2084d26fa5b115c00d065664b2124680c4edc",
+    "sha256:8df285554452285f79c035efb0c861eb33a4bcfa5b7a137016e32e6a90f9792c",
+    "sha256:7565f628ea56bfcd8e54e42bdc55da899c85c1abfe1b5bcfd147e9188cebb3b2",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "furo"
-version = "2022.9.29"
+version = "2022.12.7"
 digests = [
-    "sha256:559ee17999c0f52728481dcf6b1b0cf8c9743e68c5e3a18cb45a7992747869a9",
-    "sha256:d4238145629c623609c2deb5384f8d036e2a1ee2a101d64b67b4348112470dbd",
+    "sha256:7cb76c12a25ef65db85ab0743df907573d03027a33631f17d267e598ebb191f7",
+    "sha256:d8008f8efbe7587a97ba533c8b2df1f9c21ee9b3e5cad0d27f61193d38b1a986",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -7070,10 +7074,10 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "hypothesis"
-version = "6.60.0"
+version = "6.61.0"
 digests = [
-    "sha256:3e8a1e061a6bfa3d8c282dafec100f2c8c527ea50b6560e9a33adf0e2e5fef8f",
-    "sha256:39c06cd49f491204380d7c7aa45389d3fb84ee80ea1e3f10afc744044aceb751",
+    "sha256:7bb22d22e35db99d5724bbf5bdc686b46add94a0f228bf1be249c47ec46b9c7f",
+    "sha256:fbf7da30aea839d88898f74bcc027f0f997060498a8a7605880688c8a2166215",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -7110,10 +7114,10 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "importlib-resources"
-version = "5.10.0"
+version = "5.10.1"
 digests = [
-    "sha256:ee17ec648f85480d523596ce49eae8ead87d5631ae1551f913c0100b5edd3437",
-    "sha256:c01b1b94210d9849f286b86bb51bcea7cd56dde0600d8db721d7b81330711668",
+    "sha256:c09b067d82e72c66f4f8eb12332f5efbebc9b007c0b6c40818108c9870adc363",
+    "sha256:32bb095bda29741f6ef0e5278c42df98d135391bee5f932841efc0041f748dc3",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -7291,10 +7295,10 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "platformdirs"
-version = "2.5.4"
+version = "2.6.0"
 digests = [
-    "sha256:af0276409f9a02373d540bf8480021a048711d572745aef4b7842dad245eba10",
-    "sha256:1006647646d80f16130f052404c6b901e80ee4ed6bef6792e1f238a8969106f7",
+    "sha256:1a89a12377800c81983db6be069ec068eee989748799b946cce2a6e80dcc54ca",
+    "sha256:b46ffafa316e6b83b47489d240ce17173f123a9b9c83282141c3daf26ad9ac2e",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -7487,10 +7491,10 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "safety"
-version = "2.3.3"
+version = "2.3.5"
 digests = [
-    "sha256:c12b2aaf3495faf42951fdd91d3c5ce6ecffd05efa423a29244408b72c556744",
-    "sha256:2e17cf127472ca720cdcc65f834008b555a10fe56627646009ab7565dd2459cf",
+    "sha256:2227fcac1b22b53c1615af78872b48348661691450aa25d6704a5504dbd1f7e2",
+    "sha256:a60c11f8952f412cbb165d70cb1f673a3b43a2ba9a93ce11f97e6a4de834aa3a",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -7503,12 +7507,12 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "semgrep"
-version = "1.0.0"
+version = "1.1.0"
 digests = [
-    "sha256:000bd2ac5923132a9112633451aa5b028fc723dcfde73a983d10f20dea3dce44",
-    "sha256:5769236dc60587ae86638272b968330d0e3334df1db30ea7ec81e237e9d63b36",
-    "sha256:3f4cdbfbf2c55402fdee39758bdeeb3d21e9cda22b8b3bd0401d33dcca89a52f",
-    "sha256:5b5119b694f9336f1c8d68bfaceee3ff51581a0bc1a6c21a6933cd5c1879c8c3",
+    "sha256:d555758796f9a5da88ec9a1fa2aeed1575ce73833908e50327ff24ce51cc9c17",
+    "sha256:0c96f26394a551b94def440a2746227d7e4d2bdb6f306f1faaea68b27015ed8c",
+    "sha256:0f8f007ad76086b4a1890e8326eb5b9949ce499c9732970c623133e030317ffa",
+    "sha256:608b1406a6772b2ecba03f71ec4eeeb0a8003bd19aac27c40b960c76a3251ece",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -7776,10 +7780,10 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "virtualenv"
-version = "20.17.0"
+version = "20.17.1"
 digests = [
-    "sha256:40a7e06a98728fd5769e1af6fd1a706005b4bb7e16176a272ed4292473180389",
-    "sha256:7d6a8d55b2f73b617f684ee40fd85740f062e1f2e379412cb1879c7136f05902",
+    "sha256:ce3b1684d6e1a20a3e5ed36795a97dfc6af29bc3970ca8dab93e11ac6094b3c4",
+    "sha256:f8b927684efc6f1cc206c9db297a570ab9ad0e51c16fa9e45487d36d1905c058",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -7900,10 +7904,10 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "certifi"
-version = "2022.9.24"
+version = "2022.12.7"
 digests = [
-    "sha256:90c1a32f1d68f940488354e36370f6cca89f0f106db09518524c88d6ed83f382",
-    "sha256:0d9c601124e5a6ba9712dbc60d9c53c21e34f5f641fe83002317394311bdce14",
+    "sha256:4ad3232f5e926d6718ec31cfc1fcadfde020920e278684144551c91769c7bc18",
+    "sha256:35824b4c3a97115964b408844d64aa14db1cc518f6562e8d7261699d1350a9e3",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -8156,18 +8160,18 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "filelock"
-version = "3.8.0"
+version = "3.8.2"
 digests = [
-    "sha256:617eb4e5eedc82fc5f47b6d61e4d11cb837c56cb4544e39081099fa17ad109d4",
-    "sha256:55447caa666f2198c5b6b13a26d2084d26fa5b115c00d065664b2124680c4edc",
+    "sha256:8df285554452285f79c035efb0c861eb33a4bcfa5b7a137016e32e6a90f9792c",
+    "sha256:7565f628ea56bfcd8e54e42bdc55da899c85c1abfe1b5bcfd147e9188cebb3b2",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "furo"
-version = "2022.9.29"
+version = "2022.12.7"
 digests = [
-    "sha256:559ee17999c0f52728481dcf6b1b0cf8c9743e68c5e3a18cb45a7992747869a9",
-    "sha256:d4238145629c623609c2deb5384f8d036e2a1ee2a101d64b67b4348112470dbd",
+    "sha256:7cb76c12a25ef65db85ab0743df907573d03027a33631f17d267e598ebb191f7",
+    "sha256:d8008f8efbe7587a97ba533c8b2df1f9c21ee9b3e5cad0d27f61193d38b1a986",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -8227,10 +8231,10 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "hypothesis"
-version = "6.60.0"
+version = "6.61.0"
 digests = [
-    "sha256:3e8a1e061a6bfa3d8c282dafec100f2c8c527ea50b6560e9a33adf0e2e5fef8f",
-    "sha256:39c06cd49f491204380d7c7aa45389d3fb84ee80ea1e3f10afc744044aceb751",
+    "sha256:7bb22d22e35db99d5724bbf5bdc686b46add94a0f228bf1be249c47ec46b9c7f",
+    "sha256:fbf7da30aea839d88898f74bcc027f0f997060498a8a7605880688c8a2166215",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -8267,10 +8271,10 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "importlib-resources"
-version = "5.10.0"
+version = "5.10.1"
 digests = [
-    "sha256:ee17ec648f85480d523596ce49eae8ead87d5631ae1551f913c0100b5edd3437",
-    "sha256:c01b1b94210d9849f286b86bb51bcea7cd56dde0600d8db721d7b81330711668",
+    "sha256:c09b067d82e72c66f4f8eb12332f5efbebc9b007c0b6c40818108c9870adc363",
+    "sha256:32bb095bda29741f6ef0e5278c42df98d135391bee5f932841efc0041f748dc3",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -8533,10 +8537,10 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "platformdirs"
-version = "2.5.4"
+version = "2.6.0"
 digests = [
-    "sha256:af0276409f9a02373d540bf8480021a048711d572745aef4b7842dad245eba10",
-    "sha256:1006647646d80f16130f052404c6b901e80ee4ed6bef6792e1f238a8969106f7",
+    "sha256:1a89a12377800c81983db6be069ec068eee989748799b946cce2a6e80dcc54ca",
+    "sha256:b46ffafa316e6b83b47489d240ce17173f123a9b9c83282141c3daf26ad9ac2e",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -8565,10 +8569,10 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "pylint"
-version = "2.15.7"
+version = "2.15.8"
 digests = [
-    "sha256:1d561d1d3e8be9dd880edc685162fbdaa0409c88b9b7400873c0cf345602e326",
-    "sha256:91e4776dbcb4b4d921a3e4b6fec669551107ba11f29d9199154a01622e460a57",
+    "sha256:ea82cd6a1e11062dc86d555d07c021b0fb65afe39becbe6fe692efd6c4a67443",
+    "sha256:ec4a87c33da054ab86a6c79afa6771dc8765cb5631620053e727fcf3ef8cbed7",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -8737,10 +8741,10 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "safety"
-version = "2.3.3"
+version = "2.3.5"
 digests = [
-    "sha256:c12b2aaf3495faf42951fdd91d3c5ce6ecffd05efa423a29244408b72c556744",
-    "sha256:2e17cf127472ca720cdcc65f834008b555a10fe56627646009ab7565dd2459cf",
+    "sha256:2227fcac1b22b53c1615af78872b48348661691450aa25d6704a5504dbd1f7e2",
+    "sha256:a60c11f8952f412cbb165d70cb1f673a3b43a2ba9a93ce11f97e6a4de834aa3a",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -8753,12 +8757,12 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "semgrep"
-version = "1.0.0"
+version = "1.1.0"
 digests = [
-    "sha256:000bd2ac5923132a9112633451aa5b028fc723dcfde73a983d10f20dea3dce44",
-    "sha256:5769236dc60587ae86638272b968330d0e3334df1db30ea7ec81e237e9d63b36",
-    "sha256:3f4cdbfbf2c55402fdee39758bdeeb3d21e9cda22b8b3bd0401d33dcca89a52f",
-    "sha256:5b5119b694f9336f1c8d68bfaceee3ff51581a0bc1a6c21a6933cd5c1879c8c3",
+    "sha256:d555758796f9a5da88ec9a1fa2aeed1575ce73833908e50327ff24ce51cc9c17",
+    "sha256:0c96f26394a551b94def440a2746227d7e4d2bdb6f306f1faaea68b27015ed8c",
+    "sha256:0f8f007ad76086b4a1890e8326eb5b9949ce499c9732970c623133e030317ffa",
+    "sha256:608b1406a6772b2ecba03f71ec4eeeb0a8003bd19aac27c40b960c76a3251ece",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -9034,10 +9038,10 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "virtualenv"
-version = "20.17.0"
+version = "20.17.1"
 digests = [
-    "sha256:40a7e06a98728fd5769e1af6fd1a706005b4bb7e16176a272ed4292473180389",
-    "sha256:7d6a8d55b2f73b617f684ee40fd85740f062e1f2e379412cb1879c7136f05902",
+    "sha256:ce3b1684d6e1a20a3e5ed36795a97dfc6af29bc3970ca8dab93e11ac6094b3c4",
+    "sha256:f8b927684efc6f1cc206c9db297a570ab9ad0e51c16fa9e45487d36d1905c058",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -9228,10 +9232,10 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "certifi"
-version = "2022.9.24"
+version = "2022.12.7"
 digests = [
-    "sha256:90c1a32f1d68f940488354e36370f6cca89f0f106db09518524c88d6ed83f382",
-    "sha256:0d9c601124e5a6ba9712dbc60d9c53c21e34f5f641fe83002317394311bdce14",
+    "sha256:4ad3232f5e926d6718ec31cfc1fcadfde020920e278684144551c91769c7bc18",
+    "sha256:35824b4c3a97115964b408844d64aa14db1cc518f6562e8d7261699d1350a9e3",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
@@ -9484,18 +9488,18 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "filelock"
-version = "3.8.0"
+version = "3.8.2"
 digests = [
-    "sha256:617eb4e5eedc82fc5f47b6d61e4d11cb837c56cb4544e39081099fa17ad109d4",
-    "sha256:55447caa666f2198c5b6b13a26d2084d26fa5b115c00d065664b2124680c4edc",
+    "sha256:8df285554452285f79c035efb0c861eb33a4bcfa5b7a137016e32e6a90f9792c",
+    "sha256:7565f628ea56bfcd8e54e42bdc55da899c85c1abfe1b5bcfd147e9188cebb3b2",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "furo"
-version = "2022.9.29"
+version = "2022.12.7"
 digests = [
-    "sha256:559ee17999c0f52728481dcf6b1b0cf8c9743e68c5e3a18cb45a7992747869a9",
-    "sha256:d4238145629c623609c2deb5384f8d036e2a1ee2a101d64b67b4348112470dbd",
+    "sha256:7cb76c12a25ef65db85ab0743df907573d03027a33631f17d267e598ebb191f7",
+    "sha256:d8008f8efbe7587a97ba533c8b2df1f9c21ee9b3e5cad0d27f61193d38b1a986",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
@@ -9555,10 +9559,10 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "hypothesis"
-version = "6.60.0"
+version = "6.61.0"
 digests = [
-    "sha256:3e8a1e061a6bfa3d8c282dafec100f2c8c527ea50b6560e9a33adf0e2e5fef8f",
-    "sha256:39c06cd49f491204380d7c7aa45389d3fb84ee80ea1e3f10afc744044aceb751",
+    "sha256:7bb22d22e35db99d5724bbf5bdc686b46add94a0f228bf1be249c47ec46b9c7f",
+    "sha256:fbf7da30aea839d88898f74bcc027f0f997060498a8a7605880688c8a2166215",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
@@ -9845,10 +9849,10 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "platformdirs"
-version = "2.5.4"
+version = "2.6.0"
 digests = [
-    "sha256:af0276409f9a02373d540bf8480021a048711d572745aef4b7842dad245eba10",
-    "sha256:1006647646d80f16130f052404c6b901e80ee4ed6bef6792e1f238a8969106f7",
+    "sha256:1a89a12377800c81983db6be069ec068eee989748799b946cce2a6e80dcc54ca",
+    "sha256:b46ffafa316e6b83b47489d240ce17173f123a9b9c83282141c3daf26ad9ac2e",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
@@ -9877,10 +9881,10 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "pylint"
-version = "2.15.7"
+version = "2.15.8"
 digests = [
-    "sha256:1d561d1d3e8be9dd880edc685162fbdaa0409c88b9b7400873c0cf345602e326",
-    "sha256:91e4776dbcb4b4d921a3e4b6fec669551107ba11f29d9199154a01622e460a57",
+    "sha256:ea82cd6a1e11062dc86d555d07c021b0fb65afe39becbe6fe692efd6c4a67443",
+    "sha256:ec4a87c33da054ab86a6c79afa6771dc8765cb5631620053e727fcf3ef8cbed7",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
@@ -10049,10 +10053,10 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "safety"
-version = "2.3.3"
+version = "2.3.5"
 digests = [
-    "sha256:c12b2aaf3495faf42951fdd91d3c5ce6ecffd05efa423a29244408b72c556744",
-    "sha256:2e17cf127472ca720cdcc65f834008b555a10fe56627646009ab7565dd2459cf",
+    "sha256:2227fcac1b22b53c1615af78872b48348661691450aa25d6704a5504dbd1f7e2",
+    "sha256:a60c11f8952f412cbb165d70cb1f673a3b43a2ba9a93ce11f97e6a4de834aa3a",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
@@ -10065,12 +10069,12 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "semgrep"
-version = "1.0.0"
+version = "1.1.0"
 digests = [
-    "sha256:000bd2ac5923132a9112633451aa5b028fc723dcfde73a983d10f20dea3dce44",
-    "sha256:5769236dc60587ae86638272b968330d0e3334df1db30ea7ec81e237e9d63b36",
-    "sha256:3f4cdbfbf2c55402fdee39758bdeeb3d21e9cda22b8b3bd0401d33dcca89a52f",
-    "sha256:5b5119b694f9336f1c8d68bfaceee3ff51581a0bc1a6c21a6933cd5c1879c8c3",
+    "sha256:d555758796f9a5da88ec9a1fa2aeed1575ce73833908e50327ff24ce51cc9c17",
+    "sha256:0c96f26394a551b94def440a2746227d7e4d2bdb6f306f1faaea68b27015ed8c",
+    "sha256:0f8f007ad76086b4a1890e8326eb5b9949ce499c9732970c623133e030317ffa",
+    "sha256:608b1406a6772b2ecba03f71ec4eeeb0a8003bd19aac27c40b960c76a3251ece",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
@@ -10346,10 +10350,10 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "virtualenv"
-version = "20.17.0"
+version = "20.17.1"
 digests = [
-    "sha256:40a7e06a98728fd5769e1af6fd1a706005b4bb7e16176a272ed4292473180389",
-    "sha256:7d6a8d55b2f73b617f684ee40fd85740f062e1f2e379412cb1879c7136f05902",
+    "sha256:ce3b1684d6e1a20a3e5ed36795a97dfc6af29bc3970ca8dab93e11ac6094b3c4",
+    "sha256:f8b927684efc6f1cc206c9db297a570ab9ad0e51c16fa9e45487d36d1905c058",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
