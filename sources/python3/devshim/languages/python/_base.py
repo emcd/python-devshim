@@ -27,7 +27,7 @@ import re
 from collections.abc import Mapping as AbstractDictionary
 from types import MappingProxyType as DictionaryProxy
 
-from ...base import expire, scribe
+from ...base import scribe
 from ...exceptions import provide_exception_factory
 # pylint: enable=unused-import
 from .. import _base as __
@@ -40,3 +40,23 @@ class LanguageContext( __.LanguageContext ):
 
 
 LanguageProvider = __.LanguageProvider
+
+
+def normalize_feature_entry( context, entry ):
+    ''' Normalizes feature entry from Python version data. '''
+    if isinstance( entry, str ):
+        return DictionaryProxy( { 'name' : entry } )
+    if isinstance( entry, AbstractDictionary ):
+        if 'name' in entry: return entry
+    raise provide_exception_factory( 'invalid data' )(
+        f"Invalid feature entry, {entry!r}, for {context}." )
+
+
+def normalize_provider_entry( context, entry ):
+    ''' Normalizes provider entry from Python version data. '''
+    if isinstance( entry, str ):
+        return DictionaryProxy( { 'name' : entry } )
+    if isinstance( entry, AbstractDictionary ):
+        if 'name' in entry: return entry
+    raise provide_exception_factory( 'invalid data' )(
+        f"Invalid provider entry, {entry!r}, for {context}." )

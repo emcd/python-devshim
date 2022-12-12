@@ -42,17 +42,21 @@ class PythonBuild( __.LanguageProvider ):
 
     name = 'python-build'
     supportable_features = (
-        'cindervm', 'cpython-tracerefs', 'pyston-lite',
+        'cindervm', 'pyston-lite', 'tracerefs',
     )
+    supportable_implementations = ( 'cpython', 'pypy', )
+    supportable_platforms = ( 'posix', )
     from ...data import paths
     # TODO: Installation paths should be relative to home directory of user
     #       and not relative to the current repository.
+    #       Use 'platformdirs' for this.
     installations_path = paths.installations / 'python/python-build'
     our_installation_path = paths.installations / 'python-build'
     our_installer_path = our_installation_path / 'bin/python-build'
     our_repository_path = paths.caches.DEV.repositories / 'pyenv.tar.gz'
 
     def __init__( self, context, version_data, provider_data ):
+        # TODO: Assert viability of features + implementation + platform.
         self.context = context
         self.provider_data = provider_data
         self.version_data = version_data
@@ -61,14 +65,18 @@ class PythonBuild( __.LanguageProvider ):
         ''' Compiles and installs Python via ``python-build``. '''
         self._ensure_installer( )
         pb_definition_name = self._calculate_pb_definition_name( )
-        # TODO: Set environment from relevant feature flags.
-        # TODO: Add platform identifiers to installation path.
-        installation_path = self.installations_path / pb_definition_name
+        from os import environ as current_process_environment
+        subprocess_environment = current_process_environment.copy( )
+        self._modify_environment_from_features( subprocess_environment )
+        installation_path = self._calculate_installation_path( )
         # TODO: Allow 'clean' flag to override.
         if installation_path.exists( ): return
         from ...base import execute_external
         execute_external( (
-            self.our_installer_path, pb_definition_name, installation_path ) )
+            self.our_installer_path, pb_definition_name, installation_path ),
+            env = subprocess_environment )
+        # TODO: Post-installation activities, such as site customization
+        #       for feature flags.
 
     def attempt_version_data_update( self ):
         ''' Detects new Python version and returns version data update. '''
@@ -93,13 +101,40 @@ class PythonBuild( __.LanguageProvider ):
         return version_data
 
     @classmethod
+    def is_supportable_base_version( class_, version ):
+        return ( 3, 7 ) <= tuple( map( int, version.split( '.' ) ) )
+
+    @classmethod
     def is_supportable_feature( class_, feature ):
         return feature in class_.supportable_features
 
     @classmethod
-    def is_supportable_platform( class_, platform ):
-        import os
-        return 'posix' == os.name
+    def is_supportable_implementation( class_, implementation ):
+        return implementation in class_.supportable_implementations
+
+    @classmethod
+    def is_supportable_platform( class_, platform = None ):
+        if None is platform:
+            import os
+            platform = os.name
+        return platform in class_.supportable_platforms
+
+    def _calculate_installation_path( self ):
+        version_data = self.version_data
+        from platform import (
+            machine as cpu_architecture, system as os_kernel_name )
+        feature_names = '+'.join(
+            __.normalize_feature_entry( self.context, entry )[ 'name' ]
+            for entry in version_data.get( 'features', ( ) ) )
+        installation_name = '--'.join( filter( None, (
+            "{implementation}-{base_version}".format(
+                implementation = version_data[ 'implementation' ],
+                base_version = version_data[ 'base-version' ] ),
+            version_data[ 'implementation-version' ],
+            feature_names,
+            os_kernel_name( ).lower( ),
+            cpu_architecture( ) ) ) )
+        return self.installations_path / installation_name
 
     def _calculate_pb_definition_name( self ):
         base_version = self.version_data[ 'base-version' ]
@@ -164,3 +199,11 @@ class PythonBuild( __.LanguageProvider ):
             move( source_path / 'share/python-build', installation_share_path )
         for path in installation_bin_path.rglob( '*' ): path.chmod( 0o755 )
         # TODO? Enforce permissions on shared data.
+
+    def _modify_environment_from_features( self, environment ):
+        for entry in self.version_data.get( 'features', ( ) ):
+            data = __.normalize_feature_entry( self.context, entry )
+            name = data[ 'name' ]
+            # TODO: Invoke relevant feature class and use it.
+            if 'tracerefs' == name:
+                environment[ 'PYTHON_CONFIGURE_OPTS' ] = '--with-trace-refs'

@@ -23,9 +23,6 @@ Fixes and Minor Improvements
   Install 'sitecustomize.py' files for module auto-loading.
   https://docs.python.org/3/library/site.html
 
-* Finish hookup of logging. May include installation of the Rich handler after
-  early package bootstrap.
-
 * Download tarball from Github for ``semgrep-rules`` rather than relying on a
   Git submodule.
 

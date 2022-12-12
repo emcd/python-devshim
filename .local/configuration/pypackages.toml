@@ -75,6 +75,9 @@ requirement = 'build'
 requirement = 'invoke'
 
 [[development.user-interface]]
+requirement = 'platformdirs'
+
+[[development.user-interface]]
 requirement = 'pre-commit'
 
 [[development.user-interface]]

@@ -54,6 +54,13 @@ class LanguageProvider( metaclass = ABCFactory ):
 
     @classmethod
     @abstract_function
+    def is_supportable_base_version( class_, version ):
+        ''' Does provider support base version? '''
+        # TODO: Use exception factory.
+        raise NotImplementedError
+
+    @classmethod
+    @abstract_function
     def is_supportable_feature( class_, feature ):
         ''' Does provider support feature? '''
         # TODO: Use exception factory.
@@ -61,7 +68,14 @@ class LanguageProvider( metaclass = ABCFactory ):
 
     @classmethod
     @abstract_function
-    def is_supportable_platform( class_, platform ):
+    def is_supportable_implementation( class_, implementation ):
+        ''' Does provider support implementation? '''
+        # TODO: Use exception factory.
+        raise NotImplementedError
+
+    @classmethod
+    @abstract_function
+    def is_supportable_platform( class_, platform = None ):
         ''' Does provider support platform? '''
         # TODO: Use exception factory.
         raise NotImplementedError

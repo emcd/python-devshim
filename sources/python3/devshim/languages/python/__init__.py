@@ -24,24 +24,51 @@
 from . import _base as __
 
 
-def survey_support( ):
-    ''' Returns declarations of Pythons versions support. '''
+def survey_support( by_availability = False ):
+    ''' Returns Python versions which have valid declarations. '''
     from ...data import paths
     from ...packages import ensure_import_package
     tomllib = ensure_import_package( 'tomllib' )
     with paths.configuration.devshim.python.versions.open( 'rb' ) as file:
         document = tomllib.load( file )
     # TODO: Check format version and dispatch accordingly.
-    declarations = document.get( 'versions', { } )
+    versions = document.get( 'versions', { } )
+    if not by_availability: return versions
     from os import environ as current_process_environment
     selector = current_process_environment.get( 'DEVSHIM_PYTHON_VERSION' )
-    if selector:
-        declarations = {
-            name: value for name, value in declarations.items( )
-            if selector == name
-        }
-    # TODO: Filter by availability of providers on current OS platform.
-    return declarations
+    select_versions = { }
+    for version, version_data in versions.items( ):
+        if None is not selector and selector != version: continue
+        select_providers = _survey_provider_support( version, version_data )
+        if not select_providers: continue
+        version_data[ 'providers' ] = select_providers
+        select_versions[ version ] = version_data
+    return select_versions
+
+
+def _survey_provider_support( version, version_data ):
+    ''' Returns valid providers for Python version declaration. '''
+    context = __.LanguageContext( version )
+    feature_names = tuple(
+        __.normalize_feature_entry( context, feature_entry )[ 'name' ]
+        for feature_entry in version_data.get( 'features', ( ) ) )
+    select_providers = [ ]
+    for provider_entry in version_data.get( 'providers', ( ) ):
+        provider_data = __.normalize_provider_entry( context, provider_entry )
+        provider_class = provider_classes[ provider_data[ 'name' ] ]
+        if not provider_class.is_supportable_platform( ): continue
+        if not provider_class.is_supportable_base_version(
+            version_data[ 'base-version' ]
+        ): continue
+        if not provider_class.is_supportable_implementation(
+            version_data[ 'implementation' ]
+        ): continue
+        if feature_names and not all(
+            provider_class.is_supportable_feature( feature_name )
+            for feature_name in feature_names
+        ): continue
+        select_providers.append( provider_data )
+    return select_providers
 
 
 def install_version( version ):
@@ -49,10 +76,10 @@ def install_version( version ):
     context, version_data = _create_context( version )
     version = context.version
     for entry in version_data[ 'providers' ]:
-        provider_data = _normalize_provider_entry( context, entry )
-        class_ = provider_classes[ provider_data[ 'name' ] ]
+        provider_data = __.normalize_provider_entry( context, entry )
+        provider_class = provider_classes[ provider_data[ 'name' ] ]
         try:
-            provider = class_( context, version_data, provider_data )
+            provider = provider_class( context, version_data, provider_data )
             provider.install( )
         except Exception: # pylint: disable=broad-except
             __.scribe.exception(
@@ -66,10 +93,10 @@ def update_version( version ):
     context, version_data = _create_context( version )
     version = context.version
     for entry in version_data[ 'providers' ]:
-        provider_data = _normalize_provider_entry( context, entry )
-        class_ = provider_classes[ provider_data[ 'name' ] ]
+        provider_data = __.normalize_provider_entry( context, entry )
+        provider_class = provider_classes[ provider_data[ 'name' ] ]
         try:
-            provider = class_( context, version_data, provider_data )
+            provider = provider_class( context, version_data, provider_data )
             version_data_ = provider.attempt_version_data_update( )
         except Exception: # pylint: disable=broad-except
             __.scribe.exception(
@@ -79,6 +106,7 @@ def update_version( version ):
             _update_version_data( version, version_data_ )
             install_version( version )
             break
+        install_version( version ) # Ensure installation is complete/valid.
 
 
 def _update_version_data( version, data ):
@@ -102,24 +130,13 @@ def _create_context( version ):
     if None is version: version = next( iter( versions ) )
     version_data = versions.get( version )
     context = __.LanguageContext( version )
-    # TODO: Use context information in error messages.
     if None is version_data:
         raise __.provide_exception_factory( 'invalid data' )(
-            f"No support declaration for {version!r}." )
+            f"No support declaration for {context}." )
     if 'providers' not in version_data:
         raise __.provide_exception_factory( 'invalid data' )(
-            f"No providers for {version!r}." )
+            f"No providers for {context}." )
     return context, version_data
-
-
-def _normalize_provider_entry( context, entry ):
-    # TODO: Use context information in error messages.
-    if isinstance( entry, str ):
-        return __.DictionaryProxy( { 'name' : entry } )
-    if isinstance( entry, __.AbstractDictionary ):
-        if 'name' in entry: return entry
-    raise __.provide_exception_factory( 'invalid data' )(
-        f"Invalid provider entry, {entry!r}, for {context.version!r}." )
 
 
 from . import python_build
