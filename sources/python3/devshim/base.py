@@ -107,6 +107,7 @@ def execute_external( command_specification, **nomargs ):
         command_specification = split_command( command_specification )
     # TODO? Handle pseudo-TTY requests with 'ptyprocess.PtyProcess'.
     # TODO? Intercept 'subprocess.SubprocessError'.
+    scribe.debug( f"Executing {command_specification!r} with {options!r}." )
     # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-audit
     return run( command_specification, check = True, **options ) # nosec B603
 
@@ -157,13 +158,13 @@ def expire( exit_specifier, message ) -> _typ.NoReturn:
 def _configure( ):
     ''' Configures development support. '''
     from pathlib import Path
-    auxiliary_path = Path( __file__ ).parent.parent.parent.parent
+    auxiliary_path = Path( __file__ ).parent.parent.parent.parent.resolve( )
     from os import environ as current_process_environment
     from types import MappingProxyType as DictionaryProxy
     configuration_ = DictionaryProxy( dict(
         auxiliary_path = auxiliary_path,
         project_path = Path( current_process_environment.get(
-            '_DEVSHIM_PROJECT_PATH', auxiliary_path ) ),
+            '_DEVSHIM_PROJECT_PATH', auxiliary_path ) ).resolve( ),
         scribe = _create_scribe( ),
     ) )
     return configuration_

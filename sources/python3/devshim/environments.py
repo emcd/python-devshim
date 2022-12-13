@@ -146,4 +146,4 @@ def derive_venv_path( version = None, python_path = None ):
     abi_label = identify_python(
         'bdist-compatibility', python_path = python_path )
     from .data import paths
-    return paths.environments / abi_label
+    return ( paths.environments / abi_label ).resolve( )

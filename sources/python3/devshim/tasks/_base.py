@@ -119,7 +119,9 @@ def _invoke_task_invocable( invocable, posargs, nomargs ):
     try: invocable( *posargs, **nomargs )
     except allowable_exceptions: raise # pylint: disable=catching-non-exception,try-except-raise
     except SystemExit as exc: raise Exit( code = exc.code ) from exc
-    except BaseException as exc: raise Exit( message = str( exc ) ) from exc
+    except BaseException as exc:
+        excc = type( exc )
+        raise Exit( message = f"{excc}: {exc}" ) from exc
 
 
 def _calculate_allowable_exceptions( ):
