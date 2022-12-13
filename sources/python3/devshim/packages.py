@@ -395,8 +395,8 @@ def indicate_current_python_packages( environment ):
             requirement = ' '.join( (
                 name_match.group( 'package_name' ) + '@',
                 line.split( ' ', maxsplit = 1 )[ 1 ] ) )
-        # TODO: Case: -e /home/me/src/python-devshim
-        elif line.startswith( '-e' ): continue
+        elif line.startswith( '-e' ): continue # Skip local editables.
+        elif '+' in line and '@' not in line: continue # Skip local versions.
         else: requirement = line
         entry.requirement = Requirement( requirement )
         entries.append( entry )
