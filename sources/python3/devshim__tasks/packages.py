@@ -183,6 +183,7 @@ def indicate_current_python_packages( environment ):
                 line.split( ' ', maxsplit = 1 )[ 1 ] ) )
         # TODO: Case: -e /home/me/src/python-devshim
         elif line.startswith( '-e' ): continue
+        elif '+' in line and '@' not in line: continue
         else: requirement = line
         entry.requirement = Requirement( requirement )
         entries.append( entry )
