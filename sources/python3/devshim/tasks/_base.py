@@ -81,7 +81,11 @@ def task( # pylint: disable=too-complex
                 from ..platforms import calculate_python_versions
                 versions = calculate_python_versions(
                     nomargs.get( 'version' ) )
-            else: versions = ( None, )
+            elif 'version' in nomargs: versions = ( nomargs[ 'version' ], )
+            else:
+                if title: render_boxed_title( title )
+                _invoke_task_invocable( invocable, posargs, nomargs )
+                return
             for version in versions:
                 if title: render_boxed_title( title, supplement = version )
                 re_posargs, re_nomargs = _replace_arguments(

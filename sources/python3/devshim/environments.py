@@ -71,9 +71,8 @@ def test_package_executable(
     from os import environ as current_process_environment
     process_environment = process_environment or current_process_environment
     venv_path = process_environment.get( 'VIRTUAL_ENV' )
-    if venv_path and is_executable_in_venv(
-        executable_name, venv_path = venv_path
-    ): return True
+    if venv_path:
+        return is_executable_in_venv( executable_name, venv_path = venv_path )
     from shutil import which
     search_path = process_environment.get( 'PATH' )
     if search_path and which( executable_name, path = search_path ):
