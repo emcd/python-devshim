@@ -11,7 +11,7 @@ providers = [
 [versions."Python 3.8"]
 base-version = "3.8"
 implementation = "cpython"
-implementation-version = "3.8.15"
+implementation-version = "3.8.16"
 providers = [
     "python-build",
 ]

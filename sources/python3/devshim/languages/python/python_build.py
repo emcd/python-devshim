@@ -46,20 +46,31 @@ class PythonBuild( __.LanguageProvider ):
     )
     supportable_implementations = ( 'cpython', 'pypy', )
     supportable_platforms = ( 'posix', )
-    from ...data import paths
-    # TODO: Installation paths should be relative to home directory of user
-    #       and not relative to the current repository.
-    #       Use 'platformdirs' for this.
-    installations_path = paths.installations / 'python/python-build'
-    our_installation_path = paths.installations / 'python-build'
-    our_installer_path = our_installation_path / 'bin/python-build'
-    our_repository_path = paths.caches.DEV.repositories / 'pyenv.tar.gz'
 
     def __init__( self, context, version_data, provider_data ):
         # TODO: Assert viability of features + implementation + platform.
         self.context = context
         self.provider_data = provider_data
         self.version_data = version_data
+
+    def __getattr__( self, name ):
+        # Note: Would prefer to do these as staticmethod and classmethod
+        #       properties, but that is messy. Cannot implement as bare class
+        #       attributes because class is evaluated at importation time which
+        #       would trigger too-early evaluation of some things in the data
+        #       module.
+        from ...data import paths
+        from ...data import user_directories
+        # TODO: Python 3.10: Use 'match' suite.
+        if 'installations_path' == name:
+            return user_directories.installations / 'python/python-build'
+        if 'our_installation_path' == name:
+            return user_directories.installations / 'python-build'
+        if 'our_installer_path' == name:
+            return self.our_installation_path / 'bin/python-build'
+        if 'our_repository_path' == name:
+            return paths.caches.DEV.repositories / 'pyenv.tar.gz'
+        raise AttributeError
 
     def install( self ):
         ''' Compiles and installs Python via ``python-build``. '''

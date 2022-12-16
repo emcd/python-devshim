@@ -49,13 +49,25 @@ def assemble( ):
     paths.caches = _calculate_caches_paths( paths )
     paths.configuration = _calculate_configuration_paths( paths )
     paths.environments = paths.local / 'environments'
-    paths.installations = paths.local / 'installations'
     paths.scm_modules = _calculate_scm_modules_paths( paths )
     paths.state = paths.local / 'state'
     paths.scripts = _calculate_scripts_paths( paths )
     paths.sources = _calculate_sources_paths( paths )
     paths.tests = _calculate_tests_paths( paths )
     return _create_namespace_recursive( paths.__dict__ )
+
+
+def calculate_user_directories( ):
+    ''' Calculates user directory locations in platform-specific manner. '''
+    # TODO: Assert existence of 'platformdirs' package.
+    from platformdirs import user_cache_path, user_data_path
+    from .data import project_name
+    data_path = user_data_path( appname = project_name )
+    return _create_namespace_recursive( dict(
+        caches = user_cache_path( appname = project_name ),
+        data = data_path,
+        installations = data_path / 'installations',
+    ) )
 
 
 def _calculate_artifacts_paths( paths ):

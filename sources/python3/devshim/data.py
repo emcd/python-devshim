@@ -28,14 +28,16 @@ import typing as _typ
 #       add this module to Pylint's 'ignored-modules' list.
 paths: _typ.Any
 project_name: str
+user_directories: _typ.Any
 
 
 def _produce_calculator_names_table( ):
     ''' Produces immutable table of data entries to calculators. '''
     from types import MappingProxyType as DictionaryProxy
     return DictionaryProxy( dict(
-        paths           = '.locations.assemble',
-        project_name    = '.project.discover_name',
+        paths            = '.locations.assemble',
+        project_name     = '.project.discover_name',
+        user_directories = '.locations.calculate_user_directories',
     ) )
 
 _calculator_names = _produce_calculator_names_table( )
