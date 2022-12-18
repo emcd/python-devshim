@@ -49,28 +49,22 @@ class PythonBuild( __.LanguageProvider ):
 
     def __init__( self, context, version_data, provider_data ):
         # TODO: Assert viability of features + implementation + platform.
+        # TODO: Call super method.
         self.context = context
         self.provider_data = provider_data
         self.version_data = version_data
-
-    def __getattr__( self, name ):
-        # Note: Would prefer to do these as staticmethod and classmethod
-        #       properties, but that is messy. Cannot implement as bare class
-        #       attributes because class is evaluated at importation time which
-        #       would trigger too-early evaluation of some things in the data
-        #       module.
+        self.installation_location = self._derive_installation_location( )
+        # Would prefer below to be class attributes, but need to defer
+        # computation until after importation to ensure necessary dependencies
+        # are available.
         from ...data import paths
         from ...data import user_directories
-        # TODO: Python 3.10: Use 'match' suite.
-        if 'installations_path' == name:
-            return user_directories.installations / 'python/python-build'
-        if 'our_installation_path' == name:
-            return user_directories.installations / 'python-build'
-        if 'our_installer_path' == name:
-            return self.our_installation_path / 'bin/python-build'
-        if 'our_repository_path' == name:
-            return paths.caches.DEV.repositories / 'pyenv.tar.gz'
-        raise AttributeError
+        self.pb_installation_location = (
+            user_directories.installations / 'python-build' )
+        self.pb_executable_location = (
+            self.pb_installation_location / 'bin/python-build' )
+        self.pb_repository_location = (
+            paths.caches.DEV.repositories / 'pyenv.tar.gz' )
 
     def install( self ):
         ''' Compiles and installs Python via ``python-build``. '''
@@ -79,12 +73,12 @@ class PythonBuild( __.LanguageProvider ):
         from os import environ as current_process_environment
         subprocess_environment = current_process_environment.copy( )
         self._modify_environment_from_features( subprocess_environment )
-        installation_path = self._calculate_installation_path( )
+        directory = self.installation_location
         # TODO: Allow 'clean' flag to override.
-        if installation_path.exists( ): return
+        if directory.exists( ): return
         from ...base import execute_external
-        execute_external( (
-            self.our_installer_path, pb_definition_name, installation_path ),
+        execute_external(
+            ( self.pb_executable_location, pb_definition_name, directory ),
             env = subprocess_environment )
         # TODO: Post-installation activities, such as site customization
         #       for feature flags.
@@ -95,7 +89,7 @@ class PythonBuild( __.LanguageProvider ):
         pb_definition_name_base = self._calculate_pb_definition_name_base( )
         from ...base import execute_external
         pb_definition_names = execute_external(
-            ( self.our_installer_path, '--definitions' ),
+            ( self.pb_executable_location, '--definitions' ),
             capture_output = True ).stdout.strip( ).split( '\n' )
         pb_definition_name_candidates = [
             pb_definition_name for pb_definition_name in pb_definition_names
@@ -130,7 +124,7 @@ class PythonBuild( __.LanguageProvider ):
             platform = os.name
         return platform in class_.supportable_platforms
 
-    def _calculate_installation_path( self ):
+    def _derive_installation_location( self ):
         version_data = self.version_data
         from platform import (
             machine as cpu_architecture, system as os_kernel_name )
@@ -145,7 +139,9 @@ class PythonBuild( __.LanguageProvider ):
             feature_names,
             os_kernel_name( ).lower( ),
             cpu_architecture( ) ) ) )
-        return self.installations_path / installation_name
+        from ...data import user_directories
+        return user_directories.installations.joinpath(
+            'python', 'python-build', installation_name )
 
     def _calculate_pb_definition_name( self ):
         base_version = self.version_data[ 'base-version' ]
@@ -174,14 +170,14 @@ class PythonBuild( __.LanguageProvider ):
 
     def _ensure_installer( self ):
         ''' Ensures that ``python-build`` is available for use. '''
-        repository_path = self.our_repository_path
+        repository_path = self.pb_repository_location
         from datetime import timedelta as TimeDelta
         from ...fs_utilities import is_older_than
         if repository_path.exists( ):
             # TODO: Configurable refresh time.
             if not is_older_than( repository_path, TimeDelta( days = 1 ) ):
                 # TODO: Test execute permissions by current user.
-                if self.our_installer_path.exists( ): return
+                if self.pb_executable_location.exists( ): return
         from ...scm_utilities import github_retrieve_tarball
         github_retrieve_tarball( 'pyenv/pyenv', 'master', repository_path )
         self._install_installer_archive( repository_path )
@@ -192,7 +188,7 @@ class PythonBuild( __.LanguageProvider ):
         from shutil import move, rmtree
         from tempfile import TemporaryDirectory
         from ...fs_utilities import extract_tarfile
-        installation_path = self.our_installation_path
+        installation_path = self.pb_installation_location
         installation_bin_path = installation_path / 'bin'
         installation_share_path = installation_path / 'share/python-build'
         def selector( member ):

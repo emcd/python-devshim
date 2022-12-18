@@ -22,6 +22,10 @@
 
 # Common Imports
 # pylint: disable=unused-import
+from abc import (
+    ABCMeta as ABCFactory, abstractmethod as abstract_function,
+)
+
 from invoke import Collection as TaskCollection, call
 
 from ..base import execute_external
@@ -52,9 +56,9 @@ def project_execute_external(
 
 
 def task( # pylint: disable=too-complex
-    title = '',
+    title = '', *,
+    multiplexer = None,
     task_nomargs = None,
-    version_expansion = '',
 ):
     ''' Produces decorator for the handling of assorted banalities.
 
@@ -67,35 +71,84 @@ def task( # pylint: disable=too-complex
 
     def decorator( invocable ):
         ''' Produces invoker for the handling of assorted banalities. '''
-        if version_expansion:
-            invocable.__doc__ = '\n\n'.join( (
-                invocable.__doc__,
-                "If version is 'ALL', "
-                f"then the task affects all {version_expansion}." ) )
+        if None is not multiplexer:
+            # TODO: Validate argument multiplexer.
+            multiplexer.augment_docstring( invocable )
 
         # nosemgrep: python.lang.maintainability.useless-inner-function
         @wraps( invocable )
         def invoker( context, *posargs, **nomargs ): # pylint: disable=unused-argument
             ''' Handles assorted banalities. '''
-            if version_expansion:
-                from ..platforms import calculate_python_versions
-                versions = calculate_python_versions(
-                    nomargs.get( 'version' ) )
-            elif 'version' in nomargs: versions = ( nomargs[ 'version' ], )
+            if None is not multiplexer:
+                for value, re_posargs, re_nomargs in multiplexer.multiplex(
+                    invocable, posargs, nomargs
+                ):
+                    if title: render_boxed_title( title, supplement = value )
+                    _invoke_task_invocable( invocable, re_posargs, re_nomargs )
             else:
                 if title: render_boxed_title( title )
                 _invoke_task_invocable( invocable, posargs, nomargs )
                 return
-            for version in versions:
-                if title: render_boxed_title( title, supplement = version )
-                re_posargs, re_nomargs = _replace_arguments(
-                    invocable, posargs, nomargs,
-                    dict( version = version ) )
-                _invoke_task_invocable( invocable, re_posargs, re_nomargs )
 
         return Task( invoker, **( task_nomargs or { } ) )
 
     return decorator
+
+
+class ArgumentMultiplexer( metaclass = ABCFactory ):
+    ''' Multiplexes values for argument across invocations. '''
+
+    def __init__( self, argument_name, subject ):
+        # TODO: Validate arguments.
+        self.argument_name = argument_name
+        self.subject = subject
+
+    @abstract_function
+    def augment_docstring( self, invocable ):
+        ''' Augments docstring of invocable to describe multiplexer effect. '''
+        # TODO: Use exception factory.
+        raise NotImplementedError
+
+    @abstract_function
+    def multiplex( self, invocable, posargs, nomargs ):
+        ''' Yields adjusted arguments for each multiplexed invocation. '''
+        # TODO: Use exception factory.
+        raise NotImplementedError
+
+
+class PythonVersionMultiplexer( ArgumentMultiplexer ):
+    ''' Multiplexes Python version argument across invocations. '''
+
+    def __init__( self,
+        argument_name = 'version',
+        subject = 'declared Python versions',
+        enable_default = True,
+    ):
+        super( ).__init__( argument_name = argument_name, subject = subject )
+        self.enable_default = enable_default
+
+    def augment_docstring( self, invocable ):
+        # TODO: Validate argument.
+        invocable.__doc__ = '\n\n'.join( (
+            invocable.__doc__,
+            f"If argument {self.argument_name!r} is 'ALL', "
+            f"then the task affects all {self.subject}." ) )
+
+    def multiplex( self, invocable, posargs, nomargs ):
+        # TODO: Validate arguments.
+        from inspect import signature as scan_signature
+        binder = scan_signature( invocable ).bind( *posargs, **nomargs )
+        binder.apply_defaults( )
+        argument = binder.arguments[ self.argument_name ]
+        from ..languages.python import (
+            detect_default_version, survey_versions, validate_version, )
+        if None is argument and self.enable_default:
+            versions = ( detect_default_version( ), )
+        elif 'ALL' == argument: versions = survey_versions( ).keys( )
+        else: versions = ( validate_version( argument ), )
+        for version in versions:
+            binder.arguments.update( { self.argument_name: version } )
+            yield version, binder.args, binder.kwargs
 
 
 def invoke_task( task_, *posargs, **nomargs ):
@@ -103,14 +156,6 @@ def invoke_task( task_, *posargs, **nomargs ):
     # Invoke with fake context until we remove dependency on Invoke.
     from invoke import Context
     return task_( Context( ), *posargs, **nomargs )
-
-
-def _replace_arguments( invocable, posargs, nomargs, replacements ):
-    from inspect import signature as scan_signature
-    binder = scan_signature( invocable ).bind( *posargs, **nomargs )
-    binder.arguments.update( replacements )
-    binder.apply_defaults( )
-    return binder.args, binder.kwargs
 
 
 def _invoke_task_invocable( invocable, posargs, nomargs ):

@@ -6,11 +6,6 @@ inputs:
     default: true
   python-version:
     description: 'Version of the Python interpreter.'
-    required: true
-    default: '3.7'
-  python-configure-flags:
-    description: 'Flags to pass to the configure script for Python builds.'
-    required: false
   use-versions-update:
     description: 'Decache updated Python version specifiers?'
     required: true
@@ -21,40 +16,35 @@ runs:
     - name: Construct Foundation
       if: "${{ 'true' == inputs.needs-clone }}"
       uses: emcd/python-devshim/.github/actions/clone@master
-    - name: Restore Tool Versions (if requested)
+    - name: Restore Python Versions (if requested)
       if: "${{ 'true' == inputs.use-versions-update }}"
       uses: actions/download-artifact@v3
       with:
-        name: asdf-tool-versions
+        name: python-versions
     - name: Select Python Version
       run: |
         set -eu
-        python_version="$(grep --extended-regexp '^python' .tool-versions | tr ' ' '\n' | grep --extended-regexp '^${{ inputs.python-version }}')"
-        echo "ASDF_PYTHON_VERSION=${python_version}" >>${GITHUB_ENV}
+        if [[ -z '${{ inputs.python-version }}' ]]; then
+            echo "DEVSHIM_PYTHON_VERSION=$(/usr/bin/python3 develop.py show.python)" >>${GITHUB_ENV}
+        else
+            echo "DEVSHIM_PYTHON_VERSION=${{ inputs.python-version }}" >>${GITHUB_ENV}
+        fi
       shell: bash
     - name: Access Cache for Python and Virtual Environment
-      if: "${{ '' == inputs.python-configure-flags }}"
       id: python-cache
       uses: actions/cache@v3
       with:
-        key: python--${{ env.ASDF_PYTHON_VERSION }}--${{ runner.os }}--${{ hashFiles('.local/configuration/pypackages.fixtures.toml') }}
+        key: python--${{ env.DEVSHIM_PYTHON_VERSION }}--${{ runner.os }}--${{ hashFiles('.local/configuration/pypackages.fixtures.toml') }}
         path: |
-          ~/.asdf/installs/python
+          ~/.local/share/devshim/installations/python
           .local/environments
-    - name: Add Python Configure Flags (if requested)
-      if: "${{ inputs.python-configure-flags }}"
-      run: |
-        set -eu
-        echo 'PYTHON_CONFIGURE_OPTS=${{ inputs.python-configure-flags }}' >>${GITHUB_ENV}
-      shell: bash
     - name: Install Python
       if: "${{ 'true' != steps.python-cache.outputs.cache-hit }}"
-      run: asdf install python
+      run: /usr/bin/python3 develop.py install.python --version ${{ env.DEVSHIM_PYTHON_VERSION }}
       shell: bash
     - name: Create Virtual Environment
       if: "${{ 'true' != steps.python-cache.outputs.cache-hit }}"
       run: |
         set -eu
-        /usr/bin/python3 develop.py build.python-venv --version ${{ env.ASDF_PYTHON_VERSION }}
-        asdf reshim python
+        /usr/bin/python3 develop.py build.python-venv --version ${{ env.DEVSHIM_PYTHON_VERSION }}
       shell: bash

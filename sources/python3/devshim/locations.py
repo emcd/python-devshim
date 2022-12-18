@@ -85,18 +85,15 @@ def _calculate_artifacts_paths( paths ):
 def _calculate_caches_paths( paths ):
     caches_path = paths.local / 'caches'
     packages_path = caches_path / 'packages'
-    platforms_path = caches_path / 'platforms'
     return _SimpleNamespace(
         SELF = caches_path,
         DEV = _SimpleNamespace(
             repositories = caches_path / f"{__package__}/repositories",
         ),
         hypothesis = caches_path / 'hypothesis',
+        # TODO: Move 'packages' under 'DEV'.
         packages = _SimpleNamespace(
             python3 = packages_path / 'python3',
-        ),
-        platforms = _SimpleNamespace(
-            python3 = platforms_path / 'python3',
         ),
         setuptools = caches_path / 'setuptools',
         sphinx = caches_path / 'sphinx',
@@ -106,18 +103,13 @@ def _calculate_caches_paths( paths ):
 def _calculate_configuration_paths( paths ):
     configuration_path = paths.local / 'configuration'
     return _SimpleNamespace(
-        asdf = paths.project / '.tool-versions',
         bumpversion = configuration_path / 'bumpversion.cfg',
         devshim = _SimpleNamespace(
-            python = _SimpleNamespace(
-                packages = configuration_path.joinpath(
-                    'devshim', 'python', 'packages.toml' ),
-                versions = configuration_path.joinpath(
-                    'devshim', 'python', 'versions.toml' ),
-            ),
+            python = configuration_path / 'devshim/python.toml',
         ),
         pre_commit = configuration_path / 'pre-commit.yaml',
-        # TODO: Move 'pypackages.toml' to Devshim config path.
+        # TODO? Move 'pypackages.toml' to Devshim config path.
+        #       Or move into 'pyproject.toml'.
         pypackages = configuration_path / 'pypackages.toml',
         # TODO: Move 'pypackages.fixtures.toml' to data path.
         pypackages_fixtures = configuration_path / 'pypackages.fixtures.toml',

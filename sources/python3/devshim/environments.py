@@ -36,8 +36,8 @@ in_our_python_environment = _probe_our_python_environment( )
 
 def build_python_venv( version, overwrite = False ):
     ''' Creates virtual environment for requested Python version. '''
-    from .platforms import detect_vmgr_python_path
-    python_path = detect_vmgr_python_path( version )
+    from .languages.python import infer_executable_location
+    python_path = infer_executable_location( version )
     from .fs_utilities import ensure_directory
     venv_path = ensure_directory( derive_venv_path( version, python_path ) )
     venv_options = [ ]
@@ -135,13 +135,14 @@ def derive_venv_path( version = None, python_path = None ):
     from pathlib import Path
     cpe = current_process_environment
     required_keys = frozenset( { 'VIRTUAL_ENV', 'OUR_VENV_NAME' } )
-    from .platforms import detect_vmgr_python_path
+    from .languages.python import infer_executable_location
     if None is python_path:
-        if version: python_path = detect_vmgr_python_path( version = version )
+        if version:
+            python_path = infer_executable_location( version = version )
         elif required_keys == required_keys & cpe.keys( ):
             venv_path = Path( cpe[ 'VIRTUAL_ENV' ] )
             if venv_path.name == cpe[ 'OUR_VENV_NAME' ]: return venv_path
-    if None is python_path: python_path = detect_vmgr_python_path( )
+    if None is python_path: python_path = infer_executable_location( )
     from .platforms import identify_python
     abi_label = identify_python(
         'bdist-compatibility', python_path = python_path )

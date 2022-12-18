@@ -24,21 +24,69 @@
 from . import _base as __
 
 
-def survey_support( by_availability = False ):
+def detect_default_version( ):
+    ''' Detects default Python version.
+
+        If in a Python virtual environment, then the Python version for that
+        environment is returned. Else, the first available Python version from
+        the project's Python version declarations is returned. '''
+    # TODO: Detect if in relevant virtual environment and infer version.
+    return next( iter( survey_versions( ) ) )
+
+
+def infer_executable_location( version = None ):
+    ''' Infers location of Python executable by version. '''
+    return infer_installation_location( version ) / 'bin/python'
+
+
+def infer_installation_location( version = None ):
+    ''' Infers location of Python installation by version. '''
+    versions = survey_versions( )
+    if None is version: version = next( iter( versions ) )
+    # TODO: Handle lookup error.
+    version_data = versions[ version ]
+    context = __.LanguageContext( version )
+    for provider_entry in version_data.get( 'providers', ( ) ):
+        provider_data = __.normalize_provider_entry( context, provider_entry )
+        provider_class = provider_classes[ provider_data[ 'name' ] ]
+        provider = provider_class( context, version_data, provider_data )
+        location = provider.installation_location
+        if not location.exists( ):
+            __.scribe.debug(
+                f"Could not locate installation of {context} "
+                f"by {provider.name}." )
+            continue
+        return location
+    # TODO: Use exception factory.
+    raise LookupError
+
+
+def validate_version( version ):
+    ''' Validates version against available Python versions. '''
+    if version not in survey_versions( ):
+        # TODO: Use exception factory.
+        raise ValueError
+    return version
+
+
+def survey_versions( by_availability = False ):
     ''' Returns Python versions which have valid declarations. '''
     from ...data import paths
     from ...packages import ensure_import_package
     tomllib = ensure_import_package( 'tomllib' )
-    with paths.configuration.devshim.python.versions.open( 'rb' ) as file:
+    with paths.configuration.devshim.python.open( 'rb' ) as file:
         document = tomllib.load( file )
     # TODO: Check format version and dispatch accordingly.
     versions = document.get( 'versions', { } )
-    if not by_availability: return versions
     from os import environ as current_process_environment
     selector = current_process_environment.get( 'DEVSHIM_PYTHON_VERSION' )
+    if selector:
+        try: return { selector: versions[ selector ] }
+        # TODO: Raise error on unmatched version.
+        except KeyError: return { }
+    if not by_availability: return versions
     select_versions = { }
     for version, version_data in versions.items( ):
-        if None is not selector and selector != version: continue
         select_providers = _survey_provider_support( version, version_data )
         if not select_providers: continue
         version_data[ 'providers' ] = select_providers
@@ -88,7 +136,7 @@ def install_version( version ):
         break
 
 
-def update_version( version ):
+def update_version( version, install = True ):
     ''' Updates requested version of Python, if declaration exists. '''
     context, version_data = _create_context( version )
     version = context.version
@@ -104,9 +152,8 @@ def update_version( version ):
             continue
         if version_data != version_data_:
             _update_version_data( version, version_data_ )
-            install_version( version )
             break
-        install_version( version ) # Ensure installation is complete/valid.
+    if install: install_version( version ) # Ensure installation.
 
 
 def _update_version_data( version, data ):
@@ -114,7 +161,7 @@ def _update_version_data( version, data ):
     from ...packages import ensure_import_package
     tomllib = ensure_import_package( 'tomllib' )
     tomli_w = ensure_import_package( 'tomli-w' )
-    with paths.configuration.devshim.python.versions.open( 'r+b' ) as file:
+    with paths.configuration.devshim.python.open( 'r+b' ) as file:
         document = tomllib.load( file )
         # TODO: Check format version and dispatch accordingly.
         document[ 'versions' ][ version ] = data
@@ -123,7 +170,7 @@ def _update_version_data( version, data ):
 
 
 def _create_context( version ):
-    versions = survey_support( )
+    versions = survey_versions( )
     if not versions:
         raise __.provide_exception_factory( 'invalid data' )(
             "No relevant support declarations." )

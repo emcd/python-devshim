@@ -23,19 +23,13 @@ jobs:
         run: /usr/bin/python3 develop.py freshen.git-modules
         shell: bash
       - name: Freshen Python Versions
-        run: |
-          set -eu
-          declare -a versions
-          for version in ${{ inputs.python-versions-words }}; do
-              versions+=("$(asdf latest python ${version})")
-          done
-          sed --in-place --regexp-extended "s/^python.*\$/python ${versions[*]}/" .tool-versions
+        run: /usr/bin/python3 develop.py freshen.python --no-install --version=ALL
         shell: bash
-      - name: Store Tool Versions
+      - name: Store Python Versions
         uses: actions/upload-artifact@v3
         with:
-          name: asdf-tool-versions
-          path: .tool-versions
+          name: python-versions
+          path: .local/configuration/devshim/python.toml
 
 
   update-python-packages:

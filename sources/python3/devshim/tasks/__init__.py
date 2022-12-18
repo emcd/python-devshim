@@ -27,24 +27,6 @@ from . import _base as __
 _sphinx_options = f"-j auto -d {__.paths.caches.sphinx} -n -T"
 
 
-@__.task( 'Show: Python Versions' )
-def list_python_versions( ):
-    ''' Lists names of supported Python versions. '''
-    from ..languages.python import survey_support
-    # TODO? With Rich and 'detail' flag, show panels with details.
-    for version in survey_support( ).keys( ): print( version )
-
-
-@__.task(
-    'Freshen: Python Version',
-    version_expansion = 'declared Python versions',
-)
-def freshen_python_new( version = None ):
-    ''' Updates requested Python version, if newer one available. '''
-    from ..languages.python import update_version
-    update_version( version )
-
-
 @__.task( )
 def ease(
     shell_name = None,
@@ -72,20 +54,19 @@ def install_git_hooks( ):
 
 @__.task(
     'Install: Python Release',
-    version_expansion = 'declared Python versions',
+    multiplexer = __.PythonVersionMultiplexer( enable_default = False ),
 )
 def install_python( version ):
     ''' Installs requested Python version.
 
         This task requires Internet access and may take some time. '''
-    __.execute_external( f"asdf install python {version}" )
-#    from ..languages.python import install
-#    install( version )
+    from ..languages.python import install_version
+    install_version( version )
 
 
 @__.task(
-    'Make: Python Virtual Environment',
-    version_expansion = 'declared Python versions',
+    'Build: Python Virtual Environment',
+    multiplexer = __.PythonVersionMultiplexer( ),
 )
 def build_python_venv( version, overwrite = False ):
     ''' Creates virtual environment for requested Python version. '''
@@ -153,7 +134,7 @@ def clean_tool_caches( include_development_support = False ):
 
 @__.task(
     'Clean: Unused Python Packages',
-    version_expansion = 'declared Python virtual environments',
+    multiplexer = __.PythonVersionMultiplexer( ),
 )
 def clean_python_packages( version = None ):
     ''' Removes unused Python packages. '''
@@ -189,7 +170,7 @@ def clean( version = None ):
 
 @__.task(
     'Check: Python Package Security',
-    version_expansion = 'declared Python virtual environments',
+    multiplexer = __.PythonVersionMultiplexer( ),
 )
 def check_security_issues( version = None ):
     ''' Checks for security issues in installed Python packages.
@@ -199,57 +180,24 @@ def check_security_issues( version = None ):
         f"safety check", venv_specification = dict( version = version ) )
 
 
-@__.task( 'Freshen: Version Manager' )
-def freshen_asdf( ):
-    ''' Asks Asdf to update itself.
+@__.task(
+    'Freshen: Python Version',
+    multiplexer = __.PythonVersionMultiplexer( ),
+)
+def freshen_python( version = None, install = True ):
+    ''' Updates requested Python version, if newer one available.
 
         This task requires Internet access and may take some time. '''
-    __.execute_external( 'asdf update' )
-    __.execute_external( 'asdf plugin update python' )
-
-
-@__.task( task_nomargs = dict( pre = ( freshen_asdf, ), ), )
-def freshen_python( version = None ):
-    ''' Updates supported Python minor version to latest patch.
-
-        If version is 'ALL', then all supported Pythons are targeted.
-
-        This task requires Internet access and may take some time. '''
-    from ..platforms import (
-        detect_vmgr_python_version,
-        indicate_python_versions_support,
-    )
-    original_versions = indicate_python_versions_support( )
-    if 'ALL' == version: versions = original_versions
-    else: versions = ( version or detect_vmgr_python_version( ), )
-    obsolete_identifiers = set( )
-    version_replacements = { }
-    for version_ in versions:
-        replacement, identifier = _freshen_python( version_ )
-        version_replacements.update( replacement )
-        if None is not identifier: obsolete_identifiers.add( identifier )
-    # Can only update record of local versions after they are installed.
-    successor_versions = [
-        version_replacements.get( version_, version_ )
-        for version_ in original_versions ]
-    __.project_execute_external( "asdf local python {versions}".format(
-        versions = ' '.join( successor_versions ) ) )
-    # Erase packages fixtures for versions which are no longer extant.
-    from ..packages import delete_python_packages_fixtures
-    delete_python_packages_fixtures( obsolete_identifiers )
-
-
-def _freshen_python( version ):
-    ''' Updates supported Python minor version to latest patch. '''
-    from ..user_interface import render_boxed_title
-    render_boxed_title( 'Freshen: Python Version', supplement = version )
-    from .. import platforms
-    return platforms.freshen_python( version )
+    from ..languages.python import update_version
+    update_version( version, install = install )
+    ## Erase packages fixtures for versions which are no longer extant.
+    #from ..packages import delete_python_packages_fixtures
+    #delete_python_packages_fixtures( obsolete_identifiers )
 
 
 @__.task(
     'Freshen: Python Package Versions',
-    version_expansion = 'declared Python virtual environments',
+    multiplexer = __.PythonVersionMultiplexer( ),
 )
 def freshen_python_packages( version = None ):
     ''' Updates declared Python packages in Python virtual environment. '''
@@ -305,7 +253,7 @@ def freshen( ):
 
 @__.task(
     'Lint: Bandit',
-    version_expansion = 'declared Python virtual environments',
+    multiplexer = __.PythonVersionMultiplexer( ),
 )
 def lint_bandit( version = None ):
     ''' Security checks the source code with Bandit. '''
@@ -319,11 +267,11 @@ def lint_bandit( version = None ):
 
 @__.task(
     'Lint: Mypy',
+    multiplexer = __.PythonVersionMultiplexer( ),
     task_nomargs = dict(
         iterable = ( 'packages', 'modules', 'files', ),
         pre = ( clean_tool_caches, ), # TODO: Target Mypy cache only.
     ),
-    version_expansion = 'declared Python virtual environments',
 )
 def lint_mypy( packages, modules, files, version = None ):
     ''' Lints the source code with Mypy. '''
@@ -346,8 +294,8 @@ def lint_mypy( packages, modules, files, version = None ):
 
 @__.task(
     'Lint: Pylint',
+    multiplexer = __.PythonVersionMultiplexer( ),
     task_nomargs = dict( iterable = ( 'targets', 'checks', ), ),
-    version_expansion = 'declared Python virtual environments',
 )
 def lint_pylint( targets, checks, report = False, version = None ):
     ''' Lints the source code with Pylint. '''
@@ -372,7 +320,7 @@ def lint_pylint( targets, checks, report = False, version = None ):
 
 @__.task(
     'Lint: Semgrep',
-    version_expansion = 'declared Python virtual environments',
+    multiplexer = __.PythonVersionMultiplexer( ),
 )
 def lint_semgrep( version = None ):
     ''' Lints the source code with Semgrep. '''
@@ -400,7 +348,7 @@ _lint_targets_default = (
 )
 
 
-@__.task( version_expansion = 'declared Python virtual environments' )
+@__.task( multiplexer = __.PythonVersionMultiplexer( ), )
 def lint( version = None ):
     ''' Lints the source code. '''
     __.invoke_task(
@@ -422,9 +370,7 @@ def report_coverage( ):
     __.project_execute_external( f"coverage xml", **execution_options )
 
 
-@__.task(
-    version_expansion = 'declared Python virtual environments',
-)
+@__.task( multiplexer = __.PythonVersionMultiplexer( ), )
 def test( ensure_sanity = True, version = None ):
     ''' Runs the test suite in Python virtual environment. '''
     __.invoke_task( clean, version = version )
@@ -854,6 +800,19 @@ def run( command, version = None ):
         command, venv_specification = dict( version = version ) )
 
 
+@__.task( )
+def show_python( all_versions = False ):
+    ''' Lists names of default supported Python version. '''
+    # TODO: Account for availability on platform.
+    # TODO? With Rich and 'detail' flag, show panels with details.
+    if all_versions:
+        from ..languages.python import survey_versions
+        for version in survey_versions( ).keys( ): print( version )
+    else:
+        from ..languages.python import detect_default_version
+        print( detect_default_version( ) )
+
+
 # For use by Invoke's module loader. Must be called 'namespace' (or 'ns').
 namespace = __.TaskCollection( )
 namespace.add_task( bootstrap )
@@ -890,7 +849,6 @@ namespace.subcollection_from_path( 'clean' ).add_task(
     clean, name = 'ALL', default = True )
 namespace.add_collection( __.TaskCollection(
     'freshen',
-    asdf = freshen_asdf,
     git_hooks = freshen_git_hooks,
     git_modules = freshen_git_modules,
     pypackages = freshen_python_packages,
@@ -932,9 +890,8 @@ namespace.add_collection( __.TaskCollection(
 ) )
 namespace.add_collection( __.TaskCollection(
     'show',
-    pythons = list_python_versions,
+    python = show_python,
 ) )
 namespace.add_collection( __.TaskCollection(
     'xp',
-    freshen_python = freshen_python_new,
 ) )
