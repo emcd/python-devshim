@@ -65,11 +65,10 @@ Quick Tour
       clean.pypackages        Removes unused Python packages.
       clean.tool-caches       Clears the caches used by code generation and testing utilities.
       freshen.ALL (freshen)   Performs the various freshening tasks, cleaning first.
-      freshen.asdf            Asks Asdf to update itself.
       freshen.git-hooks       Updates Git hooks to latest tagged release.
       freshen.git-modules     Performs recursive update of all Git modules.
       freshen.pypackages      Updates declared Python packages in Python virtual environment.
-      freshen.python          Updates supported Python minor version to latest patch.
+      freshen.python          Updates requested Python version, if newer one available.
       install.git-hooks       Installs hooks to check goodness of code before commit.
       install.python          Installs requested Python version.
       lint.ALL (lint)         Lints the source code.
@@ -88,7 +87,7 @@ Quick Tour
       publish.new-stage       Unleashes a new stage upon the world.
       publish.pypi            Publishes current sdist and wheels to PyPI.
       publish.test-pypi       Publishes current sdist and wheels to Test PyPI.
-      show.pythons            Lists names of supported Python versions.
+      show.python             Lists names of default supported Python version.
 
 `More Flair <https://www.imdb.com/title/tt0151804/characters/nm0431918>`_
 ===============================================================================
