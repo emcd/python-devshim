@@ -403,10 +403,10 @@ digests = [
 
 [["cpython-3.10.9--linux--x86_64"]]
 name = "identify"
-version = "2.5.10"
+version = "2.5.11"
 digests = [
-    "sha256:fb7c2feaeca6976a3ffa31ec3236a6911fbc51aec9acc111de2aed99f244ade2",
-    "sha256:dce9e31fee7dbc45fea36a9e855c316b8fbf807e65a862f160840bb5a2bf5dfd",
+    "sha256:e7db36b772b188099616aaf2accbee122949d1c6a1bac4f38196720d6f9f06db",
+    "sha256:14b7076b29c99b1b0b8b08e96d448c7b877a9b07683cd8cfda2ea06af85ffa1c",
 ]
 
 [["cpython-3.10.9--linux--x86_64"]]
@@ -427,10 +427,10 @@ digests = [
 
 [["cpython-3.10.9--linux--x86_64"]]
 name = "importlib-metadata"
-version = "5.1.0"
+version = "5.2.0"
 digests = [
-    "sha256:d84d17e21670ec07990e1044a99efe8d615d860fd176fc29ef5c306068fda313",
-    "sha256:d5059f9f1e8e41f80e9c56c2ee58811450c31984dfa625329ffd7c0dad88a73b",
+    "sha256:0eafa39ba42bf225fc00e67f701d71f85aead9f878569caf13c3724f704b970f",
+    "sha256:404d48d62bba0b7a77ff9d405efd91501bef2e67ff4ace0bed40a0cf28c3c7cd",
 ]
 
 [["cpython-3.10.9--linux--x86_64"]]
@@ -451,10 +451,10 @@ digests = [
 
 [["cpython-3.10.9--linux--x86_64"]]
 name = "isort"
-version = "5.11.3"
+version = "5.11.4"
 digests = [
-    "sha256:83155ffa936239d986b0f190347a3f2285f42a9b9e1725c89d865b27dd0627e5",
-    "sha256:a8ca25fbfad0f7d5d8447a4314837298d9f6b23aed8618584c894574f626b64b",
+    "sha256:c033fd0edb91000a7f09527fe5c75321878f98322a77ddcc81adbd83724afb7b",
+    "sha256:6db30c5ded9815d813932c04c2f85a360bcdd35fed496f4d8f35495ef0a261b6",
 ]
 
 [["cpython-3.10.9--linux--x86_64"]]
@@ -1729,10 +1729,10 @@ digests = [
 
 [["cpython-3.11.1--linux--x86_64"]]
 name = "identify"
-version = "2.5.10"
+version = "2.5.11"
 digests = [
-    "sha256:fb7c2feaeca6976a3ffa31ec3236a6911fbc51aec9acc111de2aed99f244ade2",
-    "sha256:dce9e31fee7dbc45fea36a9e855c316b8fbf807e65a862f160840bb5a2bf5dfd",
+    "sha256:e7db36b772b188099616aaf2accbee122949d1c6a1bac4f38196720d6f9f06db",
+    "sha256:14b7076b29c99b1b0b8b08e96d448c7b877a9b07683cd8cfda2ea06af85ffa1c",
 ]
 
 [["cpython-3.11.1--linux--x86_64"]]
@@ -1753,10 +1753,10 @@ digests = [
 
 [["cpython-3.11.1--linux--x86_64"]]
 name = "importlib-metadata"
-version = "5.1.0"
+version = "5.2.0"
 digests = [
-    "sha256:d84d17e21670ec07990e1044a99efe8d615d860fd176fc29ef5c306068fda313",
-    "sha256:d5059f9f1e8e41f80e9c56c2ee58811450c31984dfa625329ffd7c0dad88a73b",
+    "sha256:0eafa39ba42bf225fc00e67f701d71f85aead9f878569caf13c3724f704b970f",
+    "sha256:404d48d62bba0b7a77ff9d405efd91501bef2e67ff4ace0bed40a0cf28c3c7cd",
 ]
 
 [["cpython-3.11.1--linux--x86_64"]]
@@ -1777,10 +1777,10 @@ digests = [
 
 [["cpython-3.11.1--linux--x86_64"]]
 name = "isort"
-version = "5.11.3"
+version = "5.11.4"
 digests = [
-    "sha256:83155ffa936239d986b0f190347a3f2285f42a9b9e1725c89d865b27dd0627e5",
-    "sha256:a8ca25fbfad0f7d5d8447a4314837298d9f6b23aed8618584c894574f626b64b",
+    "sha256:c033fd0edb91000a7f09527fe5c75321878f98322a77ddcc81adbd83724afb7b",
+    "sha256:6db30c5ded9815d813932c04c2f85a360bcdd35fed496f4d8f35495ef0a261b6",
 ]
 
 [["cpython-3.11.1--linux--x86_64"]]
@@ -3023,10 +3023,10 @@ digests = [
 
 [["cpython-3.7.16--linux--x86_64"]]
 name = "identify"
-version = "2.5.10"
+version = "2.5.11"
 digests = [
-    "sha256:fb7c2feaeca6976a3ffa31ec3236a6911fbc51aec9acc111de2aed99f244ade2",
-    "sha256:dce9e31fee7dbc45fea36a9e855c316b8fbf807e65a862f160840bb5a2bf5dfd",
+    "sha256:e7db36b772b188099616aaf2accbee122949d1c6a1bac4f38196720d6f9f06db",
+    "sha256:14b7076b29c99b1b0b8b08e96d448c7b877a9b07683cd8cfda2ea06af85ffa1c",
 ]
 
 [["cpython-3.7.16--linux--x86_64"]]
@@ -3047,10 +3047,10 @@ digests = [
 
 [["cpython-3.7.16--linux--x86_64"]]
 name = "importlib-metadata"
-version = "5.1.0"
+version = "5.2.0"
 digests = [
-    "sha256:d84d17e21670ec07990e1044a99efe8d615d860fd176fc29ef5c306068fda313",
-    "sha256:d5059f9f1e8e41f80e9c56c2ee58811450c31984dfa625329ffd7c0dad88a73b",
+    "sha256:0eafa39ba42bf225fc00e67f701d71f85aead9f878569caf13c3724f704b970f",
+    "sha256:404d48d62bba0b7a77ff9d405efd91501bef2e67ff4ace0bed40a0cf28c3c7cd",
 ]
 
 [["cpython-3.7.16--linux--x86_64"]]
@@ -3079,10 +3079,10 @@ digests = [
 
 [["cpython-3.7.16--linux--x86_64"]]
 name = "isort"
-version = "5.11.3"
+version = "5.11.4"
 digests = [
-    "sha256:83155ffa936239d986b0f190347a3f2285f42a9b9e1725c89d865b27dd0627e5",
-    "sha256:a8ca25fbfad0f7d5d8447a4314837298d9f6b23aed8618584c894574f626b64b",
+    "sha256:c033fd0edb91000a7f09527fe5c75321878f98322a77ddcc81adbd83724afb7b",
+    "sha256:6db30c5ded9815d813932c04c2f85a360bcdd35fed496f4d8f35495ef0a261b6",
 ]
 
 [["cpython-3.7.16--linux--x86_64"]]
@@ -4403,10 +4403,10 @@ digests = [
 
 [["cpython-3.8.16--linux--x86_64"]]
 name = "identify"
-version = "2.5.10"
+version = "2.5.11"
 digests = [
-    "sha256:fb7c2feaeca6976a3ffa31ec3236a6911fbc51aec9acc111de2aed99f244ade2",
-    "sha256:dce9e31fee7dbc45fea36a9e855c316b8fbf807e65a862f160840bb5a2bf5dfd",
+    "sha256:e7db36b772b188099616aaf2accbee122949d1c6a1bac4f38196720d6f9f06db",
+    "sha256:14b7076b29c99b1b0b8b08e96d448c7b877a9b07683cd8cfda2ea06af85ffa1c",
 ]
 
 [["cpython-3.8.16--linux--x86_64"]]
@@ -4427,10 +4427,10 @@ digests = [
 
 [["cpython-3.8.16--linux--x86_64"]]
 name = "importlib-metadata"
-version = "5.1.0"
+version = "5.2.0"
 digests = [
-    "sha256:d84d17e21670ec07990e1044a99efe8d615d860fd176fc29ef5c306068fda313",
-    "sha256:d5059f9f1e8e41f80e9c56c2ee58811450c31984dfa625329ffd7c0dad88a73b",
+    "sha256:0eafa39ba42bf225fc00e67f701d71f85aead9f878569caf13c3724f704b970f",
+    "sha256:404d48d62bba0b7a77ff9d405efd91501bef2e67ff4ace0bed40a0cf28c3c7cd",
 ]
 
 [["cpython-3.8.16--linux--x86_64"]]
@@ -4459,10 +4459,10 @@ digests = [
 
 [["cpython-3.8.16--linux--x86_64"]]
 name = "isort"
-version = "5.11.3"
+version = "5.11.4"
 digests = [
-    "sha256:83155ffa936239d986b0f190347a3f2285f42a9b9e1725c89d865b27dd0627e5",
-    "sha256:a8ca25fbfad0f7d5d8447a4314837298d9f6b23aed8618584c894574f626b64b",
+    "sha256:c033fd0edb91000a7f09527fe5c75321878f98322a77ddcc81adbd83724afb7b",
+    "sha256:6db30c5ded9815d813932c04c2f85a360bcdd35fed496f4d8f35495ef0a261b6",
 ]
 
 [["cpython-3.8.16--linux--x86_64"]]
@@ -5753,10 +5753,10 @@ digests = [
 
 [["cpython-3.9.16--linux--x86_64"]]
 name = "identify"
-version = "2.5.10"
+version = "2.5.11"
 digests = [
-    "sha256:fb7c2feaeca6976a3ffa31ec3236a6911fbc51aec9acc111de2aed99f244ade2",
-    "sha256:dce9e31fee7dbc45fea36a9e855c316b8fbf807e65a862f160840bb5a2bf5dfd",
+    "sha256:e7db36b772b188099616aaf2accbee122949d1c6a1bac4f38196720d6f9f06db",
+    "sha256:14b7076b29c99b1b0b8b08e96d448c7b877a9b07683cd8cfda2ea06af85ffa1c",
 ]
 
 [["cpython-3.9.16--linux--x86_64"]]
@@ -5777,10 +5777,10 @@ digests = [
 
 [["cpython-3.9.16--linux--x86_64"]]
 name = "importlib-metadata"
-version = "5.1.0"
+version = "5.2.0"
 digests = [
-    "sha256:d84d17e21670ec07990e1044a99efe8d615d860fd176fc29ef5c306068fda313",
-    "sha256:d5059f9f1e8e41f80e9c56c2ee58811450c31984dfa625329ffd7c0dad88a73b",
+    "sha256:0eafa39ba42bf225fc00e67f701d71f85aead9f878569caf13c3724f704b970f",
+    "sha256:404d48d62bba0b7a77ff9d405efd91501bef2e67ff4ace0bed40a0cf28c3c7cd",
 ]
 
 [["cpython-3.9.16--linux--x86_64"]]
@@ -5801,10 +5801,10 @@ digests = [
 
 [["cpython-3.9.16--linux--x86_64"]]
 name = "isort"
-version = "5.11.3"
+version = "5.11.4"
 digests = [
-    "sha256:83155ffa936239d986b0f190347a3f2285f42a9b9e1725c89d865b27dd0627e5",
-    "sha256:a8ca25fbfad0f7d5d8447a4314837298d9f6b23aed8618584c894574f626b64b",
+    "sha256:c033fd0edb91000a7f09527fe5c75321878f98322a77ddcc81adbd83724afb7b",
+    "sha256:6db30c5ded9815d813932c04c2f85a360bcdd35fed496f4d8f35495ef0a261b6",
 ]
 
 [["cpython-3.9.16--linux--x86_64"]]
@@ -7088,10 +7088,10 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "identify"
-version = "2.5.10"
+version = "2.5.11"
 digests = [
-    "sha256:fb7c2feaeca6976a3ffa31ec3236a6911fbc51aec9acc111de2aed99f244ade2",
-    "sha256:dce9e31fee7dbc45fea36a9e855c316b8fbf807e65a862f160840bb5a2bf5dfd",
+    "sha256:e7db36b772b188099616aaf2accbee122949d1c6a1bac4f38196720d6f9f06db",
+    "sha256:14b7076b29c99b1b0b8b08e96d448c7b877a9b07683cd8cfda2ea06af85ffa1c",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -7112,10 +7112,10 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "importlib-metadata"
-version = "5.1.0"
+version = "5.2.0"
 digests = [
-    "sha256:d84d17e21670ec07990e1044a99efe8d615d860fd176fc29ef5c306068fda313",
-    "sha256:d5059f9f1e8e41f80e9c56c2ee58811450c31984dfa625329ffd7c0dad88a73b",
+    "sha256:0eafa39ba42bf225fc00e67f701d71f85aead9f878569caf13c3724f704b970f",
+    "sha256:404d48d62bba0b7a77ff9d405efd91501bef2e67ff4ace0bed40a0cf28c3c7cd",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -8253,10 +8253,10 @@ digests = [
 
 [["pypy-3.8.15-7.3.10--linux--x86_64"]]
 name = "identify"
-version = "2.5.10"
+version = "2.5.11"
 digests = [
-    "sha256:fb7c2feaeca6976a3ffa31ec3236a6911fbc51aec9acc111de2aed99f244ade2",
-    "sha256:dce9e31fee7dbc45fea36a9e855c316b8fbf807e65a862f160840bb5a2bf5dfd",
+    "sha256:e7db36b772b188099616aaf2accbee122949d1c6a1bac4f38196720d6f9f06db",
+    "sha256:14b7076b29c99b1b0b8b08e96d448c7b877a9b07683cd8cfda2ea06af85ffa1c",
 ]
 
 [["pypy-3.8.15-7.3.10--linux--x86_64"]]
@@ -8277,10 +8277,10 @@ digests = [
 
 [["pypy-3.8.15-7.3.10--linux--x86_64"]]
 name = "importlib-metadata"
-version = "5.1.0"
+version = "5.2.0"
 digests = [
-    "sha256:d84d17e21670ec07990e1044a99efe8d615d860fd176fc29ef5c306068fda313",
-    "sha256:d5059f9f1e8e41f80e9c56c2ee58811450c31984dfa625329ffd7c0dad88a73b",
+    "sha256:0eafa39ba42bf225fc00e67f701d71f85aead9f878569caf13c3724f704b970f",
+    "sha256:404d48d62bba0b7a77ff9d405efd91501bef2e67ff4ace0bed40a0cf28c3c7cd",
 ]
 
 [["pypy-3.8.15-7.3.10--linux--x86_64"]]
@@ -8309,10 +8309,10 @@ digests = [
 
 [["pypy-3.8.15-7.3.10--linux--x86_64"]]
 name = "isort"
-version = "5.11.3"
+version = "5.11.4"
 digests = [
-    "sha256:83155ffa936239d986b0f190347a3f2285f42a9b9e1725c89d865b27dd0627e5",
-    "sha256:a8ca25fbfad0f7d5d8447a4314837298d9f6b23aed8618584c894574f626b64b",
+    "sha256:c033fd0edb91000a7f09527fe5c75321878f98322a77ddcc81adbd83724afb7b",
+    "sha256:6db30c5ded9815d813932c04c2f85a360bcdd35fed496f4d8f35495ef0a261b6",
 ]
 
 [["pypy-3.8.15-7.3.10--linux--x86_64"]]
@@ -9589,10 +9589,10 @@ digests = [
 
 [["pypy-3.9.15-7.3.10--linux--x86_64"]]
 name = "identify"
-version = "2.5.10"
+version = "2.5.11"
 digests = [
-    "sha256:fb7c2feaeca6976a3ffa31ec3236a6911fbc51aec9acc111de2aed99f244ade2",
-    "sha256:dce9e31fee7dbc45fea36a9e855c316b8fbf807e65a862f160840bb5a2bf5dfd",
+    "sha256:e7db36b772b188099616aaf2accbee122949d1c6a1bac4f38196720d6f9f06db",
+    "sha256:14b7076b29c99b1b0b8b08e96d448c7b877a9b07683cd8cfda2ea06af85ffa1c",
 ]
 
 [["pypy-3.9.15-7.3.10--linux--x86_64"]]
@@ -9613,10 +9613,10 @@ digests = [
 
 [["pypy-3.9.15-7.3.10--linux--x86_64"]]
 name = "importlib-metadata"
-version = "5.1.0"
+version = "5.2.0"
 digests = [
-    "sha256:d84d17e21670ec07990e1044a99efe8d615d860fd176fc29ef5c306068fda313",
-    "sha256:d5059f9f1e8e41f80e9c56c2ee58811450c31984dfa625329ffd7c0dad88a73b",
+    "sha256:0eafa39ba42bf225fc00e67f701d71f85aead9f878569caf13c3724f704b970f",
+    "sha256:404d48d62bba0b7a77ff9d405efd91501bef2e67ff4ace0bed40a0cf28c3c7cd",
 ]
 
 [["pypy-3.9.15-7.3.10--linux--x86_64"]]
@@ -9637,10 +9637,10 @@ digests = [
 
 [["pypy-3.9.15-7.3.10--linux--x86_64"]]
 name = "isort"
-version = "5.11.3"
+version = "5.11.4"
 digests = [
-    "sha256:83155ffa936239d986b0f190347a3f2285f42a9b9e1725c89d865b27dd0627e5",
-    "sha256:a8ca25fbfad0f7d5d8447a4314837298d9f6b23aed8618584c894574f626b64b",
+    "sha256:c033fd0edb91000a7f09527fe5c75321878f98322a77ddcc81adbd83724afb7b",
+    "sha256:6db30c5ded9815d813932c04c2f85a360bcdd35fed496f4d8f35495ef0a261b6",
 ]
 
 [["pypy-3.9.15-7.3.10--linux--x86_64"]]
