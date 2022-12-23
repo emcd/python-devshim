@@ -18,39 +18,30 @@
 #============================================================================#
 
 
-''' Utilties for management of Python language installations. '''
+''' Python versions to install. '''
 
 
-# pylint: disable=unused-import
-import re
-
-from collections.abc import Mapping as AbstractDictionary
-from types import MappingProxyType as DictionaryProxy
-
-from ...base import produce_accretive_cacher, scribe
-from ...exceptions import provide_exception_factory
-# pylint: enable=unused-import
-from .. import _base as __
+from . import _base as __
 
 
-def _summon_version_definitions( ):
-    from ...data import paths
-    from ...packages import ensure_import_package
-    tomllib = ensure_import_package( 'tomllib' )
-    with paths.configuration.devshim.python.open( 'rb' ) as file:
-        document = tomllib.load( file )
-    # TODO: Check format version and dispatch accordingly.
-    return DictionaryProxy( document.get( 'versions', { } ) )
+class LanguageVersion( __.LanguageVersion ):
+    ''' Abstract base for Python language versions. '''
 
+    def __init__( self, name ): super( ).__init__( 'Python', name )
 
-LanguageFeature = __.LanguageFeature
-LanguageProvider = __.LanguageProvider
-LanguageVersion = __.LanguageVersion
+    @classmethod
+    def summon_definitions( class_ ): return __.data.version_definitions
 
+    @classmethod
+    def provide_feature_class( class_, name ):
+        # TODO: Implement.
+        raise NotImplementedError
 
-def _produce_calculators( ):
-    return dict(
-        version_definitions = _summon_version_definitions,
-    )
-
-data = produce_accretive_cacher( _produce_calculators )
+    @classmethod
+    def provide_provider_class( class_, name ):
+        # TODO: Cache table of provider classes.
+        # TODO: Automatically detect provider classes.
+        from .python_build import PythonBuild
+        providers = {
+            provider.name: provider for provider in ( PythonBuild, ) }
+        return providers[ name ]

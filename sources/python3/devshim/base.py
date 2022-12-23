@@ -25,6 +25,34 @@ import typing as _typ
 from contextlib import contextmanager as _context_manager
 
 
+def produce_accretive_cacher( calculators_producer ):
+    ''' Produces object which computes values on demand and caches them.
+
+        The ``calculators_producer`` argument must return a dictionary of cache
+        entry names with nullary invocables as the correspondent values. Each
+        invocable is a calculator which produces a value to populate the cache.
+        Any attribute name not in the dictionary results in an
+        :py:exc:`AttributeError`. '''
+    from types import MappingProxyType as DictionaryProxy
+    cache = { }
+    calculators = DictionaryProxy( calculators_producer( ) )
+
+    # TODO: Class immutability.
+    class AccretiveCacher:
+        ''' Computes values on demand and caches them. '''
+
+        __slots__ = ( )
+
+        def __getattr__( self, name ):
+            if name not in calculators: raise AttributeError
+            if name not in cache: cache[ name ] = calculators[ name ]( )
+            return cache[ name ]
+
+        # TODO: Override __setattr__ and __delattr__ for object immutability.
+
+    return AccretiveCacher( )
+
+
 @_context_manager
 def springy_chdir( new_path ):
     ''' Changes directory, restoring original directory on context exit. '''

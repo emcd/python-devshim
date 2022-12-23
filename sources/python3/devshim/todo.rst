@@ -9,13 +9,6 @@ Prefer Prebuilt Python Executables
   that platform. Download from official Python "FTP" server:
   https://www.python.org/ftp/python/.
 
-Cache Python Installations in User Home
-===============================================================================
-
-* Use `platformdirs <https://github.com/platformdirs/platformdirs>`_ to not
-  reinvent the wheel. (Could revive old ``utilia`` code which also does this,
-  but ``platformdirs`` is more up-to-date.)
-
 Fixes and Minor Improvements
 ===============================================================================
 

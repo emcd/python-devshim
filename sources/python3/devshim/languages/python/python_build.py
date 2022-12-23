@@ -24,6 +24,23 @@
 from . import _base as __
 
 
+def _produce_calculators( ):
+    def calculate_pbil( ):
+        from ...data import user_directories
+        return user_directories.installations / 'python-build'
+    def calculate_pbrl( ):
+        from ...data import paths
+        return paths.caches.DEV.repositories / 'pyenv.tar.gz'
+    return dict(
+        pb_installation_location = calculate_pbil,
+        pb_executable_location = ( lambda:
+            _data.pb_installation_location / 'bin/python-build' ),
+        pb_repository_location = calculate_pbrl,
+    )
+
+_data = __.produce_accretive_cacher( _produce_calculators )
+
+
 _pb_definition_regex = __.re.compile(
     r'''^(?P<implementation_name>\w+)'''
     r'''(?P<base_version>\d\.\d)?-'''
@@ -47,24 +64,10 @@ class PythonBuild( __.LanguageProvider ):
     supportable_implementations = ( 'cpython', 'pypy', )
     supportable_platforms = ( 'posix', )
 
-    def __init__( self, context, version_data, provider_data ):
+    def __init__( self, version ):
+        super( ).__init__( version )
         # TODO: Assert viability of features + implementation + platform.
-        # TODO: Call super method.
-        self.context = context
-        self.provider_data = provider_data
-        self.version_data = version_data
         self.installation_location = self._derive_installation_location( )
-        # Would prefer below to be class attributes, but need to defer
-        # computation until after importation to ensure necessary dependencies
-        # are available.
-        from ...data import paths
-        from ...data import user_directories
-        self.pb_installation_location = (
-            user_directories.installations / 'python-build' )
-        self.pb_executable_location = (
-            self.pb_installation_location / 'bin/python-build' )
-        self.pb_repository_location = (
-            paths.caches.DEV.repositories / 'pyenv.tar.gz' )
 
     def install( self ):
         ''' Compiles and installs Python via ``python-build``. '''
@@ -78,7 +81,7 @@ class PythonBuild( __.LanguageProvider ):
         if directory.exists( ): return
         from ...base import execute_external
         execute_external(
-            ( self.pb_executable_location, pb_definition_name, directory ),
+            ( _data.pb_executable_location, pb_definition_name, directory ),
             env = subprocess_environment )
         # TODO: Post-installation activities, such as site customization
         #       for feature flags.
@@ -89,7 +92,7 @@ class PythonBuild( __.LanguageProvider ):
         pb_definition_name_base = self._calculate_pb_definition_name_base( )
         from ...base import execute_external
         pb_definition_names = execute_external(
-            ( self.pb_executable_location, '--definitions' ),
+            ( _data.pb_executable_location, '--definitions' ),
             capture_output = True ).stdout.strip( ).split( '\n' )
         pb_definition_name_candidates = [
             pb_definition_name for pb_definition_name in pb_definition_names
@@ -97,13 +100,13 @@ class PythonBuild( __.LanguageProvider ):
         if not pb_definition_name_candidates:
             # TODO: Log warning about no valid definitions matching base.
             #       Or, consider raising error.
-            return self.version_data
+            return self.version.definition
         pb_definition_name = pb_definition_name_candidates[ -1 ]
         implementation_version = _parse_implementation_version(
             pb_definition_name )
-        version_data = self.version_data.copy( )
-        version_data[ 'implementation-version' ] = implementation_version
-        return version_data
+        definition = self.version.definition.copy( )
+        definition[ 'implementation-version' ] = implementation_version
+        return definition
 
     @classmethod
     def is_supportable_base_version( class_, version ):
@@ -125,17 +128,15 @@ class PythonBuild( __.LanguageProvider ):
         return platform in class_.supportable_platforms
 
     def _derive_installation_location( self ):
-        version_data = self.version_data
+        version_definition = self.version.definition
         from platform import (
             machine as cpu_architecture, system as os_kernel_name )
-        feature_names = '+'.join(
-            __.normalize_feature_entry( self.context, entry )[ 'name' ]
-            for entry in version_data.get( 'features', ( ) ) )
+        feature_names = '+'.join( self.version.features.keys( ) )
         installation_name = '--'.join( filter( None, (
             "{implementation}-{base_version}".format(
-                implementation = version_data[ 'implementation' ],
-                base_version = version_data[ 'base-version' ] ),
-            version_data[ 'implementation-version' ],
+                implementation = version_definition[ 'implementation' ],
+                base_version = version_definition[ 'base-version' ] ),
+            version_definition[ 'implementation-version' ],
             feature_names,
             os_kernel_name( ).lower( ),
             cpu_architecture( ) ) ) )
@@ -144,12 +145,12 @@ class PythonBuild( __.LanguageProvider ):
             'python', 'python-build', installation_name )
 
     def _calculate_pb_definition_name( self ):
-        base_version = self.version_data[ 'base-version' ]
-        implementation_name = self.version_data[ 'implementation' ]
-        implementation_version = self.version_data[
-            'implementation-version' ]
+        version_definition = self.version.definition
+        base_version = version_definition[ 'base-version' ]
+        implementation_name = version_definition[ 'implementation' ]
+        implementation_version = version_definition[ 'implementation-version' ]
         if 'cpython' == implementation_name:
-            return self.version_data[ 'implementation-version' ]
+            return version_definition[ 'implementation-version' ]
         if implementation_name in ( 'pypy', ):
             return (
                 f"{implementation_name}{base_version}-"
@@ -157,38 +158,38 @@ class PythonBuild( __.LanguageProvider ):
         return f"{implementation_name}-{implementation_version}"
 
     def _calculate_pb_definition_name_base( self ):
-        base_version = self.version_data[ 'base-version' ]
-        implementation_name = self.version_data[ 'implementation' ]
+        version_definition = self.version.definition
+        base_version = version_definition[ 'base-version' ]
+        implementation_name = version_definition[ 'implementation' ]
         if 'cpython' == implementation_name: return base_version
         if implementation_name in ( 'pypy', ):
             return f"{implementation_name}{base_version}-"
-        implementation_version = self.version_data[
-            'implementation-version' ]
+        implementation_version = version_definition[ 'implementation-version' ]
         implementation_version_base = '.'.join(
             implementation_version.split( '.' )[ : -1 ] )
         return f"{implementation_name}-{implementation_version_base}"
 
     def _ensure_installer( self ):
         ''' Ensures that ``python-build`` is available for use. '''
-        repository_path = self.pb_repository_location
+        repository_path = _data.pb_repository_location
         from datetime import timedelta as TimeDelta
         from ...fs_utilities import is_older_than
         if repository_path.exists( ):
             # TODO: Configurable refresh time.
             if not is_older_than( repository_path, TimeDelta( days = 1 ) ):
                 # TODO: Test execute permissions by current user.
-                if self.pb_executable_location.exists( ): return
+                if _data.pb_executable_location.exists( ): return
         from ...scm_utilities import github_retrieve_tarball
         github_retrieve_tarball( 'pyenv/pyenv', 'master', repository_path )
         self._install_installer_archive( repository_path )
 
-    def _install_installer_archive( self, archive ):
+    def _install_installer_archive( self, archive ): # pylint: disable=no-self-use
         ''' Extracts and installs installer. '''
         from pathlib import Path
         from shutil import move, rmtree
         from tempfile import TemporaryDirectory
         from ...fs_utilities import extract_tarfile
-        installation_path = self.pb_installation_location
+        installation_path = _data.pb_installation_location
         installation_bin_path = installation_path / 'bin'
         installation_share_path = installation_path / 'share/python-build'
         def selector( member ):
@@ -208,9 +209,7 @@ class PythonBuild( __.LanguageProvider ):
         # TODO? Enforce permissions on shared data.
 
     def _modify_environment_from_features( self, environment ):
-        for entry in self.version_data.get( 'features', ( ) ):
-            data = __.normalize_feature_entry( self.context, entry )
-            name = data[ 'name' ]
+        for feature in self.version.features.keys( ):
             # TODO: Invoke relevant feature class and use it.
-            if 'tracerefs' == name:
+            if 'tracerefs' == feature.name:
                 environment[ 'PYTHON_CONFIGURE_OPTS' ] = '--with-trace-refs'
