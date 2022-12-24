@@ -31,30 +31,37 @@
     compact but it is not supported in the Python standard library. '''
 
 
-# TODO: Work directly with dictionary.
-#       Conversion to immutable namespace will happen on return from public
-#       interface.
-from types import SimpleNamespace as _SimpleNamespace
+# TODO: Reduce scope of this module. Allow other modules to calculate their own
+#       locations of interest on demand rather than maintain a central
+#       registry. I.e., this module should only contain the high-level skeleton
+#       and not be aware of domain-specific details.
+# TODO: Remove project/auxiliary dichotomy. Devshim should only care about the
+#       project's sources, tests, etc... and its own configuration and state.
+#       Should not need to be aware of its own sources from the project's
+#       context, especially as they may be an installed package rather than a
+#       submodule.
+
+
+from . import base as __
 
 
 def assemble( ):
     ''' Assembles project file system locations from configuration. '''
-    from .base import configuration
-    paths = _SimpleNamespace(
-        auxiliary = configuration[ 'auxiliary_path' ],
-        project = configuration[ 'project_path' ],
+    locations = __.SimpleNamespace(
+        auxiliary = __.configuration[ 'auxiliary_path' ],
+        project = __.configuration[ 'project_path' ],
     )
-    paths.local = paths.project / '.local'
-    paths.artifacts = _calculate_artifacts_paths( paths )
-    paths.caches = _calculate_caches_paths( paths )
-    paths.configuration = _calculate_configuration_paths( paths )
-    paths.environments = paths.local / 'environments'
-    paths.scm_modules = _calculate_scm_modules_paths( paths )
-    paths.state = paths.local / 'state'
-    paths.scripts = _calculate_scripts_paths( paths )
-    paths.sources = _calculate_sources_paths( paths )
-    paths.tests = _calculate_tests_paths( paths )
-    return _create_namespace_recursive( paths.__dict__ )
+    locations.local = locations.project / '.local'
+    locations.artifacts = _calculate_artifacts_locations( locations )
+    locations.caches = _calculate_caches_locations( locations )
+    locations.configuration = _calculate_configuration_locations( locations )
+    locations.environments = locations.local / 'environments'
+    locations.scm_modules = _calculate_scm_modules_locations( locations )
+    locations.state = _calculate_state_locations( locations )
+    locations.scripts = _calculate_scripts_locations( locations )
+    locations.sources = _calculate_sources_locations( locations )
+    locations.tests = _calculate_tests_locations( locations )
+    return _create_namespace_recursive( locations.__dict__ )
 
 
 def calculate_user_directories( ):
@@ -70,10 +77,10 @@ def calculate_user_directories( ):
     ) )
 
 
-def _calculate_artifacts_paths( paths ):
-    artifacts_path = paths.local / 'artifacts'
+def _calculate_artifacts_locations( locations ):
+    artifacts_path = locations.local / 'artifacts'
     html_path = artifacts_path / 'html'
-    return _SimpleNamespace(
+    return __.SimpleNamespace(
         SELF = artifacts_path,
         sdists = artifacts_path / 'sdists',
         sphinx_html = html_path / 'sphinx',
@@ -82,17 +89,17 @@ def _calculate_artifacts_paths( paths ):
     )
 
 
-def _calculate_caches_paths( paths ):
-    caches_path = paths.local / 'caches'
+def _calculate_caches_locations( locations ):
+    caches_path = locations.local / 'caches'
     packages_path = caches_path / 'packages'
-    return _SimpleNamespace(
+    return __.SimpleNamespace(
         SELF = caches_path,
-        DEV = _SimpleNamespace(
+        DEV = __.SimpleNamespace(
             repositories = caches_path / f"{__package__}/repositories",
         ),
         hypothesis = caches_path / 'hypothesis',
         # TODO: Move 'packages' under 'DEV'.
-        packages = _SimpleNamespace(
+        packages = __.SimpleNamespace(
             python3 = packages_path / 'python3',
         ),
         setuptools = caches_path / 'setuptools',
@@ -100,11 +107,11 @@ def _calculate_caches_paths( paths ):
     )
 
 
-def _calculate_configuration_paths( paths ):
-    configuration_path = paths.local / 'configuration'
-    return _SimpleNamespace(
+def _calculate_configuration_locations( locations ):
+    configuration_path = locations.local / 'configuration'
+    return __.SimpleNamespace(
         bumpversion = configuration_path / 'bumpversion.cfg',
-        devshim = _SimpleNamespace(
+        devshim = __.SimpleNamespace(
             python = configuration_path / 'devshim/python.toml',
         ),
         pre_commit = configuration_path / 'pre-commit.yaml',
@@ -113,52 +120,63 @@ def _calculate_configuration_paths( paths ):
         pypackages = configuration_path / 'pypackages.toml',
         # TODO: Move 'pypackages.fixtures.toml' to data path.
         pypackages_fixtures = configuration_path / 'pypackages.fixtures.toml',
-        pyproject = paths.project / 'pyproject.toml',
+        pyproject = locations.project / 'pyproject.toml',
     )
 
 
-def _calculate_scm_modules_paths( paths ):
-    return _SimpleNamespace(
-        aux = paths.auxiliary / 'scm-modules',
-        prj = paths.local / 'scm-modules',
+def _calculate_scm_modules_locations( locations ):
+    return __.SimpleNamespace(
+        aux = locations.auxiliary / 'scm-modules',
+        prj = locations.local / 'scm-modules',
     )
 
 
-def _calculate_scripts_paths( paths ):
-    auxiliary_path = paths.auxiliary / 'scripts'
-    project_path = paths.project / 'scripts'
-    return _SimpleNamespace(
-        aux = _SimpleNamespace(
+def _calculate_scripts_locations( locations ):
+    auxiliary_path = locations.auxiliary / 'scripts'
+    project_path = locations.project / 'scripts'
+    return __.SimpleNamespace(
+        aux = __.SimpleNamespace(
             python3 = auxiliary_path / 'python3',
         ),
-        prj = _SimpleNamespace(
+        prj = __.SimpleNamespace(
             python3 = project_path / 'python3',
         ),
     )
 
 
-def _calculate_sources_paths( paths ):
-    auxiliary_path = paths.auxiliary / 'sources'
-    project_path = paths.project / 'sources'
-    return _SimpleNamespace(
-        aux = _SimpleNamespace(
+def _calculate_sources_locations( locations ):
+    auxiliary_path = locations.auxiliary / 'sources'
+    project_path = locations.project / 'sources'
+    return __.SimpleNamespace(
+        aux = __.SimpleNamespace(
             python3 = auxiliary_path / 'python3',
         ),
-        prj = _SimpleNamespace(
+        prj = __.SimpleNamespace(
             python3 = project_path / 'python3',
             sphinx = project_path / 'sphinx',
         ),
     )
 
 
-def _calculate_tests_paths( paths ):
-    auxiliary_path = paths.auxiliary / 'tests'
-    project_path = paths.project / 'tests'
-    return _SimpleNamespace(
-        aux = _SimpleNamespace(
+def _calculate_state_locations( locations ):
+    location = locations.local / 'state'
+    my_location = location / __.__package__
+    return __.SimpleNamespace(
+        SELF = location,
+        DEV = __.SimpleNamespace(
+            SELF = my_location,
+        ),
+    )
+
+
+def _calculate_tests_locations( locations ):
+    auxiliary_path = locations.auxiliary / 'tests'
+    project_path = locations.project / 'tests'
+    return __.SimpleNamespace(
+        aux = __.SimpleNamespace(
             python3 = auxiliary_path / 'python3',
         ),
-        prj = _SimpleNamespace(
+        prj = __.SimpleNamespace(
             python3 = project_path / 'python3',
         ),
     )

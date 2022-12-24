@@ -22,20 +22,48 @@
 
 import typing as _typ
 
-from contextlib import contextmanager as _context_manager
+# pylint: disable=unused-import
+from contextlib import contextmanager as context_manager
+from functools import partial as partial_function
+from types import (
+    MappingProxyType as DictionaryProxy,
+    SimpleNamespace,
+)
+# pylint: enable=unused-import
 
 
-def produce_accretive_cacher( calculators_producer ):
-    ''' Produces object which computes values on demand and caches them.
+def module_introduce_accretive_cache( calculators_provider ):
+    ''' Produces module __getattr__ which computes and caches values.
 
-        The ``calculators_producer`` argument must return a dictionary of cache
+        The ``calculators_provider`` argument must return a dictionary of cache
         entry names with nullary invocables as the correspondent values. Each
         invocable is a calculator which produces a value to populate the cache.
         Any attribute name not in the dictionary results in an
         :py:exc:`AttributeError`. '''
-    from types import MappingProxyType as DictionaryProxy
     cache = { }
-    calculators = DictionaryProxy( calculators_producer( ) )
+    # TODO: Validate calculators provider.
+    calculators = DictionaryProxy( calculators_provider( ) )
+
+    def module_getattr( name ):
+        ''' Computes values on demand and caches them. '''
+        if name not in calculators: raise AttributeError
+        if name not in cache: cache[ name ] = calculators[ name ]( )
+        return cache[ name ]
+
+    return module_getattr
+
+
+def produce_accretive_cacher( calculators_provider ):
+    ''' Produces object which computes computes and caches values.
+
+        The ``calculators_provider`` argument must return a dictionary of cache
+        entry names with nullary invocables as the correspondent values. Each
+        invocable is a calculator which produces a value to populate the cache.
+        Any attribute name not in the dictionary results in an
+        :py:exc:`AttributeError`. '''
+    cache = { }
+    # TODO: Validate calculators provider.
+    calculators = DictionaryProxy( calculators_provider( ) )
 
     # TODO: Class immutability.
     class AccretiveCacher:
@@ -53,7 +81,7 @@ def produce_accretive_cacher( calculators_producer ):
     return AccretiveCacher( )
 
 
-@_context_manager
+@context_manager
 def springy_chdir( new_path ):
     ''' Changes directory, restoring original directory on context exit. '''
     from os import chdir, getcwd
@@ -104,7 +132,6 @@ def _select_narrative_functions( ):
     from pprint import pprint
     from sys import stderr
     if stderr is not narration_target: return print, pprint
-    from functools import partial as partial_function
     return (
         partial_function( print, file = stderr ),
         partial_function( pprint, stream = stderr ),
@@ -188,7 +215,6 @@ def _configure( ):
     from pathlib import Path
     auxiliary_path = Path( __file__ ).parent.parent.parent.parent.resolve( )
     from os import environ as current_process_environment
-    from types import MappingProxyType as DictionaryProxy
     configuration_ = DictionaryProxy( dict(
         auxiliary_path = auxiliary_path,
         project_path = Path( current_process_environment.get(

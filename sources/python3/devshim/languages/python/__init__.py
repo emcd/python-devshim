@@ -128,8 +128,13 @@ def update_version( version, install = True ):
             __.scribe.exception(
                 f"Could not update {version} by {provider.name}." )
             continue
+        # TODO: Split language configuration and data.
+        #       Data file indexed by version name.
+        #       Has current provider and implementation version.
+        # TODO: Use interface of version object for updates.
         if version.definition != definition:
             _update_version_data( version.name, definition )
+            version.definition = definition
             break
     if install: install_version( version.name ) # Ensure installation.
 

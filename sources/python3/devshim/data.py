@@ -23,39 +23,24 @@
 
 import typing as _typ
 
+from . import base as __
 
-# Note: Currently, this is to prevent Mypy from crashing and to avoid having to
-#       add this module to Pylint's 'ignored-modules' list.
+
+# Note: Need to explicitly declare __getattr__-synthesized module attributes
+#       to avoid issues with MyPy and Pylint.
 paths: _typ.Any
 project_name: str
 user_directories: _typ.Any
 
 
-def _produce_calculator_names_table( ):
-    ''' Produces immutable table of data entries to calculators. '''
-    from types import MappingProxyType as DictionaryProxy
-    return DictionaryProxy( dict(
-        paths            = '.locations.assemble',
-        project_name     = '.project.discover_name',
-        user_directories = '.locations.calculate_user_directories',
-    ) )
-
-_calculator_names = _produce_calculator_names_table( )
-
-
-# TODO? Python 3.9: Replace with 'functools.cache'.
-def _produce_accretive_getattr( ):
-    ''' Produces module __getattr__ which caches computed values. '''
-    cache = { }
-
-    def module_getattr( name ):
-        ''' Returns requested data entry, calculating it if necessary. '''
-        if name not in _calculator_names: raise AttributeError
-        if name not in cache:
-            cache[ name ] = _invoke( _calculator_names[ name ] )
-        return cache[ name ]
-
-    return module_getattr
+def _provide_calculators( ):
+    return dict(
+        paths = __.partial_function( _invoke, '.locations.assemble' ),
+        project_name = __.partial_function(
+            _invoke, '.project.discover_name' ),
+        user_directories = __.partial_function(
+            _invoke, '.locations.calculate_user_directories' )
+    )
 
 
 def _invoke( name ):
@@ -67,4 +52,4 @@ def _invoke( name ):
     return getattr( module, invocable_name )( )
 
 
-__getattr__ = _produce_accretive_getattr( )
+__getattr__ = __.module_introduce_accretive_cache( _provide_calculators )
