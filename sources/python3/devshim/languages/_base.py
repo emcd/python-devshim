@@ -21,8 +21,15 @@
 ''' Utilities for management of language installations. '''
 
 
+# pylint: disable=unused-import
 from abc import ABCMeta as ABCFactory, abstractmethod as abstract_function
-from types import MappingProxyType as DictionaryProxy
+from types import (
+    MappingProxyType as DictionaryProxy,
+    SimpleNamespace,
+)
+# pylint: enable=unused-import
+
+from .. import base as __
 
 
 # TODO: Class immutability.
@@ -34,6 +41,7 @@ class LanguageVersion( metaclass = ABCFactory ):
         self.language = language
         self.name = name
         self.definition = self._summon_definition( )
+        self.record = self._summon_record( )
         self.features = self._instantiate_features( )
         self.providers = self._instantiate_providers( )
 
@@ -60,6 +68,20 @@ class LanguageVersion( metaclass = ABCFactory ):
         # TODO: Use exception factory.
         raise NotImplementedError
 
+    @classmethod
+    @abstract_function
+    def summon_records( class_ ):
+        ''' Summons records for language versions. '''
+        # TODO: Use exception factory.
+        raise NotImplementedError
+
+    @classmethod
+    @abstract_function
+    def survey_provider_support( class_, definition ):
+        ''' Surveys all providers which support language version. '''
+        # TODO: Use exception factory.
+        raise NotImplementedError
+
     def _instantiate_features( self ):
         features = { }
         for name in self.definition.get( 'features', ( ) ):
@@ -74,6 +96,9 @@ class LanguageVersion( metaclass = ABCFactory ):
 
     def _summon_definition( self ):
         return DictionaryProxy( self.summon_definitions( )[ self.name ] )
+
+    def _summon_record( self ):
+        return DictionaryProxy( self.summon_records( )[ self.name ] )
 
 
 # TODO: Class immutability.
@@ -120,18 +145,27 @@ class LanguageFeature( metaclass = ABCFactory ):
 class LanguageProvider( metaclass = ABCFactory ):
     ''' Abstract base for language version providers. '''
 
-    # TODO: Validate argument.
-    def __init__( self, version ): self.version = version
+    @classmethod
+    def check_version_support( class_, definition ):
+        ''' Does provider support version? '''
+        feature_names = definition.get( 'features', ( ) )
+        #if not class_.is_supportable_platform( ): continue
+        if not class_.is_supportable_base_version(
+            definition[ 'base-version' ]
+        ): return False
+        if not class_.is_supportable_implementation(
+            definition[ 'implementation' ]
+        ): return False
+        if not all(
+            class_.is_supportable_feature( feature_name )
+            for feature_name in feature_names
+        ): return False
+        return True
 
+    @classmethod
     @abstract_function
-    def install( self ):
-        ''' Installs version of language. '''
-        # TODO: Use exception factory.
-        raise NotImplementedError
-
-    @abstract_function
-    def attempt_version_data_update( self ):
-        ''' Attempts to update version data for version of language. '''
+    def discover_current_version( class_, definition ):
+        ''' Discovers latest implementation version for base version. '''
         # TODO: Use exception factory.
         raise NotImplementedError
 
@@ -162,3 +196,34 @@ class LanguageProvider( metaclass = ABCFactory ):
         ''' Does provider support platform? '''
         # TODO: Use exception factory.
         raise NotImplementedError
+
+    # TODO: Validate argument.
+    def __init__( self, version ): self.version = version
+
+    @abstract_function
+    def install( self ):
+        ''' Installs version of language. '''
+        # TODO: Use exception factory.
+        raise NotImplementedError
+
+    @abstract_function
+    def attempt_version_data_update( self ):
+        ''' Attempts to update version data for version of language. '''
+        # TODO: Use exception factory.
+        raise NotImplementedError
+
+
+def _calculate_locations( ):
+    from ..data import locations
+    return __.create_immutable_namespace( dict(
+        configuration = locations.configuration.DEV.SELF / 'languages',
+        state = locations.state.DEV.SELF / 'languages',
+    ) )
+
+
+def _produce_calculators( ):
+    return dict(
+        locations = _calculate_locations,
+    )
+
+data = __.produce_accretive_cacher( _produce_calculators )

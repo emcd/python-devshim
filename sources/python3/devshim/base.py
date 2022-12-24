@@ -32,6 +32,25 @@ from types import (
 # pylint: enable=unused-import
 
 
+def create_immutable_namespace( source ):
+    ''' Creates immutable namespace from dictionary or simple namespace. '''
+    from collections.abc import Mapping as AbstractDictionary
+    from inspect import isfunction as is_function
+    # TODO: Validate source.
+    if isinstance( source, SimpleNamespace ): source = source.__dict__
+    namespace = { }
+    for name, value in source.items( ):
+        # TODO: Assert valid Python public identifiers.
+        if is_function( value ):
+            namespace[ name ] = staticmethod( value )
+        elif isinstance( value, ( AbstractDictionary, SimpleNamespace, ) ):
+            namespace[ name ] = create_immutable_namespace( value )
+        else: namespace[ name ] = value
+    namespace[ '__slots__' ] = ( )
+    class_ = type( 'Namespace', ( ), namespace )
+    return class_( )
+
+
 def module_introduce_accretive_cache( calculators_provider ):
     ''' Produces module __getattr__ which computes and caches values.
 

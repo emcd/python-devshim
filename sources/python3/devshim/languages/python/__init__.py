@@ -78,76 +78,23 @@ def survey_versions( by_availability = False ):
     from .version import LanguageVersion
     select_versions = { }
     for name, definition in definitions.items( ):
-        select_providers = _survey_provider_support( LanguageVersion( name ) )
-        if not select_providers: continue
+        supports = LanguageVersion.survey_provider_support( definition )
+        if not supports: continue
         select_versions[ name ] = definition.copy( )
-        select_versions[ name ][ 'providers' ] = select_providers
+        select_versions[ name ][ 'providers' ] = tuple(
+            record[ 'provider' ] for record in supports )
     return select_versions
-
-
-def _survey_provider_support( version ):
-    ''' Returns valid providers for Python version declaration. '''
-    feature_names = tuple( version.features.keys( ) )
-    select_providers = [ ]
-    for provider_name, provider in version.providers.items( ):
-        if not provider.is_supportable_platform( ): continue
-        if not provider.is_supportable_base_version(
-            version.definition[ 'base-version' ]
-        ): continue
-        if not provider.is_supportable_implementation(
-            version.definition[ 'implementation' ]
-        ): continue
-        if feature_names and not all(
-            provider.is_supportable_feature( feature_name )
-            for feature_name in feature_names
-        ): continue
-        select_providers.append( provider_name )
-    return select_providers
 
 
 def install_version( version ):
     ''' Installs requested version of Python, if declaration exists. '''
     from .version import LanguageVersion
     version = LanguageVersion( version )
-    for provider in version.providers.values( ):
-        try: provider.install( )
-        except Exception: # pylint: disable=broad-except
-            __.scribe.exception(
-                f"Could not install {version} by {provider.name}." )
-            continue
-        break
+    version.install( )
 
 
 def update_version( version, install = True ):
     ''' Updates requested version of Python, if declaration exists. '''
     from .version import LanguageVersion
     version = LanguageVersion( version )
-    for provider in version.providers.values( ):
-        try: definition = provider.attempt_version_data_update( )
-        except Exception: # pylint: disable=broad-except
-            __.scribe.exception(
-                f"Could not update {version} by {provider.name}." )
-            continue
-        # TODO: Split language configuration and data.
-        #       Data file indexed by version name.
-        #       Has current provider and implementation version.
-        # TODO: Use interface of version object for updates.
-        if version.definition != definition:
-            _update_version_data( version.name, definition )
-            version.definition = definition
-            break
-    if install: install_version( version.name ) # Ensure installation.
-
-
-def _update_version_data( version, data ):
-    from ...data import paths
-    from ...packages import ensure_import_package
-    tomllib = ensure_import_package( 'tomllib' )
-    tomli_w = ensure_import_package( 'tomli-w' )
-    with paths.configuration.devshim.python.open( 'rb' ) as file:
-        document = tomllib.load( file )
-    # Repoen to truncate file and reset I/O cursor.
-    with paths.configuration.devshim.python.open( 'wb' ) as file:
-        # TODO: Check format version and dispatch accordingly.
-        document[ 'versions' ][ version ] = data
-        tomli_w.dump( document, file )
+    version.update( install = install )

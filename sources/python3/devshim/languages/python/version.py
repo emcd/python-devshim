@@ -30,18 +30,94 @@ class LanguageVersion( __.LanguageVersion ):
     def __init__( self, name ): super( ).__init__( 'Python', name )
 
     @classmethod
-    def summon_definitions( class_ ): return __.data.version_definitions
-
-    @classmethod
     def provide_feature_class( class_, name ):
         # TODO: Implement.
         raise NotImplementedError
 
     @classmethod
     def provide_provider_class( class_, name ):
-        # TODO: Cache table of provider classes.
-        # TODO: Automatically detect provider classes.
-        from .python_build import PythonBuild
-        providers = {
-            provider.name: provider for provider in ( PythonBuild, ) }
-        return providers[ name ]
+        return __.data.provider_classes[ name ]
+
+    @classmethod
+    def summon_definitions( class_ ): return __.data.version_definitions
+
+    @classmethod
+    def summon_records( class_ ):
+        from ...packages import ensure_import_package
+        tomllib = ensure_import_package( 'tomllib' )
+        records_location = __.data.locations.version_records
+        if not records_location.exists( ): class_._create_records( )
+        # TODO: Check format version and dispatch accordingly.
+        with __.data.locations.version_records.open( 'rb' ) as file:
+            return tomllib.load( file )[ 'versions' ]
+
+    @classmethod
+    def _create_records( class_ ):
+        document = { 'format-version': 1, 'versions': { } }
+        for name, definition in __.data.version_definitions.items( ):
+            # TODO: Sort records by version descending.
+            record = next( iter( class_.survey_provider_support(
+                definition ) ) )
+            document[ 'versions' ][ name ] = record
+        _commit_version_records( document )
+        return class_
+
+    @classmethod
+    def survey_provider_support( class_, definition ):
+        supports = [ ]
+        for provider_class in __.data.provider_classes.values( ):
+            if not provider_class.check_version_support( definition ): continue
+            supports.append( {
+                'implementation-version':
+                    provider_class.discover_current_version( definition ),
+                'provider': provider_class.name,
+            } )
+        return supports
+
+    def install( self ):
+        ''' Installs version with provider of record. '''
+        provider = self.providers[ self.record[ 'provider' ] ]
+        provider.install( )
+
+    def update( self, install = True ):
+        ''' Attempts to update version with most relevant provider. '''
+        implementation_version = tuple( map(
+            int, self.record[ 'implementation-version' ].split( '.' ) ) )
+        for provider in self.providers.values( ):
+            current_implementation_version = tuple( map(
+                int,
+                provider.discover_current_version(
+                    self.definition ).split( '.' )
+            ) )
+            if current_implementation_version <= implementation_version:
+                continue
+            try: record = provider.attempt_version_data_update( )
+            except Exception: # pylint: disable=broad-except
+                __.scribe.exception(
+                    f"Could not update {self.name} by {provider.name}." )
+                continue
+            if self.record != record:
+                self.record = record
+                self._update( )
+                break
+        if install: self.install( ) # Ensure installation.
+        return self
+
+    def _update( self ):
+        from ...packages import ensure_import_package
+        tomllib = ensure_import_package( 'tomllib' )
+        # TODO: Check format version and dispatch accordingly.
+        with __.data.locations.version_records.open( 'rb' ) as file:
+            document = tomllib.load( file )
+        document[ 'versions' ][ self.name ] = self.record
+        _commit_version_records( document )
+
+
+def _commit_version_records( document ):
+    from ...packages import ensure_import_package
+    tomli_w = ensure_import_package( 'tomli-w' )
+    records_location = __.data.locations.version_records
+    records_location.parent.mkdir( exist_ok = True, parents = True )
+    with records_location.open( 'wb' ) as file:
+        # TODO: Write comment header to warn about machine-generated code.
+        tomli_w.dump( document, file )

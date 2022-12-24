@@ -61,7 +61,7 @@ def assemble( ):
     locations.scripts = _calculate_scripts_locations( locations )
     locations.sources = _calculate_sources_locations( locations )
     locations.tests = _calculate_tests_locations( locations )
-    return _create_namespace_recursive( locations.__dict__ )
+    return __.create_immutable_namespace( locations )
 
 
 def calculate_user_directories( ):
@@ -70,7 +70,7 @@ def calculate_user_directories( ):
     from platformdirs import user_cache_path, user_data_path
     from .data import project_name
     data_path = user_data_path( appname = project_name )
-    return _create_namespace_recursive( dict(
+    return __.create_immutable_namespace( dict(
         caches = user_cache_path( appname = project_name ),
         data = data_path,
         installations = data_path / 'installations',
@@ -108,18 +108,24 @@ def _calculate_caches_locations( locations ):
 
 
 def _calculate_configuration_locations( locations ):
-    configuration_path = locations.local / 'configuration'
+    location = locations.local / 'configuration'
+    my_location = location / __.__package__
     return __.SimpleNamespace(
-        bumpversion = configuration_path / 'bumpversion.cfg',
-        devshim = __.SimpleNamespace(
-            python = configuration_path / 'devshim/python.toml',
+        SELF = location,
+        DEV = __.SimpleNamespace(
+            SELF = my_location,
         ),
-        pre_commit = configuration_path / 'pre-commit.yaml',
+        bumpversion = location / 'bumpversion.cfg',
+        # TODO: Remove. Use 'DEV' entry instead.
+        devshim = __.SimpleNamespace(
+            python = location / 'devshim/python.toml',
+        ),
+        pre_commit = location / 'pre-commit.yaml',
         # TODO? Move 'pypackages.toml' to Devshim config path.
         #       Or move into 'pyproject.toml'.
-        pypackages = configuration_path / 'pypackages.toml',
-        # TODO: Move 'pypackages.fixtures.toml' to data path.
-        pypackages_fixtures = configuration_path / 'pypackages.fixtures.toml',
+        pypackages = location / 'pypackages.toml',
+        # TODO: Move 'pypackages.fixtures.toml' to state path.
+        pypackages_fixtures = location / 'pypackages.fixtures.toml',
         pyproject = locations.project / 'pyproject.toml',
     )
 
@@ -180,23 +186,3 @@ def _calculate_tests_locations( locations ):
             python3 = project_path / 'python3',
         ),
     )
-
-
-def _create_namespace_recursive( dictionary ):
-    from collections.abc import Mapping as AbstractDictionary
-    from inspect import isfunction as is_function
-    from types import SimpleNamespace
-    namespace = { }
-    for name, value in dictionary.items( ):
-        # TODO: Filter for valid Python identifiers.
-        # TODO: Filter for public names.
-        if is_function( value ):
-            namespace[ name ] = staticmethod( value )
-        elif isinstance( value, AbstractDictionary ):
-            namespace[ name ] = _create_namespace_recursive( value )
-        elif isinstance( value, SimpleNamespace ):
-            namespace[ name ] = _create_namespace_recursive( value.__dict__ )
-        else: namespace[ name ] = value
-    namespace[ '__slots__' ] = ( )
-    class_ = type( 'Namespace', ( ), namespace )
-    return class_( )

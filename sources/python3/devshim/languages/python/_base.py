@@ -25,22 +25,16 @@
 import re
 
 from collections.abc import Mapping as AbstractDictionary
-from types import MappingProxyType as DictionaryProxy
+from types import (
+    MappingProxyType as DictionaryProxy,
+    SimpleNamespace,
+)
 
-from ...base import produce_accretive_cacher, scribe
+from ...base import (
+    create_immutable_namespace, produce_accretive_cacher, scribe, )
 from ...exceptions import provide_exception_factory
 # pylint: enable=unused-import
 from .. import _base as __
-
-
-def _summon_version_definitions( ):
-    from ...data import paths
-    from ...packages import ensure_import_package
-    tomllib = ensure_import_package( 'tomllib' )
-    with paths.configuration.devshim.python.open( 'rb' ) as file:
-        document = tomllib.load( file )
-    # TODO: Check format version and dispatch accordingly.
-    return DictionaryProxy( document.get( 'versions', { } ) )
 
 
 LanguageFeature = __.LanguageFeature
@@ -48,9 +42,38 @@ LanguageProvider = __.LanguageProvider
 LanguageVersion = __.LanguageVersion
 
 
+def _calculate_locations( ):
+    return create_immutable_namespace( dict(
+        # TODO? Use 'importlib-resources' to access default data.
+        version_definitions = __.data.locations.configuration / 'python.toml',
+        version_records = __.data.locations.state / 'python.toml',
+    ) )
+
+
+def _discover_provider_classes( ):
+    # TODO: Cache table of provider classes.
+    # TODO: Automatically detect provider classes.
+    from .python_build import PythonBuild # pylint: disable=cyclic-import
+    return DictionaryProxy( {
+        'python-build': PythonBuild,
+    } )
+
+
+def _summon_version_definitions( ):
+    from ...packages import ensure_import_package
+    tomllib = ensure_import_package( 'tomllib' )
+    with data.locations.version_definitions.open( 'rb' ) as file:
+        document = tomllib.load( file )
+    # TODO: Check format version and dispatch accordingly.
+    return DictionaryProxy( document.get( 'versions', { } ) )
+
+
 def _produce_calculators( ):
     return dict(
+        locations = _calculate_locations,
+        provider_classes = _discover_provider_classes,
         version_definitions = _summon_version_definitions,
     )
 
+# TODO: Hoist into separate data module.
 data = produce_accretive_cacher( _produce_calculators )

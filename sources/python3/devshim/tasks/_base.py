@@ -34,6 +34,8 @@ from ..environments import derive_venv_variables
 from ..project import discover_version as discover_project_version
 # pylint: enable=unused-import
 
+from .. import base as __
+
 
 def project_execute_external(
     command_specification, venv_specification = None, **nomargs
@@ -159,18 +161,9 @@ def invoke_task( task_, *posargs, **nomargs ):
 
 
 def _invoke_task_invocable( invocable, posargs, nomargs ):
-    from invoke import Exit
-    allowable_exceptions = _calculate_allowable_exceptions( ) # TODO? Cache.
+    from subprocess import CalledProcessError as SubprocessFailure # nosec B404
     try: invocable( *posargs, **nomargs )
-    except allowable_exceptions: raise # pylint: disable=catching-non-exception,try-except-raise
-    except SystemExit as exc: raise Exit( code = exc.code ) from exc
-    except BaseException as exc:
+    except SubprocessFailure as exc:
         excc = type( exc )
-        raise Exit( message = f"{excc}: {exc}" ) from exc
-
-
-def _calculate_allowable_exceptions( ):
-    import invoke.exceptions
-    return tuple(
-        attribute for attribute in vars( invoke.exceptions ).values( )
-        if isinstance( attribute, BaseException ) )
+        __.scribe.error( f"{excc.__module__}.{excc.__qualname__}: {exc}" )
+        raise SystemExit( exc.returncode ) from exc
