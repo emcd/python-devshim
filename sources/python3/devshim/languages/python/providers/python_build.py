@@ -21,7 +21,7 @@
 ''' Management of Python installations via :command:`python-build`. '''
 
 
-from .. import _base as __
+from .. import base as __
 
 
 class PythonBuild( __.LanguageProvider ):

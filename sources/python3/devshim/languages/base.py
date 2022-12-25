@@ -27,9 +27,12 @@ from types import (
     MappingProxyType as DictionaryProxy,
     SimpleNamespace,
 )
-# pylint: enable=unused-import
 
-from .. import base as __
+from ..base import (
+    create_immutable_namespace,
+    module_introduce_accretive_cache,
+)
+# pylint: enable=unused-import
 
 
 # TODO: Class immutability.
@@ -211,19 +214,3 @@ class LanguageProvider( metaclass = ABCFactory ):
         ''' Attempts to update version data for version of language. '''
         # TODO: Use exception factory.
         raise NotImplementedError
-
-
-def _calculate_locations( ):
-    from ..data import locations
-    return __.create_immutable_namespace( dict(
-        configuration = locations.configuration.DEV.SELF / 'languages',
-        state = locations.state.DEV.SELF / 'languages',
-    ) )
-
-
-def _produce_calculators( ):
-    return dict(
-        locations = _calculate_locations,
-    )
-
-data = __.produce_accretive_cacher( _produce_calculators )

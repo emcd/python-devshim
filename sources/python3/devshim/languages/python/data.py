@@ -18,64 +18,56 @@
 #============================================================================#
 
 
-''' Utilties for management of Python language installations. '''
+''' Latent immutable values for Python language support. '''
 
 
-# pylint: disable=unused-import
-import re
+import typing as _typ
 
-from collections.abc import Mapping as AbstractDictionary
-from types import (
-    MappingProxyType as DictionaryProxy,
-    SimpleNamespace,
-)
-
-from ...base import (
-    create_immutable_namespace, produce_accretive_cacher, scribe, )
-from ...exceptions import provide_exception_factory
-# pylint: enable=unused-import
-from .. import _base as __
+from . import base as __
 
 
-LanguageFeature = __.LanguageFeature
-LanguageProvider = __.LanguageProvider
-LanguageVersion = __.LanguageVersion
+# Note: Need to explicitly declare __getattr__-synthesized module attributes
+#       to avoid issues with MyPy and Pylint.
+locations: _typ.Any
+provider_classes: _typ.Any
+version_definitions: _typ.Any
 
 
 def _calculate_locations( ):
-    return create_immutable_namespace( dict(
+    from ..data import locations as language_locations
+    return __.create_immutable_namespace( dict(
         # TODO? Use 'importlib-resources' to access default data.
-        version_definitions = __.data.locations.configuration / 'python.toml',
-        version_records = __.data.locations.state / 'python.toml',
+        version_definitions = language_locations.configuration / 'python.toml',
+        version_records = language_locations.state / 'python.toml',
     ) )
 
 
 def _discover_provider_classes( ):
     from inspect import isclass as is_class
-    from . import providers # pylint: disable=cyclic-import
-    provider_classes = { }
+    from ..base import LanguageProvider
+    from . import providers
+    classes = { }
     for object_ in vars( providers ).values( ):
         if not is_class( object_ ): continue
         if not issubclass( object_, LanguageProvider ): continue
-        provider_classes[ object_.name ] = object_
-    return DictionaryProxy( provider_classes )
+        classes[ object_.name ] = object_
+    return __.DictionaryProxy( classes )
 
 
 def _summon_version_definitions( ):
     from ...packages import ensure_import_package
     tomllib = ensure_import_package( 'tomllib' )
-    with data.locations.version_definitions.open( 'rb' ) as file:
+    with __getattr__( 'locations' ).version_definitions.open( 'rb' ) as file:
         document = tomllib.load( file )
     # TODO: Check format version and dispatch accordingly.
-    return DictionaryProxy( document.get( 'versions', { } ) )
+    return __.DictionaryProxy( document.get( 'versions', { } ) )
 
 
-def _produce_calculators( ):
+def _provide_calculators( ):
     return dict(
         locations = _calculate_locations,
         provider_classes = _discover_provider_classes,
         version_definitions = _summon_version_definitions,
     )
 
-# TODO: Hoist into separate data module.
-data = produce_accretive_cacher( _produce_calculators )
+__getattr__ = __.module_introduce_accretive_cache( _provide_calculators )

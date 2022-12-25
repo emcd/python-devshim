@@ -21,7 +21,7 @@
 ''' Management of Python language installations. '''
 
 
-from . import _base as __
+from . import providers
 
 
 def detect_default_version( ):
@@ -41,6 +41,7 @@ def infer_executable_location( version = None ):
 
 def infer_installation_location( version = None ):
     ''' Infers location of Python installation by version. '''
+    from ...base import scribe
     versions = survey_versions( )
     if None is version: version = next( iter( versions ) )
     from .version import LanguageVersion
@@ -48,7 +49,7 @@ def infer_installation_location( version = None ):
     for provider in version.providers.values( ):
         location = provider.installation_location
         if not location.exists( ):
-            __.scribe.debug(
+            scribe.debug(
                 f"Could not locate installation of {version} "
                 f"by {provider.name}." )
             continue
@@ -67,7 +68,7 @@ def validate_version( version ):
 
 def survey_versions( by_availability = False ):
     ''' Returns Python versions which have valid declarations. '''
-    definitions = __.data.version_definitions
+    from .data import version_definitions as definitions
     from os import environ as current_process_environment
     selector = current_process_environment.get( 'DEVSHIM_PYTHON_VERSION' )
     if selector:

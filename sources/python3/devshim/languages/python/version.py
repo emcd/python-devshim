@@ -21,7 +21,7 @@
 ''' Python versions to install. '''
 
 
-from . import _base as __
+from . import base as __
 
 
 class LanguageVersion( __.LanguageVersion ):
@@ -36,25 +36,30 @@ class LanguageVersion( __.LanguageVersion ):
 
     @classmethod
     def provide_provider_class( class_, name ):
-        return __.data.provider_classes[ name ]
+        from .data import provider_classes
+        return provider_classes[ name ]
 
     @classmethod
-    def summon_definitions( class_ ): return __.data.version_definitions
+    def summon_definitions( class_ ):
+        from .data import version_definitions
+        return version_definitions
 
     @classmethod
     def summon_records( class_ ):
         from ...packages import ensure_import_package
         tomllib = ensure_import_package( 'tomllib' )
-        records_location = __.data.locations.version_records
+        from .data import locations
+        records_location = locations.version_records
         if not records_location.exists( ): class_._create_records( )
         # TODO: Check format version and dispatch accordingly.
-        with __.data.locations.version_records.open( 'rb' ) as file:
+        with records_location.open( 'rb' ) as file:
             return tomllib.load( file )[ 'versions' ]
 
     @classmethod
     def _create_records( class_ ):
+        from .data import version_definitions
         document = { 'format-version': 1, 'versions': { } }
-        for name, definition in __.data.version_definitions.items( ):
+        for name, definition in version_definitions.items( ):
             # TODO: Sort records by version descending.
             record = next( iter( class_.survey_provider_support(
                 definition ) ) )
@@ -64,8 +69,9 @@ class LanguageVersion( __.LanguageVersion ):
 
     @classmethod
     def survey_provider_support( class_, definition ):
+        from .data import provider_classes
         supports = [ ]
-        for provider_class in __.data.provider_classes.values( ):
+        for provider_class in provider_classes.values( ):
             if not provider_class.check_version_support( definition ): continue
             supports.append( {
                 'implementation-version':
@@ -81,6 +87,7 @@ class LanguageVersion( __.LanguageVersion ):
 
     def update( self, install = True ):
         ''' Attempts to update version with most relevant provider. '''
+        from ...base import scribe
         implementation_version = tuple( map(
             int, self.record[ 'implementation-version' ].split( '.' ) ) )
         for provider in self.providers.values( ):
@@ -93,7 +100,7 @@ class LanguageVersion( __.LanguageVersion ):
                 continue
             try: record = provider.attempt_version_data_update( )
             except Exception: # pylint: disable=broad-except
-                __.scribe.exception(
+                scribe.exception(
                     f"Could not update {self.name} by {provider.name}." )
                 continue
             if self.record != record:
@@ -107,7 +114,8 @@ class LanguageVersion( __.LanguageVersion ):
         from ...packages import ensure_import_package
         tomllib = ensure_import_package( 'tomllib' )
         # TODO: Check format version and dispatch accordingly.
-        with __.data.locations.version_records.open( 'rb' ) as file:
+        from .data import locations
+        with locations.version_records.open( 'rb' ) as file:
             document = tomllib.load( file )
         document[ 'versions' ][ self.name ] = self.record
         _commit_version_records( document )
@@ -116,7 +124,8 @@ class LanguageVersion( __.LanguageVersion ):
 def _commit_version_records( document ):
     from ...packages import ensure_import_package
     tomli_w = ensure_import_package( 'tomli-w' )
-    records_location = __.data.locations.version_records
+    from .data import locations
+    records_location = locations.version_records
     records_location.parent.mkdir( exist_ok = True, parents = True )
     with records_location.open( 'wb' ) as file:
         # TODO: Write comment header to warn about machine-generated code.
