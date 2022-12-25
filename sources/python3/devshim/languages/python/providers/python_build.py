@@ -18,10 +18,10 @@
 #============================================================================#
 
 
-''' Management of Python language installations with 'python-build'. '''
+''' Management of Python installations via :command:`python-build`. '''
 
 
-from . import _base as __
+from .. import _base as __
 
 
 class PythonBuild( __.LanguageProvider ):
@@ -49,7 +49,7 @@ class PythonBuild( __.LanguageProvider ):
         directory = self.installation_location
         # TODO: Allow 'clean' flag to override.
         if directory.exists( ): return
-        from ...base import execute_external
+        from ....base import execute_external
         execute_external(
             ( _data.pb_executable_location, pb_definition_name, directory ),
             env = subprocess_environment )
@@ -71,7 +71,7 @@ class PythonBuild( __.LanguageProvider ):
         _ensure_installer( )
         pb_definition_name_base = class_._calculate_pb_definition_name_base(
             definition )
-        from ...base import execute_external
+        from ....base import execute_external
         pb_definition_names = execute_external(
             ( _data.pb_executable_location, '--definitions' ),
             capture_output = True ).stdout.strip( ).split( '\n' )
@@ -117,7 +117,7 @@ class PythonBuild( __.LanguageProvider ):
             feature_names,
             os_kernel_name( ).lower( ),
             cpu_architecture( ) ) ) )
-        from ...data import user_directories
+        from ....data import user_directories
         return user_directories.installations.joinpath(
             'python', 'python-build', installation_name )
 
@@ -154,13 +154,13 @@ def _ensure_installer( ):
     ''' Ensures that ``python-build`` is available for use. '''
     repository_path = _data.pb_repository_location
     from datetime import timedelta as TimeDelta
-    from ...fs_utilities import is_older_than
+    from ....fs_utilities import is_older_than
     if repository_path.exists( ):
         # TODO: Configurable refresh time.
         if not is_older_than( repository_path, TimeDelta( days = 1 ) ):
             # TODO: Test execute permissions by current user.
             if _data.pb_executable_location.exists( ): return
-    from ...scm_utilities import github_retrieve_tarball
+    from ....scm_utilities import github_retrieve_tarball
     github_retrieve_tarball( 'pyenv/pyenv', 'master', repository_path )
     _install_installer_archive( repository_path )
 
@@ -169,7 +169,7 @@ def _install_installer_archive( archive ):
     from pathlib import Path
     from shutil import move, rmtree
     from tempfile import TemporaryDirectory
-    from ...fs_utilities import extract_tarfile
+    from ....fs_utilities import extract_tarfile
     installation_path = _data.pb_installation_location
     installation_bin_path = installation_path / 'bin'
     installation_share_path = installation_path / 'share/python-build'
@@ -205,10 +205,10 @@ def _parse_implementation_version( pb_definition_name ):
 
 def _produce_calculators( ):
     def calculate_pbil( ):
-        from ...data import user_directories
+        from ....data import user_directories
         return user_directories.installations / 'python-build'
     def calculate_pbrl( ):
-        from ...data import paths
+        from ....data import paths
         return paths.caches.DEV.repositories / 'pyenv.tar.gz'
     return dict(
         pb_installation_location = calculate_pbil,

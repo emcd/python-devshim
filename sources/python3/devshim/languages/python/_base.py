@@ -51,12 +51,14 @@ def _calculate_locations( ):
 
 
 def _discover_provider_classes( ):
-    # TODO: Cache table of provider classes.
-    # TODO: Automatically detect provider classes.
-    from .python_build import PythonBuild # pylint: disable=cyclic-import
-    return DictionaryProxy( {
-        'python-build': PythonBuild,
-    } )
+    from inspect import isclass as is_class
+    from . import providers # pylint: disable=cyclic-import
+    provider_classes = { }
+    for object_ in vars( providers ).values( ):
+        if not is_class( object_ ): continue
+        if not issubclass( object_, LanguageProvider ): continue
+        provider_classes[ object_.name ] = object_
+    return DictionaryProxy( provider_classes )
 
 
 def _summon_version_definitions( ):
