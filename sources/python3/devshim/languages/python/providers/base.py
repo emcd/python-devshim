@@ -18,8 +18,25 @@
 #============================================================================#
 
 
-''' Installation providers for the Python language. '''
+''' Utilities for the Python language providers. '''
 
 
-from .base import register_class, reveal_class_registry
-from .python_build import PythonBuild
+# pylint: disable=unused-import
+import re
+
+from ....base import (
+    create_registrar as _create_registrar,
+    produce_accretive_cacher,
+)
+from ...base import LanguageProvider
+# pylint: enable=unused-import
+
+
+def _validate_class( class_ ):
+    from inspect import isclass as is_class
+    if not is_class( class_ ) or not issubclass( class_, LanguageProvider ):
+        # TODO: Use exception factory.
+        raise ValueError
+    return class_
+
+register_class, reveal_class_registry = _create_registrar( _validate_class )

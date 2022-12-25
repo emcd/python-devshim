@@ -42,18 +42,6 @@ def _calculate_locations( ):
     ) )
 
 
-def _discover_provider_classes( ):
-    from inspect import isclass as is_class
-    from ..base import LanguageProvider
-    from . import providers
-    classes = { }
-    for object_ in vars( providers ).values( ):
-        if not is_class( object_ ): continue
-        if not issubclass( object_, LanguageProvider ): continue
-        classes[ object_.name ] = object_
-    return __.DictionaryProxy( classes )
-
-
 def _summon_version_definitions( ):
     from ...packages import ensure_import_package
     tomllib = ensure_import_package( 'tomllib' )
@@ -64,9 +52,10 @@ def _summon_version_definitions( ):
 
 
 def _provide_calculators( ):
+    from .providers import reveal_class_registry as reveal_provider_classes
     return dict(
         locations = _calculate_locations,
-        provider_classes = _discover_provider_classes,
+        provider_classes = reveal_provider_classes,
         version_definitions = _summon_version_definitions,
     )
 

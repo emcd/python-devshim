@@ -51,6 +51,26 @@ def create_immutable_namespace( source ):
     return class_( )
 
 
+def create_registrar( validator ):
+    ''' Creates registar for functionality extensions. '''
+    registry = { }
+
+    def register( object_ ):
+        ''' Registers object. '''
+        object_ = validator( object_ )
+        name = object_.name
+        if name in registry:
+            # TODO: Properly handle error case.
+            raise ValueError
+        registry[ name ] = object_
+
+    def reveal_registry( ):
+        ''' Returns immutable view upon registry. '''
+        return DictionaryProxy( registry )
+
+    return register, reveal_registry
+
+
 def module_introduce_accretive_cache( calculators_provider ):
     ''' Produces module __getattr__ which computes and caches values.
 

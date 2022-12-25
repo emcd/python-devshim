@@ -22,6 +22,7 @@
 
 
 from . import providers
+from .version import LanguageVersion
 
 
 def detect_default_version( ):
@@ -44,7 +45,6 @@ def infer_installation_location( version = None ):
     from ...base import scribe
     versions = survey_versions( )
     if None is version: version = next( iter( versions ) )
-    from .version import LanguageVersion
     version = LanguageVersion( version )
     for provider in version.providers.values( ):
         location = provider.installation_location
@@ -76,7 +76,6 @@ def survey_versions( by_availability = False ):
         # TODO: Raise error on unmatched version.
         except KeyError: return { }
     if not by_availability: return definitions
-    from .version import LanguageVersion
     select_versions = { }
     for name, definition in definitions.items( ):
         supports = LanguageVersion.survey_provider_support( definition )
@@ -89,13 +88,11 @@ def survey_versions( by_availability = False ):
 
 def install_version( version ):
     ''' Installs requested version of Python, if declaration exists. '''
-    from .version import LanguageVersion
     version = LanguageVersion( version )
     version.install( )
 
 
 def update_version( version, install = True ):
     ''' Updates requested version of Python, if declaration exists. '''
-    from .version import LanguageVersion
     version = LanguageVersion( version )
     version.update( install = install )

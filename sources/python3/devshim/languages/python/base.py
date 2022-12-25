@@ -22,8 +22,6 @@
 
 
 # pylint: disable=unused-import
-import re
-
 from collections.abc import Mapping as AbstractDictionary
 from types import (
     MappingProxyType as DictionaryProxy,
@@ -33,9 +31,8 @@ from types import (
 from ...base import (
     create_immutable_namespace,
     module_introduce_accretive_cache,
-    produce_accretive_cacher,
     scribe,
 )
 from ...exceptions import provide_exception_factory
-from ..base import LanguageFeature, LanguageProvider, LanguageVersion
+from ..base import LanguageFeature, LanguageVersion
 # pylint: enable=unused-import

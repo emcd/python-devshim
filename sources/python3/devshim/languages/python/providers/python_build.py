@@ -21,7 +21,7 @@
 ''' Management of Python installations via :command:`python-build`. '''
 
 
-from .. import base as __
+from . import base as __
 
 
 class PythonBuild( __.LanguageProvider ):
@@ -148,6 +148,8 @@ class PythonBuild( __.LanguageProvider ):
             # TODO: Invoke relevant feature class and use it.
             if 'tracerefs' == feature.name:
                 environment[ 'PYTHON_CONFIGURE_OPTS' ] = '--with-trace-refs'
+
+__.register_class( PythonBuild )
 
 
 def _ensure_installer( ):

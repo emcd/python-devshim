@@ -28,6 +28,7 @@ from . import (
     base,
     data,
     environments,
+    exceptions,
     file_utilities,
     fs_utilities,
     languages,
