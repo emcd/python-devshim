@@ -29,7 +29,6 @@ from . import base as __
 # Note: Need to explicitly declare __getattr__-synthesized module attributes
 #       to avoid issues with MyPy and Pylint.
 locations: _typ.Any
-provider_classes: _typ.Any
 version_definitions: _typ.Any
 
 
@@ -52,10 +51,8 @@ def _summon_version_definitions( ):
 
 
 def _provide_calculators( ):
-    from .providers import reveal_class_registry as reveal_provider_classes
     return dict(
         locations = _calculate_locations,
-        provider_classes = reveal_provider_classes,
         version_definitions = _summon_version_definitions,
     )
 

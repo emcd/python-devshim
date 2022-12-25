@@ -176,6 +176,9 @@ def check_security_issues( version = None ):
     ''' Checks for security issues in installed Python packages.
 
         This task requires Internet access and may take some time. '''
+    from ..languages.python import probe_version_feature_labels
+    # Ruamel binary package requires standard ABI.
+    if probe_version_feature_labels( version, 'abi-incompatible' ): return
     __.project_execute_external(
         f"safety check", venv_specification = dict( version = version ) )
 
@@ -257,6 +260,9 @@ def freshen( ):
 )
 def lint_bandit( version = None ):
     ''' Security checks the source code with Bandit. '''
+    from ..languages.python import probe_version_feature_labels
+    # Cyaml binary package requires standard ABI.
+    if probe_version_feature_labels( version, 'abi-incompatible' ): return
     files = _lint_targets_default
     files_str = ' '.join( map( str, files ) )
     __.project_execute_external(
@@ -275,6 +281,9 @@ def lint_bandit( version = None ):
 )
 def lint_mypy( packages, modules, files, version = None ):
     ''' Lints the source code with Mypy. '''
+    from ..languages.python import probe_version_feature_labels
+    # Mypy binary package requires standard ABI.
+    if probe_version_feature_labels( version, 'abi-incompatible' ): return
     process_environment = __.derive_venv_variables( version = version )
     # TODO: Check executable in decorator.
     from ..environments import test_package_executable
@@ -324,6 +333,9 @@ def lint_pylint( targets, checks, report = False, version = None ):
 )
 def lint_semgrep( version = None ):
     ''' Lints the source code with Semgrep. '''
+    from ..languages.python import probe_version_feature_labels
+    # Ruamel binary package requires standard ABI.
+    if probe_version_feature_labels( version, 'abi-incompatible' ): return
     process_environment = __.derive_venv_variables( version = version )
     # TODO: Check executable in decorator.
     from ..environments import test_package_executable
@@ -377,6 +389,9 @@ def test( ensure_sanity = True, version = None ):
     if ensure_sanity: __.invoke_task( lint, version = version )
     from ..user_interface import render_boxed_title
     render_boxed_title( 'Test: Unit + Code Coverage', supplement = version )
+    from ..languages.python import probe_version_feature_labels
+    # Cyaml binary package requires standard ABI.
+    if probe_version_feature_labels( version, 'abi-incompatible' ): return
     process_environment = __.derive_venv_variables( version = version )
     process_environment.update( dict(
         HYPOTHESIS_STORAGE_DIRECTORY = __.paths.caches.hypothesis,

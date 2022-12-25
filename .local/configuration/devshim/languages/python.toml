@@ -30,12 +30,12 @@ implementation = 'cpython'
 providers = [ 'python-build', ]
 title = 'Python 3.11'
 
-#[versions.'cpython-3.8--tracerefs']
-#base-version = '3.8'
-#features = [ 'tracerefs', ]
-#implementation = 'cpython'
-#providers = [ 'python-build', ]
-#title = 'Python 3.8 +TRACEREFS'
+[versions.'cpython-3.8--tracerefs']
+base-version = '3.8'
+features = [ 'tracerefs', ]
+implementation = 'cpython'
+providers = [ 'python-build', ]
+title = 'Python 3.8 +TRACEREFS'
 
 [versions.'pypy-3.7']
 base-version = '3.7'
