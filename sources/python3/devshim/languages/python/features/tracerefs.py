@@ -18,8 +18,40 @@
 #============================================================================#
 
 
-''' Providers for the Python language. '''
+''' Management of special compilation option for reference tracing. '''
 
 
-from .base import register_class, reveal_class_registry
-from .python_build import PythonBuild
+from . import base as __
+
+
+supportable_implementations = ( 'cpython', )
+
+
+class TraceRefs( __.LanguageFeature ):
+    ''' Special compilation option to internally augment Python.
+
+        .. warning:: Incompatible with standard Python binary wheels.
+
+        For CPython, enables compilation with the 'TRACEREFS' macro. '''
+
+    name = 'tracerefs'
+
+    @classmethod
+    def is_supportable_base_version( class_, version ): return True
+
+    @classmethod
+    def is_supportable_implementation( class_, implementation ):
+        return implementation in supportable_implementations
+
+    @classmethod
+    def is_supportable_platform( class_, platform = None ): return True
+
+    def modify_installation( self, installation_location ): return self
+
+    def modify_provider_environment( self, environment ):
+        index = 'PYTHON_CONFIGURE_OPTS'
+        environment[ index ] = ' '.join( filter( None,
+            ( environment.get( index, '' ), '--with-trace-refs', ) ) )
+        return self
+
+__.register_class( TraceRefs )

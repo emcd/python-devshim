@@ -18,7 +18,7 @@
 #============================================================================#
 
 
-''' Management of Python installations via :command:`python-build`. '''
+''' Management of Python versions via :command:`python-build`. '''
 
 
 from . import base as __
@@ -33,37 +33,6 @@ class PythonBuild( __.LanguageProvider ):
     )
     supportable_implementations = ( 'cpython', 'pypy', )
     supportable_platforms = ( 'posix', )
-
-    def __init__( self, version ):
-        super( ).__init__( version )
-        # TODO: Assert viability of features + implementation + platform.
-        self.installation_location = self._derive_installation_location( )
-
-    def install( self ):
-        ''' Compiles and installs Python via ``python-build``. '''
-        _ensure_installer( )
-        pb_definition_name = self._calculate_pb_definition_name( )
-        from os import environ as current_process_environment
-        subprocess_environment = current_process_environment.copy( )
-        self._modify_environment_from_features( subprocess_environment )
-        directory = self.installation_location
-        # TODO: Allow 'clean' flag to override.
-        if directory.exists( ): return
-        from ....base import execute_external
-        execute_external(
-            ( _data.pb_executable_location, pb_definition_name, directory ),
-            env = subprocess_environment )
-        # TODO: Post-installation activities, such as site customization
-        #       for feature flags.
-
-    def attempt_version_data_update( self ):
-        ''' Detects new Python version and returns version data update. '''
-        implementation_version = self.discover_current_version(
-            self.version.definition )
-        return {
-            'implementation-version': implementation_version,
-            'provider': self.name,
-        }
 
     @classmethod
     def discover_current_version( class_, definition ):
@@ -102,6 +71,28 @@ class PythonBuild( __.LanguageProvider ):
             import os
             platform = os.name
         return platform in class_.supportable_platforms
+
+    def __init__( self, version ):
+        super( ).__init__( version )
+        # TODO: Assert viability of features + implementation + platform.
+        self.installation_location = self._derive_installation_location( )
+
+    def install( self ):
+        ''' Compiles and installs Python via ``python-build``. '''
+        _ensure_installer( )
+        pb_definition_name = self._calculate_pb_definition_name( )
+        from os import environ as current_process_environment
+        subprocess_environment = current_process_environment.copy( )
+        self._modify_environment_from_features( subprocess_environment )
+        directory = self.installation_location
+        # TODO: Allow 'clean' flag to override.
+        if directory.exists( ): return self
+        from ....base import execute_external
+        execute_external(
+            ( _data.pb_executable_location, pb_definition_name, directory ),
+            env = subprocess_environment )
+        self._execute_post_installation_activities( )
+        return self
 
     def _derive_installation_location( self ):
         version_definition = self.version.definition
@@ -144,10 +135,13 @@ class PythonBuild( __.LanguageProvider ):
         return f"{implementation_name}-"
 
     def _modify_environment_from_features( self, environment ):
-        for feature in self.version.features.keys( ):
-            # TODO: Invoke relevant feature class and use it.
-            if 'tracerefs' == feature.name:
-                environment[ 'PYTHON_CONFIGURE_OPTS' ] = '--with-trace-refs'
+        for feature in self.version.features.values( ):
+            feature.modify_provider_environment( environment )
+
+    def _execute_post_installation_activities( self ):
+        # Per-feature activities, such as site customization.
+        for feature in self.version.features.values( ):
+            feature.modify_installation( self.installation_location )
 
 __.register_class( PythonBuild )
 

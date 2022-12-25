@@ -108,20 +108,6 @@ class LanguageVersion( metaclass = ABCFactory ):
 class LanguageFeature( metaclass = ABCFactory ):
     ''' Abstract base for language installation features. '''
 
-    def __init__( self, version ): self.version = version
-
-    @abstract_function
-    def modify_installation( self, installation_location ):
-        ''' Modifies language version installation. '''
-        # TODO: Use exception factory.
-        raise NotImplementedError
-
-    @abstract_function
-    def modify_provider_environment( self, environment ):
-        ''' Modifies language version provider environment. '''
-        # TODO: Use exception factory.
-        raise NotImplementedError
-
     @classmethod
     @abstract_function
     def is_supportable_base_version( class_, version ):
@@ -143,14 +129,33 @@ class LanguageFeature( metaclass = ABCFactory ):
         # TODO: Use exception factory.
         raise NotImplementedError
 
+    def __init__( self, version ): self.version = version
+
+    @abstract_function
+    def modify_installation( self, installation_location ):
+        ''' Modifies language version installation. '''
+        # TODO: Use exception factory.
+        raise NotImplementedError
+
+    @abstract_function
+    def modify_provider_environment( self, environment ):
+        ''' Modifies language version provider environment. '''
+        # TODO: Use exception factory.
+        raise NotImplementedError
+
 
 # TODO: Class immutability.
 class LanguageProvider( metaclass = ABCFactory ):
     ''' Abstract base for language version providers. '''
 
+    name: str
+
     @classmethod
-    def check_version_support( class_, definition ):
+    def check_version_support( class_, version ):
         ''' Does provider support version? '''
+        if isinstance( version, LanguageVersion ):
+            definition = version.definition
+        else: definition = version
         feature_names = definition.get( 'features', ( ) )
         #if not class_.is_supportable_platform( ): continue
         if not class_.is_supportable_base_version(
@@ -171,6 +176,18 @@ class LanguageProvider( metaclass = ABCFactory ):
         ''' Discovers latest implementation version for base version. '''
         # TODO: Use exception factory.
         raise NotImplementedError
+
+    @classmethod
+    def generate_current_version_record( class_, version ):
+        ''' Detects latest Python version and returns version record. '''
+        if isinstance( version, LanguageVersion ):
+            definition = version.definition
+        else: definition = version
+        return {
+            'implementation-version':
+                class_.discover_current_version( definition ),
+            'provider': class_.name,
+        }
 
     @classmethod
     @abstract_function
@@ -206,11 +223,5 @@ class LanguageProvider( metaclass = ABCFactory ):
     @abstract_function
     def install( self ):
         ''' Installs version of language. '''
-        # TODO: Use exception factory.
-        raise NotImplementedError
-
-    @abstract_function
-    def attempt_version_data_update( self ):
-        ''' Attempts to update version data for version of language. '''
         # TODO: Use exception factory.
         raise NotImplementedError

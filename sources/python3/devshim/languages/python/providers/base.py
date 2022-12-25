@@ -18,7 +18,7 @@
 #============================================================================#
 
 
-''' Utilities for the Python language providers. '''
+''' Utilities for Python language providers. '''
 
 
 # pylint: disable=unused-import

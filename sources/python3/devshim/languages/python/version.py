@@ -98,7 +98,7 @@ class LanguageVersion( __.LanguageVersion ):
             ) )
             if current_implementation_version <= implementation_version:
                 continue
-            try: record = provider.attempt_version_data_update( )
+            try: record = provider.generate_current_version_record( self )
             except Exception: # pylint: disable=broad-except
                 scribe.exception(
                     f"Could not update {self.name} by {provider.name}." )
