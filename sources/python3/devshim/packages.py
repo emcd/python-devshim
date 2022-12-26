@@ -29,7 +29,7 @@
 from re import compile as _regex_compile
 from types import MappingProxyType as _DictionaryProxy
 
-from .base import expire as _expire
+from . import base as __
 
 
 def install_python_packages( process_environment, identifier = None ):
@@ -117,7 +117,7 @@ def ensure_python_packages( domain = '*', excludes = ( ) ):
         indicate_python_packages( )[ 0 ], domains )
     from collections.abc import Sequence as AbstractSequence
     if not isinstance( excludes, AbstractSequence ):
-        _expire(
+        __.expire(
             'invalid state',
             f"Python package exclusions not a sequence: {excludes!r}" )
     requirements = tuple(
@@ -167,7 +167,7 @@ def _validate_pypackages_format_version( specifications ):
     ''' Validates 'pypackages.toml' file format version and returns it. '''
     version = specifications.get( 'format-version', 1 )
     if 1 != version:
-        _expire(
+        __.expire(
             'invalid data',
             f"Invalid Python packages manifest format version: {version!r}" )
     return version
@@ -180,7 +180,7 @@ def _extract_python_package_requirement( specification ):
     if isinstance( specification, Dictionary ):
         # TODO: Validate that requirement entry exists.
         return specification[ 'requirement' ]
-    _expire(
+    __.expire(
         'invalid state',
         "Invalid package specification type {class_!r}.".format(
             class_ = type( specification ) ) )
@@ -207,7 +207,7 @@ def _canonicalize_pypackages_domain( domain ):
         for domain_ in domain:
             domains.update( _canonicalize_pypackages_domain( domain_ ) )
         return domains
-    _expire( 'invalid state', f"Invalid domain: {domain!r}" )
+    __.expire( 'invalid state', f"Invalid domain: {domain!r}" )
 
 
 def indicate_python_packages( identifier = None ):
@@ -360,13 +360,13 @@ def calculate_python_packages_fixtures( environment ):
         if requirement.url: fixture.update( dict( url = requirement.url, ) )
         else:
             package_version = next( iter( requirement.specifier ) ).version
+            try:
+                digests = aggregate_pypi_release_digests(
+                    requirement.name, package_version )
+            except: continue # pylint: disable=bare-except
             fixture.update( dict(
                 version = package_version,
-                digests = tuple( map(
-                    lambda s: f"sha256:{s}",
-                    aggregate_pypi_release_digests(
-                        requirement.name, package_version )
-                ) )
+                digests = tuple( map( lambda s: f"sha256:{s}", digests ) )
             ) )
         fixtures.append( fixture )
     return fixtures
@@ -418,23 +418,29 @@ def aggregate_pypi_release_digests( name, version, index_url = '' ):
     return digests
 
 
-def retrieve_pypi_release_information( name, version, index_url = '' ): # pylint: disable=inconsistent-return-statements
+def retrieve_pypi_release_information( name, version, index_url = '' ): # pylint: disable=inconsistent-return-statements,too-many-locals
     ''' Retrieves information about specific release on PyPI. '''
     index_url = index_url or 'https://pypi.org'
+    from http import HTTPStatus as HttpStatus
     from json import load
     from time import sleep
-    from urllib.error import URLError as UrlError
+    from urllib.error import HTTPError as HttpError, URLError as UrlError
     from urllib.request import Request as HttpRequest, urlopen as access_url
     # https://warehouse.pypa.io/api-reference/json.html#release
-    request = HttpRequest(
-        f"{index_url}/pypi/{name}/json",
-        headers = { 'Accept': 'application/json', } )
+    url = f"{index_url}/pypi/{name}/json"
+    request = HttpRequest( url, headers = { 'Accept': 'application/json', } )
     attempts_count_max = 2
     for attempts_count in range( attempts_count_max + 1 ):
         try:
             with access_url( request ) as http_reader: # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected
                 return load( http_reader )[ 'releases' ][ version ]
-        except ( KeyError, UrlError, ):
+        except KeyError:
+            __.scribe.error( f"No version {version!r} of package {name!r}." )
+            raise
+        except UrlError as exc:
+            __.scribe.error( f"Failed to retrieve data from {url!r}." )
+            if isinstance( exc, HttpError ):
+                if HttpStatus.NOT_FOUND.value == exc.code: raise
             if attempts_count_max == attempts_count: raise
             sleep( 2 ** attempts_count )
 

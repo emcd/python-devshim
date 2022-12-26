@@ -62,7 +62,9 @@ year-of-origin = 2021
 
 [tool.bandit]
 exclude_dirs = [ 'tests' ]
+# TODO: Reenable skips.
 skips = [
+  'B112', # try_except_continue
   'B310', # urllib_urlopen
 ]
 

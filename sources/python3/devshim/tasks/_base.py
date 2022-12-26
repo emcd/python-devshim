@@ -28,7 +28,7 @@ from abc import (
 
 from invoke import Collection as TaskCollection, call
 
-from ..base import execute_external
+from ..base import execute_external, scribe
 from ..data import paths, project_name
 from ..environments import derive_venv_variables
 from ..project import discover_version as discover_project_version

@@ -93,10 +93,20 @@ def is_executable_in_venv( name, venv_path = None, version = None ):
     from os import F_OK, R_OK, X_OK, access as test_fs_access
     from pathlib import Path
     venv_path = Path( venv_path or derive_venv_path( version = version ) )
+    if not venv_path.exists( ): return False
     for path in ( venv_path / 'bin' ).iterdir( ):
         if name != path.name: continue
         if test_fs_access( path, F_OK | R_OK | X_OK ): return True
     return False
+
+
+def generate_venv_executable_location(
+    name, venv_path = None, version = None
+):
+    ''' Generates expected location of executable in virtual environment. '''
+    from pathlib import Path
+    venv_path = Path( venv_path or derive_venv_path( version = version ) )
+    return venv_path / 'bin' / name
 
 
 def venv_execute_external(
