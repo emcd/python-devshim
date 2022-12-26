@@ -138,6 +138,17 @@ def clean_tool_caches( include_development_support = False ):
 )
 def clean_python_packages( version = None ):
     ''' Removes unused Python packages. '''
+    from ..environments import (
+        build_python_venv as build_python_venv_,
+        is_executable_in_venv,
+    )
+    if not is_executable_in_venv( 'pip', version = version ):
+        __.scribe.error(
+            f"Detected corrupt virtual environment for Python {version!r}." )
+        __.scribe.info(
+            f"Rebuilding virtual environment for Python {version!r}." )
+        build_python_venv_( version, overwrite = True )
+        return
     process_environment = __.derive_venv_variables( version = version )
     from ..platforms import pep508_identify_python
     identifier = pep508_identify_python( version = version )
@@ -204,6 +215,16 @@ def freshen_python( version = None, install = True ):
 )
 def freshen_python_packages( version = None ):
     ''' Updates declared Python packages in Python virtual environment. '''
+    from ..environments import (
+        build_python_venv as build_python_venv_,
+        is_executable_in_venv,
+    )
+    if not is_executable_in_venv( 'pip', version = version ):
+        __.scribe.error(
+            f"Detected corrupt virtual environment for Python {version!r}." )
+        __.scribe.info(
+            f"Rebuilding virtual environment for Python {version!r}." )
+        build_python_venv_( version, overwrite = True )
     process_environment = __.derive_venv_variables( version = version )
     from ..platforms import pep508_identify_python
     identifier = pep508_identify_python( version = version )
