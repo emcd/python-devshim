@@ -35,9 +35,13 @@ class TraceRefs( __.LanguageFeature ):
         For CPython, enables compilation with the 'TRACEREFS' macro. '''
 
     name = 'tracerefs'
+    labels = frozenset( ( 'abi-incompatible', 'requires-compilation', ) )
+    mutex_labels = frozenset( ( 'modifies-interpreter', ) )
 
     @classmethod
-    def is_supportable_base_version( class_, version ): return True
+    def is_supportable_base_version( class_, version ):
+        # CPython: 'sys.getobjects' not available until version 3.8.
+        return ( 3, 8 ) <= tuple( map( int, version.split( '.' ) ) )
 
     @classmethod
     def is_supportable_implementation( class_, implementation ):

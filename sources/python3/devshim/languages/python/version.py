@@ -30,14 +30,25 @@ class LanguageVersion( __.LanguageVersion ):
     def __init__( self, name ): super( ).__init__( 'Python', name )
 
     @classmethod
+    def create_record( class_, name ):
+        document = _summon_version_records( )
+        from .data import version_definitions
+        definition = version_definitions[ name ]
+        # TODO: Sort records by version descending.
+        record = next( iter( class_.survey_provider_support( definition ) ) )
+        document[ 'versions' ][ name ] = record
+        _commit_version_records( document )
+        return record
+
+    @classmethod
     def provide_feature_class( class_, name ):
-        # TODO: Implement.
-        raise NotImplementedError
+        from .features import reveal_class_registry
+        return reveal_class_registry( )[ name ]
 
     @classmethod
     def provide_provider_class( class_, name ):
-        from .data import provider_classes
-        return provider_classes[ name ]
+        from .providers import reveal_class_registry
+        return reveal_class_registry( )[ name ]
 
     @classmethod
     def summon_definitions( class_ ):
@@ -46,14 +57,9 @@ class LanguageVersion( __.LanguageVersion ):
 
     @classmethod
     def summon_records( class_ ):
-        from ...packages import ensure_import_package
-        tomllib = ensure_import_package( 'tomllib' )
         from .data import locations
-        records_location = locations.version_records
-        if not records_location.exists( ): class_._create_records( )
-        # TODO: Check format version and dispatch accordingly.
-        with records_location.open( 'rb' ) as file:
-            return tomllib.load( file )[ 'versions' ]
+        if not locations.version_records.exists( ): class_._create_records( )
+        return _summon_version_records( )[ 'versions' ]
 
     @classmethod
     def _create_records( class_ ):
@@ -69,9 +75,9 @@ class LanguageVersion( __.LanguageVersion ):
 
     @classmethod
     def survey_provider_support( class_, definition ):
-        from .data import provider_classes
+        from .providers import reveal_class_registry
         supports = [ ]
-        for provider_class in provider_classes.values( ):
+        for provider_class in reveal_class_registry( ).values( ):
             if not provider_class.check_version_support( definition ): continue
             supports.append( {
                 'implementation-version':
@@ -111,12 +117,7 @@ class LanguageVersion( __.LanguageVersion ):
         return self
 
     def _update( self ):
-        from ...packages import ensure_import_package
-        tomllib = ensure_import_package( 'tomllib' )
-        # TODO: Check format version and dispatch accordingly.
-        from .data import locations
-        with locations.version_records.open( 'rb' ) as file:
-            document = tomllib.load( file )
+        document = _summon_version_records( )
         document[ 'versions' ][ self.name ] = self.record
         _commit_version_records( document )
 
@@ -130,3 +131,12 @@ def _commit_version_records( document ):
     with records_location.open( 'wb' ) as file:
         # TODO: Write comment header to warn about machine-generated code.
         tomli_w.dump( document, file )
+
+
+def _summon_version_records( ):
+    from ...packages import ensure_import_package
+    tomllib = ensure_import_package( 'tomllib' )
+    from .data import locations
+    with locations.version_records.open( 'rb' ) as file:
+        # TODO: Check format version and update records format, if necessary.
+        return tomllib.load( file )

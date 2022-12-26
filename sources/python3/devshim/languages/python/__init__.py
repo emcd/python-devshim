@@ -58,6 +58,15 @@ def infer_installation_location( version = None ):
     raise LookupError
 
 
+def probe_version_feature_labels( version, labels ):
+    ''' Tests if any features of version have labels. '''
+    version = LanguageVersion( version )
+    if isinstance( labels, str ): labels = ( labels, )
+    from itertools import chain
+    return frozenset( labels ) & frozenset( chain.from_iterable(
+        feature.labels for feature in version.features.values( ) ) )
+
+
 def validate_version( version ):
     ''' Validates version against available Python versions. '''
     if version not in survey_versions( ):

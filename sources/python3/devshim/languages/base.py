@@ -21,6 +21,8 @@
 ''' Utilities for management of language installations. '''
 
 
+import typing as _typ
+
 # pylint: disable=unused-import
 from abc import ABCMeta as ABCFactory, abstractmethod as abstract_function
 from types import (
@@ -49,6 +51,13 @@ class LanguageVersion( metaclass = ABCFactory ):
         self.providers = self._instantiate_providers( )
 
     def __str__( self ): return f"{self.language} {self.name}"
+
+    @classmethod
+    @abstract_function
+    def create_record( class_, name ):
+        ''' Creates record for language version. '''
+        # TODO: Use exception factory.
+        raise NotImplementedError
 
     @classmethod
     @abstract_function
@@ -87,8 +96,15 @@ class LanguageVersion( metaclass = ABCFactory ):
 
     def _instantiate_features( self ):
         features = { }
+        mutex_labels = frozenset( )
         for name in self.definition.get( 'features', ( ) ):
-            features[ name ] = self.provide_feature_class( name )( self )
+            feature = self.provide_feature_class( name )( self )
+            features[ name ] = feature
+            # Sanity check for mutually-exclusive features.
+            if mutex_labels & feature.mutex_labels:
+                # TODO: Use exception factory.
+                raise ValueError
+            mutex_labels = mutex_labels | frozenset( feature.mutex_labels )
         return DictionaryProxy( features )
 
     def _instantiate_providers( self ):
@@ -101,12 +117,20 @@ class LanguageVersion( metaclass = ABCFactory ):
         return DictionaryProxy( self.summon_definitions( )[ self.name ] )
 
     def _summon_record( self ):
-        return DictionaryProxy( self.summon_records( )[ self.name ] )
+        name = self.name
+        records = self.summon_records( )
+        if name not in records: record = self.create_record( name )
+        else: record = records[ name ]
+        return DictionaryProxy( record )
 
 
 # TODO: Class immutability.
 class LanguageFeature( metaclass = ABCFactory ):
     ''' Abstract base for language installation features. '''
+
+    name: str
+    labels: _typ.FrozenSet[ str ]
+    mutex_labels: _typ.FrozenSet[ str ]
 
     @classmethod
     @abstract_function
