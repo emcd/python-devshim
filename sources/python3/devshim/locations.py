@@ -54,6 +54,7 @@ def assemble( ):
     locations.local = locations.project / '.local'
     locations.artifacts = _calculate_artifacts_locations( locations )
     locations.caches = _calculate_caches_locations( locations )
+    locations.data = _calculate_data_locations( locations )
     locations.configuration = _calculate_configuration_locations( locations )
     locations.environments = locations.local / 'environments'
     locations.scm_modules = _calculate_scm_modules_locations( locations )
@@ -127,6 +128,17 @@ def _calculate_configuration_locations( locations ):
         # TODO: Move 'pypackages.fixtures.toml' to state path.
         pypackages_fixtures = location / 'pypackages.fixtures.toml',
         pyproject = locations.project / 'pyproject.toml',
+    )
+
+
+def _calculate_data_locations( locations ):
+    location = locations.local / 'data'
+    my_location = location / __.__package__
+    return __.SimpleNamespace(
+        SELF = location,
+        DEV = __.SimpleNamespace(
+            SELF = my_location,
+        ),
     )
 
 

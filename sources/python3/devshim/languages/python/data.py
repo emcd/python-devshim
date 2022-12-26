@@ -37,7 +37,7 @@ def _calculate_locations( ):
     return __.create_immutable_namespace( dict(
         # TODO? Use 'importlib-resources' to access default data.
         version_definitions = language_locations.configuration / 'python.toml',
-        version_records = language_locations.state / 'python.toml',
+        version_records = language_locations.data / 'python.toml',
     ) )
 
 

@@ -56,7 +56,7 @@ def calculate_python_abi_extras( ):
     python_abi_extras = [ ]
     if 'cpython' == implementation_name:
         if hasattr( _sys, 'getobjects' ):
-            python_abi_extras.append( 'trace_refs' )
+            python_abi_extras.append( 'tracerefs' )
     elif 'pypy' == implementation_name:
         python_abi_extras.append(
             format_version( _sys.pypy_version_info, 2 ) ) # pylint: disable=no-member

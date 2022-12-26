@@ -23,6 +23,9 @@ Fixes and Minor Improvements
   :py:mod:`lockup`. Similarly to reparent classes to an immutability-enforcing
   class factory class.
 
+* Add task control argument to support warning/skipping tasks which do not meet
+  certain criteria, such as an installation not supporting them.
+
 Remove Dependency on System ``pip``
 ===============================================================================
 

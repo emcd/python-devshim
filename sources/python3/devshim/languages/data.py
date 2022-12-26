@@ -35,7 +35,7 @@ def _calculate_locations( ):
     from ..data import locations as base_locations
     return __.create_immutable_namespace( dict(
         configuration = base_locations.configuration.DEV.SELF / 'languages',
-        state = base_locations.state.DEV.SELF / 'languages',
+        data = base_locations.data.DEV.SELF / 'languages',
     ) )
 
 
