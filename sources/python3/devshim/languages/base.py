@@ -95,9 +95,10 @@ class Language( metaclass = ABCFactory ):
         if None is not version:
             if version in definitions:
                 definitions = { version: definitions[ version ] }
-            raise create_data_validation_error(
-                f"No version {version!r} in definitions "
-                f"for language {class_.title}." )
+            else:
+                raise create_data_validation_error(
+                    f"No version {version!r} in definitions "
+                    f"for language {class_.title}." )
         versions = { }
         for version, definition in definitions.items( ): # pylint: disable=unused-variable
             # TODO: Consider explicit platform constraints.
