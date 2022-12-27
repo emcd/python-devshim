@@ -25,10 +25,7 @@ import typing as _typ
 
 # pylint: disable=unused-import
 from abc import ABCMeta as ABCFactory, abstractmethod as abstract
-from types import (
-    MappingProxyType as DictionaryProxy,
-    SimpleNamespace,
-)
+from types import MappingProxyType as DictionaryProxy
 
 from .. import base as __
 from ..base import (
@@ -42,6 +39,11 @@ from ..exceptions import (
     validate_argument_class,
 )
 # pylint: enable=unused-import
+
+
+# Note: Need to explicitly declare __getattr__-synthesized module attributes
+#       to avoid issues with MyPy and Pylint.
+locations: _typ.Any
 
 
 class Language( metaclass = ABCFactory ):
@@ -455,6 +457,7 @@ class LanguageProvider( metaclass = ABCFactory ):
         raise create_abstract_invocation_error( self.install )
 
 
+# TODO: Hoist into package base.
 def compare_version( left, right, parser = None ):
     ''' Properly compares two version strings.
 
@@ -473,3 +476,19 @@ def compare_version( left, right, parser = None ):
         right = parser( right )
     if left == right: return 0
     return 1 if left > right else -1
+
+
+def _calculate_locations( ):
+    from ..data import locations as base_locations
+    return create_immutable_namespace( dict(
+        configuration = base_locations.configuration.DEV.SELF / 'languages',
+        data = base_locations.data.DEV.SELF / 'languages',
+    ) )
+
+
+def _provide_calculators( ):
+    return dict(
+        locations = _calculate_locations,
+    )
+
+__getattr__ = __.module_introduce_accretive_cache( _provide_calculators )

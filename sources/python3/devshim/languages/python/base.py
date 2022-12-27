@@ -21,22 +21,18 @@
 ''' Utilties for management of Python language installations. '''
 
 
-# pylint: disable=unused-import
-from collections.abc import Mapping as AbstractDictionary
-from types import (
-    MappingProxyType as DictionaryProxy,
-    SimpleNamespace,
-)
+import typing as _typ
 
-from ...base import (
-    create_immutable_namespace,
-    module_introduce_accretive_cache,
-    scribe,
-)
-from ...exceptions import provide_exception_factory
+from types import MappingProxyType as DictionaryProxy
+
+from ...base import module_introduce_accretive_cache
 from .. import base as __
-from ..base import LanguageFeature
-# pylint: enable=unused-import
+
+
+# Note: Need to explicitly declare __getattr__-synthesized module attributes
+#       to avoid issues with MyPy and Pylint.
+locations: _typ.Any
+version_definitions: _typ.Any
 
 
 class Language( __.Language ):
@@ -66,10 +62,27 @@ class LanguageVersion( __.LanguageVersion ):
 
     @classmethod
     def provide_records_location( class_ ):
-        from .data import locations
-        return locations.version_records
+        return __.locations.data / 'python.toml'
 
+    # TODO: Roll up into base class.
     @classmethod
     def summon_definitions( class_ ):
-        from .data import version_definitions
-        return version_definitions
+        return __getattr__( 'version_definitions' )
+
+
+def _summon_version_definitions( ):
+    # TODO? Use 'importlib-resources' to access default definitions.
+    from ...packages import ensure_import_package
+    tomllib = ensure_import_package( 'tomllib' )
+    with ( __.locations.configuration / 'python.toml' ).open( 'rb' ) as file:
+        document = tomllib.load( file )
+    # TODO: Check format version and dispatch accordingly.
+    return DictionaryProxy( document.get( 'versions', { } ) )
+
+
+def _provide_calculators( ):
+    return dict(
+        version_definitions = _summon_version_definitions,
+    )
+
+__getattr__ = module_introduce_accretive_cache( _provide_calculators )
