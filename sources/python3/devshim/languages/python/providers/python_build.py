@@ -21,14 +21,13 @@
 ''' Management of Python versions via :command:`python-build`. '''
 
 
-from ..base import Language
 from . import base as __
 
 
 class PythonBuild( __.LanguageProvider ):
     ''' Works with ``python-build`` program from Pyenv. '''
 
-    language = Language
+    language = __.Language
     name = 'python-build'
     supportable_features = (
         'cindervm', 'pyston-lite', 'tracerefs',
@@ -145,7 +144,7 @@ class PythonBuild( __.LanguageProvider ):
         for feature in self.version.features.values( ):
             feature.modify_installation( self.installation_location )
 
-__.register_class( PythonBuild )
+__.register_provider_class( PythonBuild )
 
 
 def _ensure_installer( ):

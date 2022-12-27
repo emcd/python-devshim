@@ -19,6 +19,16 @@
 
 
 ''' Management of language installations. '''
+# TODO? Expand to management of language environments and tasks.
 
 
 from . import python
+
+from .base import (
+    register_feature_class,
+    register_language,
+    register_provider_class,
+    survey_feature_classes,
+    survey_languages,
+    survey_provider_classes,
+)

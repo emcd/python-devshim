@@ -34,9 +34,10 @@ class TraceRefs( __.LanguageFeature ):
 
         For CPython, enables compilation with the 'TRACEREFS' macro. '''
 
-    name = 'tracerefs'
     labels = frozenset( ( 'abi-incompatible', 'requires-compilation', ) )
+    language = __.Language
     mutex_labels = frozenset( ( 'modifies-interpreter', ) )
+    name = 'tracerefs'
 
     @classmethod
     def is_supportable_base_version( class_, version ):
@@ -58,4 +59,4 @@ class TraceRefs( __.LanguageFeature ):
             ( environment.get( index, '' ), '--with-trace-refs', ) ) )
         return self
 
-__.register_class( TraceRefs )
+__.register_feature_class( TraceRefs )

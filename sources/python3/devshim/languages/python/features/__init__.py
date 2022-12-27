@@ -21,5 +21,4 @@
 ''' Installation features for the Python language. '''
 
 
-from .base import register_class, reveal_class_registry
 from .tracerefs import TraceRefs

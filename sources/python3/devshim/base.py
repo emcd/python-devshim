@@ -23,6 +23,7 @@
 import typing as _typ
 
 # pylint: disable=unused-import
+from collections.abc import Mapping as AbstractDictionary
 from contextlib import contextmanager as context_manager
 from functools import partial as partial_function
 from types import (
@@ -34,7 +35,6 @@ from types import (
 
 def create_immutable_namespace( source ):
     ''' Creates immutable namespace from dictionary or simple namespace. '''
-    from collections.abc import Mapping as AbstractDictionary
     from inspect import isfunction as is_function
     # TODO: Validate source.
     if isinstance( source, SimpleNamespace ): source = source.__dict__
@@ -53,22 +53,32 @@ def create_immutable_namespace( source ):
 
 def create_registrar( validator ):
     ''' Creates registar for functionality extensions. '''
+    # TODO: Validate validator.
     registry = { }
 
-    def register( object_ ):
-        ''' Registers object. '''
-        object_ = validator( object_ )
-        name = object_.name
-        if name in registry:
-            # TODO: Properly handle error case.
-            raise ValueError
-        registry[ name ] = object_
+    # TODO: Immutable class.
+    class Registrar( AbstractDictionary ):
+        ''' Registrar for functionality extensions. '''
 
-    def reveal_registry( ):
-        ''' Returns immutable view upon registry. '''
-        return DictionaryProxy( registry )
+        def __getitem__( self, name ): return registry[ name ]
 
-    return register, reveal_registry
+        def __init__( self ): self.visor = DictionaryProxy( registry )
+
+        def __iter__( self ): return iter( self.visor )
+
+        def __len__( self ): return len( registry )
+
+        def __setitem__( self, name, value ):
+            if name in registry:
+                # TODO: Properly handle error case.
+                raise ValueError
+            registry[ name ] = validator( value )
+
+        def survey_registry( self ):
+            ''' Returns immutable view upon registry. '''
+            return self.visor
+
+    return Registrar( )
 
 
 def module_introduce_accretive_cache( calculators_provider ):

@@ -181,18 +181,14 @@ class LanguageVersion( metaclass = ABCFactory ):
             tomli_w.dump( document, file )
 
     @classmethod
-    @abstract
     def provide_feature_classes_registry( class_ ):
         ''' Provides language installation feature classes registry. '''
-        raise create_abstract_invocation_error(
-            class_.provide_feature_classes_registry )
+        return survey_feature_classes( class_.language )
 
     @classmethod
-    @abstract
     def provide_provider_classes_registry( class_ ):
         ''' Provides language version provider classes registry. '''
-        raise create_abstract_invocation_error(
-            class_.provide_provider_classes_registry )
+        return survey_provider_classes( class_.language )
 
     @classmethod
     @abstract
@@ -343,9 +339,10 @@ class LanguageVersion( metaclass = ABCFactory ):
 class LanguageFeature( metaclass = ABCFactory ):
     ''' Abstract base for language installation features. '''
 
-    name: str
     labels: _typ.FrozenSet[ str ]
+    language: _typ.Type[ Language ]
     mutex_labels: _typ.FrozenSet[ str ]
+    name: str
 
     @classmethod
     @abstract
@@ -495,6 +492,98 @@ def compare_version( left, right, parser = None ):
         right = parser( right )
     if left == right: return 0
     return 1 if left > right else -1
+
+
+def _validate_feature_class( class_ ):
+    from inspect import isclass as is_class
+    if not is_class( class_ ) or not issubclass( class_, LanguageFeature ):
+        raise create_argument_validation_error(
+            'class_', _validate_feature_class,
+            "sublcass of class 'LanguageFeature'" )
+    return class_
+
+
+def _validate_language( language ):
+    from inspect import isclass as is_class
+    if not is_class( language ) or not issubclass( language, Language ):
+        raise create_argument_validation_error(
+            'language', _validate_language,
+            "subclass of class 'Language'" )
+    return language
+
+
+def _validate_provider_class( class_ ):
+    from inspect import isclass as is_class
+    if not is_class( class_ ) or not issubclass( class_, LanguageProvider ):
+        raise create_argument_validation_error(
+            'class_', _validate_provider_class,
+            "subclass of class 'LanguageProvider'" )
+    return class_
+
+
+def _create_registration_interface( ): # pylint: disable=too-complex
+    from ..base import create_registrar
+    languages = create_registrar( _validate_language )
+    feature_classes = create_registrar( lambda object_: object_ )
+    provider_classes = create_registrar( lambda object_: object_ )
+
+    def register_feature_class_( feature_class ):
+        ''' Registers language installation feature class. '''
+        _validate_feature_class( feature_class )
+        language_name = _validate_language( feature_class.language ).name
+        if language_name not in languages:
+            # TODO: Use exception factory.
+            raise ValueError
+        feature_name = feature_class.name
+        feature_classes[ language_name ][ feature_name ] = feature_class
+
+    def register_language_(
+        language,
+        feature_class_validator = _validate_feature_class,
+        provider_class_validator = _validate_provider_class,
+    ):
+        ''' Registers language. '''
+        # TODO: Validate the validators. ;)
+        # TODO: Wrap custom validators with default validators for extra
+        #       safety.
+        name = _validate_language( language ).name
+        languages[ name ] = language
+        feature_classes[ name ] = create_registrar( feature_class_validator )
+        provider_classes[ name ] = create_registrar( provider_class_validator )
+
+    def register_provider_class_( provider_class ):
+        ''' Registers language installation provider class. '''
+        _validate_provider_class( provider_class )
+        language_name = _validate_language( provider_class.language ).name
+        if language_name not in languages:
+            # TODO: Use exception factory.
+            raise ValueError
+        provider_name = provider_class.name
+        provider_classes[ language_name ][ provider_name ] = provider_class
+
+    def survey_feature_classes_( language ):
+        ''' Returns immutable view upon features registry for language. '''
+        if issubclass( language, Language ): language = language.name
+        return feature_classes[ language ].survey_registry( )
+
+    def survey_languages_( ):
+        ''' Returns immutable view upon languages registry. '''
+        return languages.survey_registry( )
+
+    def survey_provider_classes_( language ):
+        ''' Returns immutable view upon providers registry for language. '''
+        if issubclass( language, Language ): language = language.name
+        return provider_classes[ language ].survey_registry( )
+
+    return (
+        register_language_,
+        register_feature_class_, register_provider_class_,
+        survey_languages_,
+        survey_feature_classes_, survey_provider_classes_ )
+
+( register_language, register_feature_class, register_provider_class,
+  survey_languages, survey_feature_classes, survey_provider_classes ) = (
+      _create_registration_interface( ) )
 
 
 def _calculate_locations( ):

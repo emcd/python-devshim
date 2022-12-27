@@ -44,22 +44,15 @@ class Language( __.Language ):
     @classmethod
     def provide_version_class( class_ ): return LanguageVersion
 
+__.register_language( Language )
+
 
 class LanguageVersion( __.LanguageVersion ):
-    ''' Abstract base for Python language versions. '''
+    ''' Manager for Python language versions. '''
 
     language = Language
 
-    @classmethod
-    def provide_feature_classes_registry( class_ ):
-        from .features import reveal_class_registry
-        return reveal_class_registry( )
-
-    @classmethod
-    def provide_provider_classes_registry( class_ ):
-        from .providers import reveal_class_registry # pylint: disable=cyclic-import
-        return reveal_class_registry( )
-
+    # TODO: Roll up into base class.
     @classmethod
     def provide_records_location( class_ ):
         return __.locations.data / 'python.toml'

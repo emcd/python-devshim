@@ -22,18 +22,6 @@
 
 
 # pylint: disable=unused-import
-from ....base import (
-    create_registrar as _create_registrar,
-)
-from ...base import LanguageFeature
+from ...base import LanguageFeature, register_feature_class
+from ..base import Language
 # pylint: enable=unused-import
-
-
-def _validate_class( class_ ):
-    from inspect import isclass as is_class
-    if not is_class( class_ ) or not issubclass( class_, LanguageFeature ):
-        # TODO: Use exception factory.
-        raise ValueError
-    return class_
-
-register_class, reveal_class_registry = _create_registrar( _validate_class )
