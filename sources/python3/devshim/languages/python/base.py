@@ -57,7 +57,7 @@ class LanguageVersion( __.LanguageVersion ):
 
     @classmethod
     def provide_provider_classes_registry( class_ ):
-        from .providers import reveal_class_registry
+        from .providers import reveal_class_registry # pylint: disable=cyclic-import
         return reveal_class_registry( )
 
     @classmethod

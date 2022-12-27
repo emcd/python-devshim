@@ -102,11 +102,8 @@ class Language( metaclass = ABCFactory ):
                     f"No version {version!r} in definitions "
                     f"for language {class_.title}." )
         versions = { }
-        for version, definition in definitions.items( ): # pylint: disable=unused-variable
-            # TODO: Consider explicit platform constraints.
-            # TODO: Offload entirety of support check to version class.
-            #supports = version_class.survey_provider_support( definition )
-            #if not supports: continue
+        for version, definition in definitions.items( ):
+            if not version_class.is_supportable( definition ): continue
             versions[ version ] = version_class( version )
         return DictionaryProxy( versions )
 
@@ -152,6 +149,24 @@ class LanguageVersion( metaclass = ABCFactory ):
             versions[ name ] = record
         class_.persist_records( versions )
         return class_
+
+    @classmethod
+    def extract_definition( class_, version ):
+        ''' Extracts definition from version if necessary. '''
+        if isinstance( version, LanguageVersion ): return version.definition
+        if isinstance( version, str ):
+            return class_.summon_definitions( )[ version ]
+        return version # TODO: Sanity-check definition.
+
+    @classmethod
+    def is_supportable( class_, definition, platform = None ):
+        ''' Is language version supportable on platform with its providers? '''
+        definition = class_.extract_definition( definition )
+        # TODO: Consider explicit platform constraints.
+        supports = class_.survey_provider_support(
+            definition, platform = platform )
+        if not supports: return False
+        return True
 
     @classmethod
     def persist_records( class_, versions ):
@@ -205,12 +220,15 @@ class LanguageVersion( metaclass = ABCFactory ):
             return DictionaryProxy( tomllib.load( file )[ 'versions' ] )
 
     @classmethod
-    def survey_provider_support( class_, definition ):
+    def survey_provider_support( class_, definition, platform = None ):
         ''' Surveys all providers which support language version. '''
+        # TODO: Extract definition if version provided.
         provider_classes_registry = class_.provide_provider_classes_registry( )
         supports = [ ]
         for provider_class in provider_classes_registry.values( ):
-            if not provider_class.check_version_support( definition ): continue
+            if not provider_class.check_version_support(
+                definition, platform = platform
+            ): continue
             supports.append( {
                 'implementation-version':
                     provider_class.discover_current_version( definition ),
@@ -375,16 +393,17 @@ class LanguageFeature( metaclass = ABCFactory ):
 class LanguageProvider( metaclass = ABCFactory ):
     ''' Abstract base for language version providers. '''
 
+    language: _typ.Type[ Language ]
     name: str
 
     @classmethod
-    def check_version_support( class_, version ):
+    def check_version_support( class_, version, platform = None ):
         ''' Does provider support version? '''
-        if isinstance( version, LanguageVersion ):
-            definition = version.definition
-        else: definition = version
-        feature_names = definition.get( 'features', ( ) )
-        #if not class_.is_supportable_platform( ): continue
+        definition = (
+            class_.language.provide_version_class( )
+            .extract_definition( version ) )
+        if not class_.is_supportable_platform( platform = platform ):
+            return False
         if not class_.is_supportable_base_version(
             definition[ 'base-version' ]
         ): return False
@@ -393,7 +412,7 @@ class LanguageProvider( metaclass = ABCFactory ):
         ): return False
         if not all(
             class_.is_supportable_feature( feature_name )
-            for feature_name in feature_names
+            for feature_name in definition.get( 'features', ( ) )
         ): return False
         return True
 
