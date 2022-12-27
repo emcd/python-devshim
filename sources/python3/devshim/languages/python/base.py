@@ -34,5 +34,42 @@ from ...base import (
     scribe,
 )
 from ...exceptions import provide_exception_factory
-from ..base import Language, LanguageFeature, LanguageVersion
+from .. import base as __
+from ..base import LanguageFeature
 # pylint: enable=unused-import
+
+
+class Language( __.Language ):
+    ''' Manager for Python language. '''
+
+    name = 'python'
+    title = 'Python'
+
+    @classmethod
+    def provide_version_class( class_ ): return LanguageVersion
+
+
+class LanguageVersion( __.LanguageVersion ):
+    ''' Abstract base for Python language versions. '''
+
+    language = Language
+
+    @classmethod
+    def provide_feature_classes_registry( class_ ):
+        from .features import reveal_class_registry
+        return reveal_class_registry( )
+
+    @classmethod
+    def provide_provider_classes_registry( class_ ):
+        from .providers import reveal_class_registry
+        return reveal_class_registry( )
+
+    @classmethod
+    def provide_records_location( class_ ):
+        from .data import locations
+        return locations.version_records
+
+    @classmethod
+    def summon_definitions( class_ ):
+        from .data import version_definitions
+        return version_definitions

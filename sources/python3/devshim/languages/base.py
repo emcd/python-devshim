@@ -126,32 +126,63 @@ class LanguageVersion( metaclass = ABCFactory ):
 
     language: _typ.Type[ Language ]
 
-    def __init__( self, name ):
-        # TODO: Validate version against defined versions.
-        self.name = validate_argument_class(
-            name, str, 'name', self.__init__ )
-        self.definition = self._summon_definition( )
-        self.record = self._summon_record( )
-        self.features = self._instantiate_features( )
-        self.providers = self._instantiate_providers( )
-
     @classmethod
-    @abstract
     def create_record( class_, name ):
-        ''' Creates record for language version. '''
-        raise create_abstract_invocation_error( class_.create_record )
+        ''' Creates languge version record and persists it. '''
+        definitions = class_.summon_definitions( )
+        versions = dict( class_.summon_records( ) )
+        definition = definitions[ name ]
+        # TODO: Sort records by version descending.
+        record = next( iter( class_.survey_provider_support( definition ) ) )
+        versions[ name ] = record
+        class_.persist_records( versions )
+        return record
+
+    @classmethod
+    def create_records( class_ ):
+        ''' Creates language version records and persists them. '''
+        definitions = class_.summon_definitions( )
+        versions = { }
+        for name, definition in definitions.items( ):
+            # TODO: Sort records by version descending.
+            record = next( iter( class_.survey_provider_support(
+                definition ) ) )
+            versions[ name ] = record
+        class_.persist_records( versions )
+        return class_
+
+    @classmethod
+    def persist_records( class_, versions ):
+        ''' Persists language version records to data store. '''
+        from ..packages import ensure_import_package
+        tomli_w = ensure_import_package( 'tomli-w' )
+        location = class_.provide_records_location( )
+        location.parent.mkdir( exist_ok = True, parents = True )
+        document = { 'format-version': 1, 'versions': dict( versions ) }
+        with location.open( 'wb' ) as file:
+            # TODO: Write comment header to warn about machine-generated code.
+            tomli_w.dump( document, file )
 
     @classmethod
     @abstract
-    def provide_feature_class( class_, name ):
-        ''' Provides language installation feature class by name. '''
-        raise create_abstract_invocation_error( class_.provide_feature_class )
+    def provide_feature_classes_registry( class_ ):
+        ''' Provides language installation feature classes registry. '''
+        raise create_abstract_invocation_error(
+            class_.provide_feature_classes_registry )
 
     @classmethod
     @abstract
-    def provide_provider_class( class_, name ):
-        ''' Provides language version provider class by name. '''
-        raise create_abstract_invocation_error( class_.provide_provider_class )
+    def provide_provider_classes_registry( class_ ):
+        ''' Provides language version provider classes registry. '''
+        raise create_abstract_invocation_error(
+            class_.provide_provider_classes_registry )
+
+    @classmethod
+    @abstract
+    def provide_records_location( class_ ):
+        ''' Provides location of language version records. '''
+        raise create_abstract_invocation_error(
+            class_.provide_records_location )
 
     @classmethod
     @abstract
@@ -160,17 +191,39 @@ class LanguageVersion( metaclass = ABCFactory ):
         raise create_abstract_invocation_error( class_.summon_definitions )
 
     @classmethod
-    @abstract
     def summon_records( class_ ):
         ''' Summons records for language versions. '''
-        raise create_abstract_invocation_error( class_.summon_records )
+        location = class_.provide_records_location( )
+        if not location.exists( ): class_.create_records( )
+        from ..packages import ensure_import_package
+        tomllib = ensure_import_package( 'tomllib' )
+        with location.open( 'rb' ) as file:
+            # TODO: Check format version and update records format,
+            #       if necessary.
+            return DictionaryProxy( tomllib.load( file )[ 'versions' ] )
 
     @classmethod
-    @abstract
     def survey_provider_support( class_, definition ):
         ''' Surveys all providers which support language version. '''
-        raise create_abstract_invocation_error(
-            class_.survey_provider_support )
+        provider_classes_registry = class_.provide_provider_classes_registry( )
+        supports = [ ]
+        for provider_class in provider_classes_registry.values( ):
+            if not provider_class.check_version_support( definition ): continue
+            supports.append( {
+                'implementation-version':
+                    provider_class.discover_current_version( definition ),
+                'provider': provider_class.name,
+            } )
+        return supports
+
+    def __init__( self, name ):
+        # TODO: Validate version against defined versions.
+        self.name = validate_argument_class(
+            name, str, 'name', self.__init__ )
+        self.definition = self._summon_definition( )
+        self.record = self._summon_record( )
+        self.features = self._instantiate_features( )
+        self.providers = self._instantiate_providers( )
 
     def __str__( self ): return f"{self.language.title} {self.name}"
 
@@ -185,17 +238,21 @@ class LanguageVersion( metaclass = ABCFactory ):
 
     def infer_installation_location( self ):
         ''' Infers installation location for language by version. '''
-        from ..base import scribe
         for provider in self.providers.values( ):
             location = provider.installation_location
             if not location.exists( ):
-                scribe.debug(
+                __.scribe.debug(
                     f"Could not locate installation of {self} "
                     f"by {provider.name}." )
                 continue
             return location
         # TODO: Use exception factory.
         raise LookupError
+
+    def install( self ):
+        ''' Installs version with provider of record. '''
+        provider = self.providers[ self.record[ 'provider' ] ]
+        provider.install( )
 
     def probe_feature_labels( self, labels ):
         ''' Tests if any features of version have specific labels. '''
@@ -204,11 +261,33 @@ class LanguageVersion( metaclass = ABCFactory ):
         return frozenset( labels ) & frozenset( chain.from_iterable(
             feature.labels for feature in self.features.values( ) ) )
 
+    def update( self, install = True ):
+        ''' Attempts to update version with most relevant provider. '''
+        implementation_version = self.record[ 'implementation-version' ]
+        for provider in self.providers.values( ):
+            implementation_version_ = (
+                provider.discover_current_version( self.definition ) )
+            if 0 > compare_version(
+                implementation_version_, implementation_version
+            ): continue
+            try: record = provider.generate_current_version_record( self )
+            except Exception: # pylint: disable=broad-except
+                __.scribe.exception(
+                    f"Could not update {self.name} by {provider.name}." )
+                continue
+            if self.record != record:
+                self.record = record
+                self._update_record( )
+                break
+        if install: self.install( ) # Ensure installation.
+        return self
+
     def _instantiate_features( self ):
+        feature_classes_registry = self.provide_feature_classes_registry( )
         features = { }
         mutex_labels = frozenset( )
         for name in self.definition.get( 'features', ( ) ):
-            feature = self.provide_feature_class( name )( self )
+            feature = feature_classes_registry[ name ]( self )
             features[ name ] = feature
             # Sanity check for mutually-exclusive features.
             if mutex_labels & feature.mutex_labels:
@@ -218,9 +297,10 @@ class LanguageVersion( metaclass = ABCFactory ):
         return DictionaryProxy( features )
 
     def _instantiate_providers( self ):
+        provider_classes_registry = self.provide_provider_classes_registry( )
         providers = { }
         for name in self.definition.get( 'providers', ( ) ):
-            providers[ name ] = self.provide_provider_class( name )( self )
+            providers[ name ] = provider_classes_registry[ name ]( self )
         return DictionaryProxy( providers )
 
     def _summon_definition( self ):
@@ -232,6 +312,11 @@ class LanguageVersion( metaclass = ABCFactory ):
         if name not in records: record = self.create_record( name )
         else: record = records[ name ]
         return DictionaryProxy( record )
+
+    def _update_record( self ):
+        versions = self.summon_records( )
+        versions[ self.name ] = self.record
+        self.persist_records( versions )
 
 
 # TODO: Class immutability.
@@ -368,3 +453,23 @@ class LanguageProvider( metaclass = ABCFactory ):
     def install( self ):
         ''' Installs version of language. '''
         raise create_abstract_invocation_error( self.install )
+
+
+def compare_version( left, right, parser = None ):
+    ''' Properly compares two version strings.
+
+        I.e., 3.10 < 3.7 if comparison is lexicographic.
+        But, 3.10 > 3.7 with this version comparison.
+
+        If left > right, then returns 1.
+        If left == right, then returns 0.
+        If left < right, then returns -1. '''
+    if None is parser:
+        # TODO: Account for non-integer components.
+        left = tuple( map( int, left.split( '.' ) ) )
+        right = tuple( map( int, right.split( '.' ) ) )
+    else:
+        left = parser( left )
+        right = parser( right )
+    if left == right: return 0
+    return 1 if left > right else -1

@@ -23,7 +23,7 @@
 
 import typing as _typ
 
-from . import base as __
+from . import base as __ # pylint: disable=cyclic-import
 
 
 # Note: Need to explicitly declare __getattr__-synthesized module attributes
