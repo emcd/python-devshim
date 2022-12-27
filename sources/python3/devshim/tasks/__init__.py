@@ -60,8 +60,8 @@ def install_python( version ):
     ''' Installs requested Python version.
 
         This task requires Internet access and may take some time. '''
-    from ..languages.python import install_version
-    install_version( version )
+    from ..languages.python import Language
+    Language.produce_version( version ).install( )
 
 
 @__.task(
@@ -187,9 +187,12 @@ def check_security_issues( version = None ):
     ''' Checks for security issues in installed Python packages.
 
         This task requires Internet access and may take some time. '''
-    from ..languages.python import probe_version_feature_labels
     # Ruamel binary package requires standard ABI.
-    if probe_version_feature_labels( version, 'abi-incompatible' ): return
+    from ..languages.python import Language
+    if (
+        Language.produce_version( version )
+        .probe_feature_labels( 'abi-incompatible' )
+    ): return
     __.project_execute_external(
         f"safety check", venv_specification = dict( version = version ) )
 
@@ -202,8 +205,8 @@ def freshen_python( version = None, install = True ):
     ''' Updates requested Python version, if newer one available.
 
         This task requires Internet access and may take some time. '''
-    from ..languages.python import update_version
-    update_version( version, install = install )
+    from ..languages.python import Language
+    Language.produce_version( version ).update( install = install )
     ## Erase packages fixtures for versions which are no longer extant.
     #from ..packages import delete_python_packages_fixtures
     #delete_python_packages_fixtures( obsolete_identifiers )
@@ -281,9 +284,12 @@ def freshen( ):
 )
 def lint_bandit( version = None ):
     ''' Security checks the source code with Bandit. '''
-    from ..languages.python import probe_version_feature_labels
     # Cyaml binary package requires standard ABI.
-    if probe_version_feature_labels( version, 'abi-incompatible' ): return
+    from ..languages.python import Language
+    if (
+        Language.produce_version( version )
+        .probe_feature_labels( 'abi-incompatible' )
+    ): return
     files = _lint_targets_default
     files_str = ' '.join( map( str, files ) )
     __.project_execute_external(
@@ -302,9 +308,12 @@ def lint_bandit( version = None ):
 )
 def lint_mypy( packages, modules, files, version = None ):
     ''' Lints the source code with Mypy. '''
-    from ..languages.python import probe_version_feature_labels
     # Mypy binary package requires standard ABI.
-    if probe_version_feature_labels( version, 'abi-incompatible' ): return
+    from ..languages.python import Language
+    if (
+        Language.produce_version( version )
+        .probe_feature_labels( 'abi-incompatible' )
+    ): return
     process_environment = __.derive_venv_variables( version = version )
     # TODO: Check executable in decorator.
     from ..environments import test_package_executable
@@ -354,9 +363,12 @@ def lint_pylint( targets, checks, report = False, version = None ):
 )
 def lint_semgrep( version = None ):
     ''' Lints the source code with Semgrep. '''
-    from ..languages.python import probe_version_feature_labels
     # Ruamel binary package requires standard ABI.
-    if probe_version_feature_labels( version, 'abi-incompatible' ): return
+    from ..languages.python import Language
+    if (
+        Language.produce_version( version )
+        .probe_feature_labels( 'abi-incompatible' )
+    ): return
     process_environment = __.derive_venv_variables( version = version )
     # TODO: Check executable in decorator.
     from ..environments import test_package_executable
@@ -410,9 +422,12 @@ def test( ensure_sanity = True, version = None ):
     if ensure_sanity: __.invoke_task( lint, version = version )
     from ..user_interface import render_boxed_title
     render_boxed_title( 'Test: Unit + Code Coverage', supplement = version )
-    from ..languages.python import probe_version_feature_labels
     # Cyaml binary package requires standard ABI.
-    if probe_version_feature_labels( version, 'abi-incompatible' ): return
+    from ..languages.python import Language
+    if (
+        Language.produce_version( version )
+        .probe_feature_labels( 'abi-incompatible' )
+    ): return
     process_environment = __.derive_venv_variables( version = version )
     process_environment.update( dict(
         HYPOTHESIS_STORAGE_DIRECTORY = __.paths.caches.hypothesis,
@@ -839,14 +854,11 @@ def run( command, version = None ):
 @__.task( )
 def show_python( all_versions = False ):
     ''' Lists names of default supported Python version. '''
-    # TODO: Account for availability on platform.
     # TODO? With Rich and 'detail' flag, show panels with details.
+    from ..languages.python import Language
     if all_versions:
-        from ..languages.python import survey_versions
-        for version in survey_versions( ).keys( ): print( version )
-    else:
-        from ..languages.python import detect_default_version
-        print( detect_default_version( ) )
+        for version in Language.survey_versions( ).keys( ): print( version )
+    else: print( Language.detect_default_version( ).name )
 
 
 # For use by Invoke's module loader. Must be called 'namespace' (or 'ns').

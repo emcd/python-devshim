@@ -22,12 +22,13 @@
 
 
 from . import base as __
+from .language import Language # pylint: disable=cyclic-import
 
 
 class LanguageVersion( __.LanguageVersion ):
     ''' Abstract base for Python language versions. '''
 
-    def __init__( self, name ): super( ).__init__( 'Python', name )
+    language = Language
 
     @classmethod
     def create_record( class_, name ):
@@ -75,6 +76,7 @@ class LanguageVersion( __.LanguageVersion ):
 
     @classmethod
     def survey_provider_support( class_, definition ):
+        # TODO: Validate version argument.
         from .providers import reveal_class_registry
         supports = [ ]
         for provider_class in reveal_class_registry( ).values( ):

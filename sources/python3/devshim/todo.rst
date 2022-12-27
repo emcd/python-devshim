@@ -26,6 +26,9 @@ Fixes and Minor Improvements
 * Add task control argument to support warning/skipping tasks which do not meet
   certain criteria, such as an installation not supporting them.
 
+* Use ``--no-binary`` option to :command:`pip` when ``abi-incompatible`` label
+  is present on a language installation feature for a version.
+
 Remove Dependency on System ``pip``
 ===============================================================================
 

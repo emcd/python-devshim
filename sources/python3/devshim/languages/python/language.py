@@ -18,33 +18,19 @@
 #============================================================================#
 
 
-''' Management of development platforms. '''
+''' Management of Python language. '''
 
 
-def identify_active_python( mode ):
-    ''' Reports compatibility identifier for active Python. '''
-    from .identity import dispatch_table
-    return dispatch_table[ mode ]( )
+from . import base as __
 
 
-#: ABI label for executing Python.
-active_python_abi_label = identify_active_python( 'bdist-compatibility' )
+class Language( __.Language ):
+    ''' Manager for Python language. '''
 
+    name = 'python'
+    title = 'Python'
 
-def pep508_identify_python( version = None ):
-    ''' Calculates PEP 508 identifier for Python version. '''
-    from ..languages.python import Language
-    python_path = (
-        Language.produce_version( version )
-        .infer_executable_location( name = 'python' ) )
-    return identify_python( 'pep508-environment', python_path = python_path )
-
-
-def identify_python( mode, python_path ):
-    ''' Reports compatibility identifier for Python at given path. '''
-    from ..data import paths
-    detector_path = paths.scripts.aux.python3 / 'identify-python.py'
-    from ..base import execute_external
-    return execute_external(
-        ( python_path, detector_path, '--mode', mode ),
-        capture_output = True ).stdout.strip( )
+    @classmethod
+    def provide_version_class( class_ ):
+        from .version import LanguageVersion
+        return LanguageVersion

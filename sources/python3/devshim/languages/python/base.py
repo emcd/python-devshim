@@ -34,5 +34,5 @@ from ...base import (
     scribe,
 )
 from ...exceptions import provide_exception_factory
-from ..base import LanguageFeature, LanguageVersion
+from ..base import Language, LanguageFeature, LanguageVersion
 # pylint: enable=unused-import

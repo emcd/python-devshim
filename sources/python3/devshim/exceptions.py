@@ -72,18 +72,58 @@ def provide_exception_factory( name ):
     from functools import partial as partial_function
     return partial_function( exception_factory, provide_exception_class )
 
-_excfp = provide_exception_factory # Internal alias.
+
+def create_abstract_invocation_error( invocable, extra_data = None ):
+    ''' Creates error about attempt to invoke abstract invocable. '''
+    sui = create_abstract_invocation_error
+    validate_argument_invocability( invocable, 'invocable', sui )
+    from lockup.nomenclature import calculate_invocable_label
+    message = "Cannot invoke abstract {label}.".format(
+        label = calculate_invocable_label( invocable ) )
+    return _produce_exception( sui, 'InvalidOperation', message, extra_data )
 
 
-def create_invalid_data_exception(
-    exception_class_provider, message, extra_data = None,
+def create_argument_validation_error(
+    name, invocable, expectation, extra_data = None
 ):
+    ''' Creates error with context about invalid argument. '''
+    sui = create_argument_validation_error
+    validate_argument_class( name, str, 'name', sui )
+    validate_argument_invocability( invocable, 'invocable', sui )
+    validate_argument_class( expectation, str, 'expectation', sui )
+    from lockup.nomenclature import (
+        calculate_argument_label, calculate_invocable_label, )
+    message = (
+        "Invalid {argument_label} to {invocable_label}; "
+        "expected {expectation}.".format(
+            argument_label = calculate_argument_label( name, invocable ),
+            invocable_label = calculate_invocable_label( invocable ),
+            expectation = expectation ) )
+    return _produce_exception( sui, 'IncorrectData', message, extra_data )
+
+
+def create_data_validation_error( message, extra_data = None ):
     ''' Creates error about invalid data. '''
-    sui = create_invalid_data_exception
-    from lockup.validators import validate_argument_class
-    validate_argument_class( _excfp, message, str, 'message', sui )
-    return _produce_exception(
-        exception_class_provider, sui, 'IncorrectData', message, extra_data )
+    sui = create_data_validation_error
+    validate_argument_class( message, str, 'message', sui )
+    return _produce_exception( sui, 'IncorrectData', message, extra_data )
+
+
+def validate_argument_invocability( argument, argument_name, invocable ):
+    ''' Validates invocability of argument to invocable. '''
+    import lockup.validators
+    lockup.validators.validate_argument_invocability(
+        provide_exception_factory, argument, argument_name, invocable )
+
+
+def validate_argument_class(
+    argument, argument_classes, argument_name, invocable
+):
+    ''' Validates class of argument to invocable. '''
+    import lockup.validators
+    return lockup.validators.validate_argument_class(
+        provide_exception_factory,
+        argument, argument_classes, argument_name, invocable )
 
 
 def _create_class_fusion_specifiers( ):
@@ -108,7 +148,6 @@ def _create_exception_class_fuser( ):
     def fuse_exception_classes( classes ):
         ''' Fuses exceptions from outside of package with Omniexception. '''
         # TODO: Validate classes.
-        # TODO: Validate package class.
         cache_index = "{package_class_name}.{classes_names}".format(
             package_class_name = Omniexception.__name__,
             classes_names = '__'.join( map(
@@ -126,24 +165,14 @@ def _create_exception_class_fuser( ):
 _fuse_exception_classes = _create_exception_class_fuser( )
 
 
-def _produce_exception(
-    exception_class_provider, invocation, name, message, extra_data
-):
+def _produce_exception( invocation, name, message, extra_data ):
     ''' Produces exception by provider with message and failure class. '''
     # TODO: Use generalized 'produce_exception' when it is available.
-    #       This is mostly a copy from 'lockup.exceptionality'.
-    from lockup.exceptionality.general import (
-        intercept_exception_class_provider,
-    )
-    exception_class_provider = intercept_exception_class_provider(
-        exception_class_provider, invocation )
     from lockup.exceptionality.our_factories import ExtraData
     if None is extra_data: extra_data = ExtraData( )
-    from lockup.validators import validate_argument_class
-    validate_argument_class(
-        _excfp, extra_data, ExtraData, 'extra_data', invocation )
+    validate_argument_class( extra_data, ExtraData, 'extra_data', invocation )
     failure_class = ' '.join( invocation.__name__.split( '_' )[ 1 : -1 ] )
-    return exception_class_provider( name )(
+    return provide_exception_class( name )(
         message,
         *extra_data.positional_arguments,
         **_inject_exception_labels(

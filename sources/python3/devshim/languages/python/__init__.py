@@ -21,87 +21,9 @@
 ''' Management of Python language installations. '''
 
 
+from . import features
+from . import language
 from . import providers
-from .version import LanguageVersion
+from . import version
 
-
-def detect_default_version( ):
-    ''' Detects default Python version.
-
-        If in a Python virtual environment, then the Python version for that
-        environment is returned. Else, the first available Python version from
-        the project's Python version declarations is returned. '''
-    # TODO: Detect if in relevant virtual environment and infer version.
-    return next( iter( survey_versions( ) ) )
-
-
-def infer_executable_location( version = None ):
-    ''' Infers location of Python executable by version. '''
-    return infer_installation_location( version ) / 'bin/python'
-
-
-def infer_installation_location( version = None ):
-    ''' Infers location of Python installation by version. '''
-    from ...base import scribe
-    versions = survey_versions( )
-    if None is version: version = next( iter( versions ) )
-    version = LanguageVersion( version )
-    for provider in version.providers.values( ):
-        location = provider.installation_location
-        if not location.exists( ):
-            scribe.debug(
-                f"Could not locate installation of {version} "
-                f"by {provider.name}." )
-            continue
-        return location
-    # TODO: Use exception factory.
-    raise LookupError
-
-
-def probe_version_feature_labels( version, labels ):
-    ''' Tests if any features of version have labels. '''
-    version = LanguageVersion( version )
-    if isinstance( labels, str ): labels = ( labels, )
-    from itertools import chain
-    return frozenset( labels ) & frozenset( chain.from_iterable(
-        feature.labels for feature in version.features.values( ) ) )
-
-
-def validate_version( version ):
-    ''' Validates version against available Python versions. '''
-    if version not in survey_versions( ):
-        # TODO: Use exception factory.
-        raise ValueError
-    return version
-
-
-def survey_versions( by_availability = False ):
-    ''' Returns Python versions which have valid declarations. '''
-    from .data import version_definitions as definitions
-    from os import environ as current_process_environment
-    selector = current_process_environment.get( 'DEVSHIM_PYTHON_VERSION' )
-    if selector:
-        try: return { selector: definitions[ selector ] }
-        # TODO: Raise error on unmatched version.
-        except KeyError: return { }
-    if not by_availability: return definitions
-    select_versions = { }
-    for name, definition in definitions.items( ):
-        supports = LanguageVersion.survey_provider_support( definition )
-        if not supports: continue
-        select_versions[ name ] = definition.copy( )
-        select_versions[ name ][ 'providers' ] = tuple(
-            record[ 'provider' ] for record in supports )
-    return select_versions
-
-
-def install_version( version ):
-    ''' Installs requested version of Python, if declaration exists. '''
-    version = LanguageVersion( version )
-    version.install( )
-
-
-def update_version( version, install = True ):
-    ''' Updates requested version of Python, if declaration exists. '''
-    version = LanguageVersion( version )
-    version.update( install = install )
+from .language import Language
