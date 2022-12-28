@@ -23,7 +23,10 @@
 import typing as _typ
 
 # pylint: disable=unused-import
-from collections.abc import Mapping as AbstractDictionary
+from collections.abc import (
+    Mapping as AbstractDictionary,
+    Sequence as AbstractSequence,
+)
 from contextlib import contextmanager as context_manager
 from functools import partial as partial_function
 from types import (
@@ -235,6 +238,9 @@ def execute_external( command_specification, **nomargs ):
     if isinstance( command_specification, str ):
         from shlex import split as split_command
         command_specification = split_command( command_specification )
+    # TODO: Python 3.8: Remove. Has support for WindowsPath.
+    elif isinstance( command_specification, AbstractSequence ):
+        command_specification = tuple( map( str, command_specification ) )
     # TODO? Handle pseudo-TTY requests with 'ptyprocess.PtyProcess'.
     # TODO? Intercept 'subprocess.SubprocessError'.
     scribe.debug( f"Executing {command_specification!r} with {options!r}." )

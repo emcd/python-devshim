@@ -70,8 +70,12 @@ def calculate_system_abi_identifier( ):
     ''' System library linkage and virtual machine information. '''
     if system_type not in ( 'java', 'windows', ):
         return '-'.join( _platform.libc_ver( ) )
+    if 'windows' == system_type:
+        return '-'.join( (
+            *reversed( _platform.architecture( ) ),
+            _platform.win32_ver( )[ 1 ] ) )
     # TODO: Implement: java
-    # TODO: Implement: windows
+    # TODO: Implement: emscripten/wasi
     raise NotImplementedError
 
 
