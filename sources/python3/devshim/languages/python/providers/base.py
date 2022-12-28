@@ -24,6 +24,8 @@
 # pylint: disable=unused-import
 import re
 
+from types import MappingProxyType as DictionaryProxy
+
 from ....base import produce_accretive_cacher
 from ...base import LanguageProvider, register_provider_class
 from ..base import Language

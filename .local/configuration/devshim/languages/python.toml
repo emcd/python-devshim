@@ -9,7 +9,7 @@ title = 'Python 3.7'
 [versions.'cpython-3.8']
 base-version = '3.8'
 implementation = 'cpython'
-providers = [ 'python-build', ]
+providers = [ 'windows-embeddable', 'python-build', ]
 title = 'Python 3.8'
 
 [versions.'cpython-3.9']

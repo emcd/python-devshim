@@ -38,6 +38,7 @@ from ..exceptions import (
     create_data_validation_error,
     validate_argument_class,
 )
+from ..platforms.identity import calculate_platform_identifier
 # pylint: enable=unused-import
 
 
@@ -58,98 +59,115 @@ class Language( metaclass = ABCFactory ):
     title: str
 
     @classmethod
-    def calculate_version_selector_name( class_ ):
-        ''' Calculates name of environment variable for language version. '''
-        return "{package_name}_{language_name}_VERSION".format(
+    def calculate_descriptor_variable_name( class_ ):
+        ''' Calculates environment variable name for language descriptor. '''
+        return "{package_name}_{language_name}_DESCRIPTOR".format(
             package_name = __.__package__.upper( ),
             language_name = class_.name.upper( ) )
 
     @classmethod
-    def detect_default_version( class_ ):
-        ''' Detects default language version.
+    @abstract
+    def derive_actual_version( class_, version ):
+        ''' Derives comparable object for actual language version.
 
-            If in a virtual environment, then the language version for that
-            environment is returned. Else, the first available language version
-            from the project version definitions is returned. '''
-        # TODO: Detect if in relevant virtual environment and infer version.
-        return next( iter( class_.survey_versions( ).values( ) ) )
+            The result is a comparable representation of a language version
+            according to the standard scheme for versions of the language. '''
+        raise create_abstract_invocation_error( class_.derive_actual_version )
 
     @classmethod
-    def produce_version( class_, version = None ):
-        ''' Produces instance of language version manager. '''
-        if None is version: return class_.detect_default_version( )
-        return class_.provide_version_class( )( version )
+    def detect_default_descriptor( class_ ):
+        ''' Detects default language descriptor.
+
+            If in a virtual environment, then the language descriptor for that
+            environment is returned. Else, the first available language
+            descriptor from the project descriptors is returned. '''
+        # TODO: Detect if in relevant virtual environment and infer descriptor.
+        return next( iter( class_.survey_descriptors( ).values( ) ) )
+
+    @classmethod
+    def produce_descriptor( class_, descriptor = None ):
+        ''' Produces instance of language descriptor. '''
+        if None is descriptor: return class_.detect_default_descriptor( )
+        return class_.provide_descriptor_class( )( descriptor )
 
     @classmethod
     @abstract
-    def provide_version_class( class_ ):
-        ''' Provides version class associated with language. '''
-        raise create_abstract_invocation_error( class_.provide_version_class )
+    def provide_descriptor_class( class_ ):
+        ''' Provides descriptor class associated with language. '''
+        raise create_abstract_invocation_error(
+            class_.provide_descriptor_class )
 
     @classmethod
-    def survey_versions( class_ ):
-        ''' Returns language versions which have relevant definitions. '''
-        version_class = class_.provide_version_class( )
-        definitions = version_class.summon_definitions( )
+    def survey_descriptors( class_ ):
+        ''' Returns language descriptors which have relevant definitions. '''
+        descriptor_class = class_.provide_descriptor_class( )
+        definitions = descriptor_class.summon_definitions( )
         from os import environ as current_process_environment
-        version = current_process_environment.get(
-            class_.calculate_version_selector_name( ) )
-        if None is not version:
-            if version in definitions:
-                definitions = { version: definitions[ version ] }
+        descriptor = current_process_environment.get(
+            class_.calculate_descriptor_variable_name( ) )
+        if None is not descriptor:
+            if descriptor in definitions:
+                definitions = { descriptor: definitions[ descriptor ] }
             else:
                 raise create_data_validation_error(
-                    f"No version {version!r} in definitions "
+                    f"No descriptor {descriptor!r} in definitions "
                     f"for language {class_.title}." )
-        versions = { }
-        for version, definition in definitions.items( ):
-            if not version_class.is_supportable( definition ): continue
-            versions[ version ] = version_class( version )
-        return DictionaryProxy( versions )
+        descriptors = { }
+        for descriptor, definition in definitions.items( ):
+            if not descriptor_class.is_supportable( definition ): continue
+            descriptors[ descriptor ] = descriptor_class( descriptor )
+        return DictionaryProxy( descriptors )
 
     @classmethod
-    def validate_version( class_, version ):
-        ''' Validates version against available language versions. '''
-        if version not in class_.survey_versions( ):
+    def validate_descriptor( class_, descriptor ):
+        ''' Validates descriptor against available language descriptors. '''
+        if descriptor not in class_.survey_descriptors( ):
             raise create_argument_validation_error(
-                'version', class_.validate_version,
-                f"defined {class_.title} version" )
-        return version
+                'descriptor', class_.validate_descriptor,
+                f"defined {class_.title} descriptor" )
+        return descriptor
 
     # TODO: Either prevent instantiation or else use the Borg pattern.
 
 
 # TODO: Class immutability.
-class LanguageVersion( metaclass = ABCFactory ):
-    ''' Abstract base for language versions. '''
+class LanguageDescriptor( metaclass = ABCFactory ):
+    ''' Abstract base for language manifestation descriptors. '''
 
     language: _typ.Type[ Language ]
 
     @classmethod
     def create_record( class_, name ):
-        ''' Creates language version record and persists it. '''
+        ''' Creates language descriptor record and persists it. '''
         definition = class_.summon_definitions( )[ name ]
-        location = class_.provide_records_location( name )
+        location = class_.infer_records_location( name )
         if not location.exists( ): records = { }
         else: records = dict( class_.summon_records( name ) )
-        # TODO: Sort records by version descending.
-        record = next( iter( class_.survey_provider_support( definition ) ) )
-        records[ calculate_platform_name( ) ] = dict( record )
+        from operator import itemgetter
+        record = next( iter( sorted(
+            class_.survey_provider_support( definition ),
+            key = itemgetter( 'implementation-version' ), reverse = True ) ) )
+        records[ calculate_platform_identifier( ) ] = dict( record )
         class_.persist_records( name, records )
         return record
 
     @classmethod
-    def extract_definition( class_, version ):
-        ''' Extracts definition from version if necessary. '''
-        if isinstance( version, LanguageVersion ): return version.definition
-        if isinstance( version, str ):
-            return class_.summon_definitions( )[ version ]
-        return version # TODO: Sanity-check definition.
+    def infer_records_location( class_, descriptor = None ):
+        ''' Infers location for language descriptor records.
+
+            If descriptor is provided, then name of descriptor-specific
+            file is appended to directory location. '''
+        location = __getattr__( 'locations' ).data.joinpath(
+            f"{class_.language.name}/descriptors" )
+        if None is not descriptor: return location / f"{descriptor}.toml"
+        return location
 
     @classmethod
     def is_supportable( class_, definition, platform = None ):
-        ''' Is language version supportable on platform with its providers? '''
-        definition = class_.extract_definition( definition )
+        ''' Is language descriptor supportable by any of its providers?
+
+            If platform is not supplied, then current platform is assumed. '''
+        definition = class_.provide_definition( definition )
         # TODO: Consider explicit platform constraints.
         supports = class_.survey_provider_support(
             definition, platform = platform )
@@ -158,72 +176,85 @@ class LanguageVersion( metaclass = ABCFactory ):
 
     @classmethod
     def persist_records( class_, name, records ):
-        ''' Persists language version records. '''
+        ''' Persists language descriptor records. '''
         from ..packages import ensure_import_package
         tomli_w = ensure_import_package( 'tomli-w' )
-        location = class_.provide_records_location( name )
+        location = class_.infer_records_location( name )
         location.parent.mkdir( exist_ok = True, parents = True )
-        document = { 'format-version': 1, 'platforms': dict( records ) }
+        records = {
+            platform_name: {
+                'implementation-version':
+                    str( record[ 'implementation-version' ] ),
+                'provider': record[ 'provider' ],
+            } for platform_name, record in records.items( )
+        }
+        document = { 'format-version': 1, 'platforms': records }
         with location.open( 'wb' ) as file:
             # TODO: Write comment header to warn about machine-generated code.
             tomli_w.dump( document, file )
 
     @classmethod
-    def provide_feature_classes_registry( class_ ):
-        ''' Provides language installation feature classes registry. '''
+    def provide_definition( class_, descriptor ):
+        ''' Provides descriptor definition. '''
+        if isinstance( descriptor, LanguageDescriptor ):
+            return descriptor.definition
+        if isinstance( descriptor, str ):
+            return class_.summon_definitions( )[ descriptor ]
+        return descriptor # TODO: Sanity-check definition.
+
+    @classmethod
+    def provide_feature_classes( class_ ):
+        ''' Provides language installation feature classes. '''
         return survey_feature_classes( class_.language )
 
     @classmethod
-    def provide_provider_classes_registry( class_ ):
-        ''' Provides language version provider classes registry. '''
+    def provide_provider_classes( class_ ):
+        ''' Provides language installation provider classes. '''
         return survey_provider_classes( class_.language )
 
-    @classmethod
-    @abstract
-    def provide_records_directory( class_ ):
-        ''' Provides location of language versions records. '''
-        raise create_abstract_invocation_error(
-            class_.provide_records_location )
-
-    @classmethod
-    def provide_records_location( class_, name ):
-        ''' Provides location of language version records. '''
-        return class_.provide_records_directory( ) / f"{name}.toml"
-
+    # TODO: Implement with a registry using language as key.
     @classmethod
     @abstract
     def summon_definitions( class_ ):
-        ''' Summons definitions for language versions. '''
+        ''' Summons definitions for language descriptors. '''
         raise create_abstract_invocation_error( class_.summon_definitions )
 
     @classmethod
     def summon_records( class_, name ):
-        ''' Summons records for language version. '''
-        location = class_.provide_records_location( name )
+        ''' Summons records for language descriptor. '''
+        location = class_.infer_records_location( name )
         if not location.exists( ): class_.create_record( name )
         from ..packages import ensure_import_package
         tomllib = ensure_import_package( 'tomllib' )
         with location.open( 'rb' ) as file:
             # TODO: Check format version and update records format,
             #       if necessary.
-            return DictionaryProxy( tomllib.load( file )[ 'platforms' ] )
+            records = tomllib.load( file )[ 'platforms' ]
+        records = {
+            platform_name: DictionaryProxy( {
+                'implementation-version':
+                    class_.language.derive_actual_version(
+                        record[ 'implementation-version' ] ),
+                'provider': record[ 'provider' ],
+            } ) for platform_name, record in records.items( )
+        }
+        return DictionaryProxy( records )
 
     @classmethod
     def survey_provider_support( class_, definition, platform = None ):
-        ''' Surveys all providers which support language version. '''
-        definition = class_.extract_definition( definition )
-        provider_classes_registry = class_.provide_provider_classes_registry( )
+        ''' Surveys all providers which support language descriptor. '''
+        definition = class_.provide_definition( definition )
+        provider_classes = class_.provide_provider_classes( )
         supports = [ ]
-        for provider_class in provider_classes_registry.values( ):
-            if not provider_class.check_version_support(
+        for provider_class in provider_classes.values( ):
+            if not provider_class.check_descriptor_support(
                 definition, platform = platform
             ): continue
-            supports.append(
-                provider_class.generate_current_version_record( definition ) )
+            supports.append( provider_class.form_version_record( definition ) )
         return supports
 
     def __init__( self, name ):
-        # TODO: Validate version against defined versions.
+        # TODO: Validate name against definition keys.
         self.name = validate_argument_class(
             name, str, 'name', self.__init__ )
         self.definition = self._summon_definition( )
@@ -233,8 +264,8 @@ class LanguageVersion( metaclass = ABCFactory ):
 
     def __str__( self ): return f"{self.language.title} {self.name}"
 
-    def infer_executable_location( self, name = None ):
-        ''' Infers executables location for language by version.
+    def infer_executables_location( self, name = None ):
+        ''' Infers installation location for executables.
 
             If a command name is given, then it is appended to the inferred
             executables location and returned. '''
@@ -243,7 +274,7 @@ class LanguageVersion( metaclass = ABCFactory ):
         return location
 
     def infer_installation_location( self ):
-        ''' Infers installation location for language by version. '''
+        ''' Infers installation location of language manifestation. '''
         for provider in self.providers.values( ):
             location = provider.installation_location
             if not location.exists( ):
@@ -255,29 +286,25 @@ class LanguageVersion( metaclass = ABCFactory ):
         # TODO: Use exception factory.
         raise LookupError
 
-    def install( self ):
-        ''' Installs version with provider of record. '''
+    def install( self, force = False ):
+        ''' Installs language manifestation with provider of record. '''
         provider = self.providers[ self.record[ 'provider' ] ]
-        provider.install( )
+        provider.install( force = force )
 
     def probe_feature_labels( self, labels ):
-        ''' Tests if any features of version have specific labels. '''
+        ''' Tests if any features of descriptor have specific labels. '''
         if isinstance( labels, str ): labels = ( labels, )
         from itertools import chain
         return frozenset( labels ) & frozenset( chain.from_iterable(
             feature.labels for feature in self.features.values( ) ) )
 
     def update( self, install = True ):
-        ''' Attempts to update version with most relevant provider. '''
-        from ..base import compare_version
-        implementation_version = self.record[ 'implementation-version' ]
+        ''' Attempts to update manifestation with most relevant provider. '''
+        status_quo = self.record[ 'implementation-version' ]
         for provider in self.providers.values( ):
-            implementation_version_ = (
-                provider.discover_current_version( self.definition ) )
-            if 0 > compare_version(
-                implementation_version_, implementation_version
-            ): continue
-            try: record = provider.generate_current_version_record( self )
+            offer = provider.discover_current_version( self.definition )
+            if offer < status_quo: continue
+            try: record = provider.form_version_record( self )
             except Exception: # pylint: disable=broad-except
                 __.scribe.exception(
                     f"Could not update {self.name} by {provider.name}." )
@@ -290,12 +317,14 @@ class LanguageVersion( metaclass = ABCFactory ):
         return self
 
     def _instantiate_features( self ):
-        feature_classes_registry = self.provide_feature_classes_registry( )
+        feature_classes = self.provide_feature_classes( )
         features = { }
         mutex_labels = frozenset( )
         for name in self.definition.get( 'features', ( ) ):
-            feature = feature_classes_registry[ name ]( self )
-            features[ name ] = feature
+            feature_class = feature_classes[ name ]
+            if not feature_class.check_descriptor_support( self.definition ):
+                continue
+            features[ name ] = feature = feature_class( self )
             # Sanity check for mutually-exclusive features.
             if mutex_labels & feature.mutex_labels:
                 # TODO: Use exception factory.
@@ -304,10 +333,13 @@ class LanguageVersion( metaclass = ABCFactory ):
         return DictionaryProxy( features )
 
     def _instantiate_providers( self ):
-        provider_classes_registry = self.provide_provider_classes_registry( )
+        provider_classes = self.provide_provider_classes( )
         providers = { }
         for name in self.definition.get( 'providers', ( ) ):
-            providers[ name ] = provider_classes_registry[ name ]( self )
+            provider_class = provider_classes[ name ]
+            if not provider_class.check_descriptor_support( self.definition ):
+                continue
+            providers[ name ] = provider_class( self )
         return DictionaryProxy( providers )
 
     def _summon_definition( self ):
@@ -315,11 +347,13 @@ class LanguageVersion( metaclass = ABCFactory ):
 
     def _summon_record( self ):
         records = self.summon_records( self.name )
-        return records[ calculate_platform_name( ) ]
+        platform_name = calculate_platform_identifier( )
+        if platform_name not in records: return self.create_record( self.name )
+        return records[ platform_name ]
 
     def _update_record( self ):
         records = dict( self.summon_records( self.name ) )
-        records[ calculate_platform_name( ) ] = dict( self.record )
+        records[ calculate_platform_identifier( ) ] = dict( self.record )
         self.persist_records( self.name, records )
 
 
@@ -331,6 +365,22 @@ class LanguageFeature( metaclass = ABCFactory ):
     language: _typ.Type[ Language ]
     mutex_labels: _typ.FrozenSet[ str ]
     name: str
+
+    @classmethod
+    def check_descriptor_support( class_, descriptor, platform = None ):
+        ''' Does feature support language manifestation descriptor? '''
+        definition = (
+            class_.language.provide_descriptor_class( )
+            .provide_definition( descriptor ) )
+        if not class_.is_supportable_platform( platform = platform ):
+            return False
+        if not class_.is_supportable_base_version(
+            definition[ 'base-version' ]
+        ): return False
+        if not class_.is_supportable_implementation(
+            definition[ 'implementation' ]
+        ): return False
+        return True
 
     @classmethod
     @abstract
@@ -356,19 +406,19 @@ class LanguageFeature( metaclass = ABCFactory ):
             # nosemgrep: python.lang.maintainability.is-function-without-parentheses
             class_.is_supportable_platform )
 
-    def __init__( self, version ):
-        self.version = validate_argument_class(
-            version, LanguageVersion, 'version', self.__init__ )
+    def __init__( self, descriptor ):
+        self.descriptor = validate_argument_class(
+            descriptor, LanguageDescriptor, 'descriptor', self.__init__ )
 
     @abstract
     def modify_installation( self, installation_location ):
-        ''' Modifies language version installation. '''
+        ''' Modifies language installation. '''
         # nosemgrep: python.lang.maintainability.is-function-without-parentheses
         raise create_abstract_invocation_error( self.modify_installation )
 
     @abstract
     def modify_provider_environment( self, environment ):
-        ''' Modifies language version provider environment. '''
+        ''' Modifies language installation provider environment. '''
         raise create_abstract_invocation_error(
             # nosemgrep: python.lang.maintainability.is-function-without-parentheses
             self.modify_provider_environment )
@@ -376,17 +426,17 @@ class LanguageFeature( metaclass = ABCFactory ):
 
 # TODO: Class immutability.
 class LanguageProvider( metaclass = ABCFactory ):
-    ''' Abstract base for language version providers. '''
+    ''' Abstract base for language installation providers. '''
 
     language: _typ.Type[ Language ]
     name: str
 
     @classmethod
-    def check_version_support( class_, version, platform = None ):
-        ''' Does provider support version? '''
+    def check_descriptor_support( class_, descriptor, platform = None ):
+        ''' Does provider support language manifestation descriptor? '''
         definition = (
-            class_.language.provide_version_class( )
-            .extract_definition( version ) )
+            class_.language.provide_descriptor_class( )
+            .provide_definition( descriptor ) )
         if not class_.is_supportable_platform( platform = platform ):
             return False
         if not class_.is_supportable_base_version(
@@ -409,11 +459,12 @@ class LanguageProvider( metaclass = ABCFactory ):
             class_.discover_current_version )
 
     @classmethod
-    def generate_current_version_record( class_, version ):
-        ''' Detects latest Python version and returns version record. '''
+    def form_version_record( class_, descriptor, version = None ): # pylint: disable=unused-argument
+        ''' Forms version record. '''
         definition = (
-            class_.language.provide_version_class( )
-            .extract_definition( version ) )
+            class_.language.provide_descriptor_class( )
+            .provide_definition( descriptor ) )
+        # TODO: Handle version argument.
         return {
             'implementation-version':
                 class_.discover_current_version( definition ),
@@ -451,9 +502,9 @@ class LanguageProvider( metaclass = ABCFactory ):
             # nosemgrep: python.lang.maintainability.is-function-without-parentheses
             class_.is_supportable_platform )
 
-    def __init__( self, version ):
-        self.version = validate_argument_class(
-            version, LanguageVersion, 'version', self.__init__ )
+    def __init__( self, descriptor ):
+        self.descriptor = validate_argument_class(
+            descriptor, LanguageDescriptor, 'descriptor', self.__init__ )
         self.installation_name = self.calculate_installation_name( )
         self.installation_location = self.calculate_installation_location( )
         # TODO: Assert viability of features + implementation + platform.
@@ -466,29 +517,21 @@ class LanguageProvider( metaclass = ABCFactory ):
 
     def calculate_installation_name( self ):
         ''' Calculates installation name from version and platform. '''
-        version_definition = self.version.definition
-        feature_names = '+'.join( self.version.features.keys( ) )
+        definition = self.descriptor.definition
+        feature_names = '+'.join( self.descriptor.features.keys( ) )
         # TODO? Calculate with relevant C library or language VM name.
         return '--'.join( filter( None, (
             "{implementation}-{base_version}".format(
-                implementation = version_definition[ 'implementation' ],
-                base_version = version_definition[ 'base-version' ] ),
-            self.version.record[ 'implementation-version' ],
+                implementation = definition[ 'implementation' ],
+                base_version = definition[ 'base-version' ] ),
+            str( self.descriptor.record[ 'implementation-version' ] ),
             feature_names,
-            calculate_platform_name( ) ) ) )
+            calculate_platform_identifier( ) ) ) )
 
     @abstract
     def install( self ):
         ''' Installs version of language. '''
         raise create_abstract_invocation_error( self.install )
-
-
-# TODO: Move calculation to 'platforms' module.
-# TODO: Cache on module.
-def calculate_platform_name( ):
-    ''' Calculates platform name from OS kernel and CPU architecture. '''
-    from platform import machine as cpu_architecture, system as os_kernel_name
-    return '--'.join( ( os_kernel_name( ).lower( ), cpu_architecture( ) ) )
 
 
 def _validate_feature_class( class_ ):
@@ -597,3 +640,6 @@ def _provide_calculators( ):
     )
 
 __getattr__ = __.module_introduce_accretive_cache( _provide_calculators )
+
+# TODO: Setup proxy 'me' to this module itself for more natural access to
+#       computed attributes.

@@ -38,8 +38,8 @@ def build_python_venv( version, overwrite = False ):
     ''' Creates virtual environment for requested Python version. '''
     from .languages.python import Language
     python_path = (
-        Language.produce_version( version )
-        .infer_executable_location( name = 'python' ) )
+        Language.produce_descriptor( version )
+        .infer_executables_location( name = 'python' ) )
     from .fs_utilities import ensure_directory
     venv_path = ensure_directory( derive_venv_path( version, python_path ) )
     venv_options = [ ]
@@ -155,8 +155,8 @@ def derive_venv_path( version = None, python_path = None ):
     if None is python_path:
         from .languages.python import Language
         python_path = (
-            Language.produce_version( version = version )
-            .infer_executable_location( name = 'python' ) )
+            Language.produce_descriptor( version )
+            .infer_executables_location( name = 'python' ) )
     from .platforms import identify_python
     abi_label = identify_python(
         'bdist-compatibility', python_path = python_path )

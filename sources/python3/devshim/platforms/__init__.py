@@ -35,8 +35,8 @@ def pep508_identify_python( version = None ):
     ''' Calculates PEP 508 identifier for Python version. '''
     from ..languages.python import Language
     python_path = (
-        Language.produce_version( version )
-        .infer_executable_location( name = 'python' ) )
+        Language.produce_descriptor( version )
+        .infer_executables_location( name = 'python' ) )
     return identify_python( 'pep508-environment', python_path = python_path )
 
 

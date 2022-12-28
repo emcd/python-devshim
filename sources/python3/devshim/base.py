@@ -36,6 +36,9 @@ from types import (
 # pylint: enable=unused-import
 
 
+environment_variable_prefix = __package__.upper( )
+
+
 def naively_parse_version( version ):
     ''' Naively splits version on periods and converts parts to integers.
 

@@ -69,6 +69,9 @@ requirement = 'hypothesis'
 requirement = 'pytest'
 
 [[development.user-interface]]
+requirement = 'beautifulsoup4'
+
+[[development.user-interface]]
 requirement = 'build'
 
 [[development.user-interface]]

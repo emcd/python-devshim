@@ -28,8 +28,8 @@ jobs:
       - name: Store Python Versions
         uses: actions/upload-artifact@v3
         with:
-          name: python-versions
-          path: .local/data/devshim/languages/python/
+          name: python-descriptors
+          path: .local/data/devshim/languages/python/descriptors/
 
 
   update-python-packages:
