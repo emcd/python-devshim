@@ -1,0 +1,9 @@
+format-version = 1
+
+[platforms.linux-64bit--x86_64]
+implementation-version = "3.10.9"
+provider = "python-build"
+
+[platforms.windows-64bit--amd64]
+implementation-version = "3.10.9"
+provider = "windows-embeddable"

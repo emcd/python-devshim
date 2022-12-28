@@ -28,8 +28,8 @@ jobs:
       - name: Store Python Versions
         uses: actions/upload-artifact@v3
         with:
-          name: python-versions
-          path: .local/data/devshim/languages/python/
+          name: python-descriptors
+          path: .local/data/devshim/languages/python/descriptors/
 
 
   update-python-packages:
@@ -40,7 +40,8 @@ jobs:
         python-version: ${{ fromJSON(inputs.python-versions-json) }}
     steps:
       - name: Prepare Python Virtual Environment
-        uses: emcd/python-devshim/.github/actions/python-venv@master
+        #uses: emcd/python-devshim/.github/actions/python-venv@master
+        uses: emcd/python-devshim/.github/actions/python-venv@windows
         with:
           python-version: '${{ matrix.python-version }}'
           use-versions-update: true
@@ -65,7 +66,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prepare Python Virtual Environment
-        uses: emcd/python-devshim/.github/actions/python-venv@master
+        #uses: emcd/python-devshim/.github/actions/python-venv@master
+        uses: emcd/python-devshim/.github/actions/python-venv@windows
         with:
           use-versions-update: true
       - name: Freshen Git Modules

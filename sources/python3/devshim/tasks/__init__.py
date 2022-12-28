@@ -61,7 +61,7 @@ def install_python( version ):
 
         This task requires Internet access and may take some time. '''
     from ..languages.python import Language
-    Language.produce_version( version ).install( )
+    Language.produce_descriptor( version ).install( )
 
 
 @__.task(
@@ -190,7 +190,7 @@ def check_security_issues( version = None ):
     # Ruamel binary package requires standard ABI.
     from ..languages.python import Language
     if (
-        Language.produce_version( version )
+        Language.produce_descriptor( version )
         .probe_feature_labels( 'abi-incompatible' )
     ): return
     __.project_execute_external(
@@ -206,7 +206,7 @@ def freshen_python( version = None, install = True ):
 
         This task requires Internet access and may take some time. '''
     from ..languages.python import Language
-    Language.produce_version( version ).update( install = install )
+    Language.produce_descriptor( version ).update( install = install )
     ## Erase packages fixtures for versions which are no longer extant.
     #from ..packages import delete_python_packages_fixtures
     #delete_python_packages_fixtures( obsolete_identifiers )
@@ -287,7 +287,7 @@ def lint_bandit( version = None ):
     # Cyaml binary package requires standard ABI.
     from ..languages.python import Language
     if (
-        Language.produce_version( version )
+        Language.produce_descriptor( version )
         .probe_feature_labels( 'abi-incompatible' )
     ): return
     files = _lint_targets_default
@@ -311,7 +311,7 @@ def lint_mypy( packages, modules, files, version = None ):
     # Mypy binary package requires standard ABI.
     from ..languages.python import Language
     if (
-        Language.produce_version( version )
+        Language.produce_descriptor( version )
         .probe_feature_labels( 'abi-incompatible' )
     ): return
     process_environment = __.derive_venv_variables( version = version )
@@ -366,7 +366,7 @@ def lint_semgrep( version = None ):
     # Ruamel binary package requires standard ABI.
     from ..languages.python import Language
     if (
-        Language.produce_version( version )
+        Language.produce_descriptor( version )
         .probe_feature_labels( 'abi-incompatible' )
     ): return
     process_environment = __.derive_venv_variables( version = version )
@@ -425,7 +425,7 @@ def test( ensure_sanity = True, version = None ):
     # Cyaml binary package requires standard ABI.
     from ..languages.python import Language
     if (
-        Language.produce_version( version )
+        Language.produce_descriptor( version )
         .probe_feature_labels( 'abi-incompatible' )
     ): return
     process_environment = __.derive_venv_variables( version = version )
@@ -857,8 +857,8 @@ def show_python( all_versions = False ):
     # TODO? With Rich and 'detail' flag, show panels with details.
     from ..languages.python import Language
     if all_versions:
-        for version in Language.survey_versions( ).keys( ): print( version )
-    else: print( Language.detect_default_version( ).name )
+        for version in Language.survey_descriptors( ).keys( ): print( version )
+    else: print( Language.detect_default_descriptor( ).name )
 
 
 # For use by Invoke's module loader. Must be called 'namespace' (or 'ns').

@@ -1,0 +1,482 @@
+format-version = 1
+
+[versions."3.7.0"]
+amd64 = "https://www.python.org/ftp/python/3.7.0/python-3.7.0-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.0/python-3.7.0-embed-win32.zip"
+
+[versions."3.7.1rc1"]
+amd64 = "https://www.python.org/ftp/python/3.7.1/python-3.7.1rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.1/python-3.7.1rc1-embed-win32.zip"
+
+[versions."3.7.1rc2"]
+amd64 = "https://www.python.org/ftp/python/3.7.1/python-3.7.1rc2-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.1/python-3.7.1rc2-embed-win32.zip"
+
+[versions."3.7.1"]
+amd64 = "https://www.python.org/ftp/python/3.7.1/python-3.7.1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.1/python-3.7.1-embed-win32.zip"
+
+[versions."3.7.2rc1"]
+amd64 = "https://www.python.org/ftp/python/3.7.2/python-3.7.2rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.2/python-3.7.2rc1-embed-win32.zip"
+
+[versions."3.7.2.post1"]
+amd64 = "https://www.python.org/ftp/python/3.7.2/python-3.7.2.post1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.2/python-3.7.2.post1-embed-win32.zip"
+
+[versions."3.7.3rc1"]
+amd64 = "https://www.python.org/ftp/python/3.7.3/python-3.7.3rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.3/python-3.7.3rc1-embed-win32.zip"
+
+[versions."3.7.3"]
+amd64 = "https://www.python.org/ftp/python/3.7.3/python-3.7.3-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.3/python-3.7.3-embed-win32.zip"
+
+[versions."3.7.4rc1"]
+amd64 = "https://www.python.org/ftp/python/3.7.4/python-3.7.4rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.4/python-3.7.4rc1-embed-win32.zip"
+
+[versions."3.7.4"]
+amd64 = "https://www.python.org/ftp/python/3.7.4/python-3.7.4-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.4/python-3.7.4-embed-win32.zip"
+
+[versions."3.7.5rc1"]
+amd64 = "https://www.python.org/ftp/python/3.7.5/python-3.7.5rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.5/python-3.7.5rc1-embed-win32.zip"
+
+[versions."3.7.5"]
+amd64 = "https://www.python.org/ftp/python/3.7.5/python-3.7.5-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.5/python-3.7.5-embed-win32.zip"
+
+[versions."3.7.6rc1"]
+amd64 = "https://www.python.org/ftp/python/3.7.6/python-3.7.6rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.6/python-3.7.6rc1-embed-win32.zip"
+
+[versions."3.7.6"]
+amd64 = "https://www.python.org/ftp/python/3.7.6/python-3.7.6-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.6/python-3.7.6-embed-win32.zip"
+
+[versions."3.7.7rc1"]
+amd64 = "https://www.python.org/ftp/python/3.7.7/python-3.7.7rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.7/python-3.7.7rc1-embed-win32.zip"
+
+[versions."3.7.7"]
+amd64 = "https://www.python.org/ftp/python/3.7.7/python-3.7.7-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.7/python-3.7.7-embed-win32.zip"
+
+[versions."3.7.8rc1"]
+amd64 = "https://www.python.org/ftp/python/3.7.8/python-3.7.8rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.8/python-3.7.8rc1-embed-win32.zip"
+
+[versions."3.7.8"]
+amd64 = "https://www.python.org/ftp/python/3.7.8/python-3.7.8-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.8/python-3.7.8-embed-win32.zip"
+
+[versions."3.7.9"]
+amd64 = "https://www.python.org/ftp/python/3.7.9/python-3.7.9-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.7.9/python-3.7.9-embed-win32.zip"
+
+[versions."3.8.0a1"]
+amd64 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0a1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0a1-embed-win32.zip"
+
+[versions."3.8.0a2"]
+amd64 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0a2-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0a2-embed-win32.zip"
+
+[versions."3.8.0a3"]
+amd64 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0a3-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0a3-embed-win32.zip"
+
+[versions."3.8.0a4"]
+amd64 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0a4-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0a4-embed-win32.zip"
+
+[versions."3.8.0b1"]
+amd64 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0b1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0b1-embed-win32.zip"
+
+[versions."3.8.0b2"]
+amd64 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0b2-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0b2-embed-win32.zip"
+
+[versions."3.8.0b3"]
+amd64 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0b3-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0b3-embed-win32.zip"
+
+[versions."3.8.0b4"]
+amd64 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0b4-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0b4-embed-win32.zip"
+
+[versions."3.8.0rc1"]
+amd64 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0rc1-embed-win32.zip"
+
+[versions."3.8.0"]
+amd64 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.0/python-3.8.0-embed-win32.zip"
+
+[versions."3.8.1rc1"]
+amd64 = "https://www.python.org/ftp/python/3.8.1/python-3.8.1rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.1/python-3.8.1rc1-embed-win32.zip"
+
+[versions."3.8.1"]
+amd64 = "https://www.python.org/ftp/python/3.8.1/python-3.8.1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.1/python-3.8.1-embed-win32.zip"
+
+[versions."3.8.2rc1"]
+amd64 = "https://www.python.org/ftp/python/3.8.2/python-3.8.2rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.2/python-3.8.2rc1-embed-win32.zip"
+
+[versions."3.8.2rc2"]
+amd64 = "https://www.python.org/ftp/python/3.8.2/python-3.8.2rc2-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.2/python-3.8.2rc2-embed-win32.zip"
+
+[versions."3.8.2"]
+amd64 = "https://www.python.org/ftp/python/3.8.2/python-3.8.2-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.2/python-3.8.2-embed-win32.zip"
+
+[versions."3.8.3rc1"]
+amd64 = "https://www.python.org/ftp/python/3.8.3/python-3.8.3rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.3/python-3.8.3rc1-embed-win32.zip"
+
+[versions."3.8.3"]
+amd64 = "https://www.python.org/ftp/python/3.8.3/python-3.8.3-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.3/python-3.8.3-embed-win32.zip"
+
+[versions."3.8.4rc1"]
+amd64 = "https://www.python.org/ftp/python/3.8.4/python-3.8.4rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.4/python-3.8.4rc1-embed-win32.zip"
+
+[versions."3.8.4"]
+amd64 = "https://www.python.org/ftp/python/3.8.4/python-3.8.4-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.4/python-3.8.4-embed-win32.zip"
+
+[versions."3.8.5"]
+amd64 = "https://www.python.org/ftp/python/3.8.5/python-3.8.5-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.5/python-3.8.5-embed-win32.zip"
+
+[versions."3.8.6rc1"]
+amd64 = "https://www.python.org/ftp/python/3.8.6/python-3.8.6rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.6/python-3.8.6rc1-embed-win32.zip"
+
+[versions."3.8.6"]
+amd64 = "https://www.python.org/ftp/python/3.8.6/python-3.8.6-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.6/python-3.8.6-embed-win32.zip"
+
+[versions."3.8.7rc1"]
+amd64 = "https://www.python.org/ftp/python/3.8.7/python-3.8.7rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.7/python-3.8.7rc1-embed-win32.zip"
+
+[versions."3.8.7"]
+amd64 = "https://www.python.org/ftp/python/3.8.7/python-3.8.7-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.7/python-3.8.7-embed-win32.zip"
+
+[versions."3.8.8rc1"]
+amd64 = "https://www.python.org/ftp/python/3.8.8/python-3.8.8rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.8/python-3.8.8rc1-embed-win32.zip"
+
+[versions."3.8.8"]
+amd64 = "https://www.python.org/ftp/python/3.8.8/python-3.8.8-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.8/python-3.8.8-embed-win32.zip"
+
+[versions."3.8.9"]
+amd64 = "https://www.python.org/ftp/python/3.8.9/python-3.8.9-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.9/python-3.8.9-embed-win32.zip"
+
+[versions."3.8.10"]
+amd64 = "https://www.python.org/ftp/python/3.8.10/python-3.8.10-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.8.10/python-3.8.10-embed-win32.zip"
+
+[versions."3.9.0a1"]
+amd64 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0a1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0a1-embed-win32.zip"
+
+[versions."3.9.0a2"]
+amd64 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0a2-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0a2-embed-win32.zip"
+
+[versions."3.9.0a3"]
+amd64 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0a3-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0a3-embed-win32.zip"
+
+[versions."3.9.0a4"]
+amd64 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0a4-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0a4-embed-win32.zip"
+
+[versions."3.9.0a5"]
+amd64 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0a5-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0a5-embed-win32.zip"
+
+[versions."3.9.0a6"]
+amd64 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0a6-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0a6-embed-win32.zip"
+
+[versions."3.9.0b1"]
+amd64 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0b1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0b1-embed-win32.zip"
+
+[versions."3.9.0b2"]
+amd64 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0b2-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0b2-embed-win32.zip"
+
+[versions."3.9.0b3"]
+amd64 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0b3-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0b3-embed-win32.zip"
+
+[versions."3.9.0b4"]
+amd64 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0b4-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0b4-embed-win32.zip"
+
+[versions."3.9.0b5"]
+amd64 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0b5-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0b5-embed-win32.zip"
+
+[versions."3.9.0rc1"]
+amd64 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0rc1-embed-win32.zip"
+
+[versions."3.9.0rc2"]
+amd64 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0rc2-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0rc2-embed-win32.zip"
+
+[versions."3.9.0"]
+amd64 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.0/python-3.9.0-embed-win32.zip"
+
+[versions."3.9.1rc1"]
+amd64 = "https://www.python.org/ftp/python/3.9.1/python-3.9.1rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.1/python-3.9.1rc1-embed-win32.zip"
+
+[versions."3.9.1"]
+amd64 = "https://www.python.org/ftp/python/3.9.1/python-3.9.1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.1/python-3.9.1-embed-win32.zip"
+
+[versions."3.9.2rc1"]
+amd64 = "https://www.python.org/ftp/python/3.9.2/python-3.9.2rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.2/python-3.9.2rc1-embed-win32.zip"
+
+[versions."3.9.2"]
+amd64 = "https://www.python.org/ftp/python/3.9.2/python-3.9.2-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.2/python-3.9.2-embed-win32.zip"
+
+[versions."3.9.4"]
+amd64 = "https://www.python.org/ftp/python/3.9.4/python-3.9.4-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.4/python-3.9.4-embed-win32.zip"
+
+[versions."3.9.5"]
+amd64 = "https://www.python.org/ftp/python/3.9.5/python-3.9.5-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.5/python-3.9.5-embed-win32.zip"
+
+[versions."3.9.6"]
+amd64 = "https://www.python.org/ftp/python/3.9.6/python-3.9.6-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.6/python-3.9.6-embed-win32.zip"
+
+[versions."3.9.7"]
+amd64 = "https://www.python.org/ftp/python/3.9.7/python-3.9.7-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.7/python-3.9.7-embed-win32.zip"
+
+[versions."3.9.8"]
+amd64 = "https://www.python.org/ftp/python/3.9.8/python-3.9.8-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.8/python-3.9.8-embed-win32.zip"
+
+[versions."3.9.9"]
+amd64 = "https://www.python.org/ftp/python/3.9.9/python-3.9.9-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.9/python-3.9.9-embed-win32.zip"
+
+[versions."3.9.10"]
+amd64 = "https://www.python.org/ftp/python/3.9.10/python-3.9.10-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.10/python-3.9.10-embed-win32.zip"
+
+[versions."3.9.11"]
+amd64 = "https://www.python.org/ftp/python/3.9.11/python-3.9.11-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.11/python-3.9.11-embed-win32.zip"
+
+[versions."3.9.12"]
+amd64 = "https://www.python.org/ftp/python/3.9.12/python-3.9.12-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.12/python-3.9.12-embed-win32.zip"
+
+[versions."3.9.13"]
+amd64 = "https://www.python.org/ftp/python/3.9.13/python-3.9.13-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.9.13/python-3.9.13-embed-win32.zip"
+
+[versions."3.10.0a1"]
+amd64 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0a1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0a1-embed-win32.zip"
+
+[versions."3.10.0a2"]
+amd64 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0a2-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0a2-embed-win32.zip"
+
+[versions."3.10.0a3"]
+amd64 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0a3-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0a3-embed-win32.zip"
+
+[versions."3.10.0a4"]
+amd64 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0a4-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0a4-embed-win32.zip"
+
+[versions."3.10.0a5"]
+amd64 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0a5-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0a5-embed-win32.zip"
+
+[versions."3.10.0a6"]
+amd64 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0a6-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0a6-embed-win32.zip"
+
+[versions."3.10.0a7"]
+amd64 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0a7-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0a7-embed-win32.zip"
+
+[versions."3.10.0b1"]
+amd64 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0b1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0b1-embed-win32.zip"
+
+[versions."3.10.0b2"]
+amd64 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0b2-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0b2-embed-win32.zip"
+
+[versions."3.10.0b3"]
+amd64 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0b3-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0b3-embed-win32.zip"
+
+[versions."3.10.0b4"]
+amd64 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0b4-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0b4-embed-win32.zip"
+
+[versions."3.10.0rc1"]
+amd64 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0rc1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0rc1-embed-win32.zip"
+
+[versions."3.10.0rc2"]
+amd64 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0rc2-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0rc2-embed-win32.zip"
+
+[versions."3.10.0"]
+amd64 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.0/python-3.10.0-embed-win32.zip"
+
+[versions."3.10.1"]
+amd64 = "https://www.python.org/ftp/python/3.10.1/python-3.10.1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.1/python-3.10.1-embed-win32.zip"
+
+[versions."3.10.2"]
+amd64 = "https://www.python.org/ftp/python/3.10.2/python-3.10.2-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.2/python-3.10.2-embed-win32.zip"
+
+[versions."3.10.3"]
+amd64 = "https://www.python.org/ftp/python/3.10.3/python-3.10.3-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.3/python-3.10.3-embed-win32.zip"
+
+[versions."3.10.4"]
+amd64 = "https://www.python.org/ftp/python/3.10.4/python-3.10.4-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.4/python-3.10.4-embed-win32.zip"
+
+[versions."3.10.5"]
+amd64 = "https://www.python.org/ftp/python/3.10.5/python-3.10.5-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.5/python-3.10.5-embed-win32.zip"
+
+[versions."3.10.6"]
+amd64 = "https://www.python.org/ftp/python/3.10.6/python-3.10.6-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.6/python-3.10.6-embed-win32.zip"
+
+[versions."3.10.7"]
+amd64 = "https://www.python.org/ftp/python/3.10.7/python-3.10.7-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.7/python-3.10.7-embed-win32.zip"
+
+[versions."3.10.8"]
+amd64 = "https://www.python.org/ftp/python/3.10.8/python-3.10.8-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.8/python-3.10.8-embed-win32.zip"
+
+[versions."3.10.9"]
+amd64 = "https://www.python.org/ftp/python/3.10.9/python-3.10.9-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.10.9/python-3.10.9-embed-win32.zip"
+
+[versions."3.11.0a1"]
+amd64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0a1-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0a1-embed-win32.zip"
+
+[versions."3.11.0a2"]
+amd64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0a2-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0a2-embed-win32.zip"
+
+[versions."3.11.0a3"]
+amd64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0a3-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0a3-embed-win32.zip"
+
+[versions."3.11.0a4"]
+amd64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0a4-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0a4-embed-win32.zip"
+
+[versions."3.11.0a5"]
+amd64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0a5-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0a5-embed-win32.zip"
+
+[versions."3.11.0a6"]
+amd64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0a6-embed-amd64.zip"
+x86 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0a6-embed-win32.zip"
+
+[versions."3.11.0a7"]
+amd64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0a7-embed-amd64.zip"
+arm64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0a7-embed-arm64.zip"
+x86 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0a7-embed-win32.zip"
+
+[versions."3.11.0b1"]
+amd64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0b1-embed-amd64.zip"
+arm64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0b1-embed-arm64.zip"
+x86 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0b1-embed-win32.zip"
+
+[versions."3.11.0b2"]
+amd64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0b2-embed-amd64.zip"
+arm64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0b2-embed-arm64.zip"
+x86 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0b2-embed-win32.zip"
+
+[versions."3.11.0b3"]
+amd64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0b3-embed-amd64.zip"
+arm64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0b3-embed-arm64.zip"
+x86 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0b3-embed-win32.zip"
+
+[versions."3.11.0b4"]
+amd64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0b4-embed-amd64.zip"
+arm64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0b4-embed-arm64.zip"
+x86 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0b4-embed-win32.zip"
+
+[versions."3.11.0b5"]
+amd64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0b5-embed-amd64.zip"
+arm64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0b5-embed-arm64.zip"
+x86 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0b5-embed-win32.zip"
+
+[versions."3.11.0rc1"]
+amd64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0rc1-embed-amd64.zip"
+arm64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0rc1-embed-arm64.zip"
+x86 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0rc1-embed-win32.zip"
+
+[versions."3.11.0rc2"]
+amd64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0rc2-embed-amd64.zip"
+arm64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0rc2-embed-arm64.zip"
+x86 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0rc2-embed-win32.zip"
+
+[versions."3.11.0"]
+amd64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0-embed-amd64.zip"
+arm64 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0-embed-arm64.zip"
+x86 = "https://www.python.org/ftp/python/3.11.0/python-3.11.0-embed-win32.zip"
+
+[versions."3.11.1"]
+amd64 = "https://www.python.org/ftp/python/3.11.1/python-3.11.1-embed-amd64.zip"
+arm64 = "https://www.python.org/ftp/python/3.11.1/python-3.11.1-embed-arm64.zip"
+x86 = "https://www.python.org/ftp/python/3.11.1/python-3.11.1-embed-win32.zip"
+
+[versions."3.12.0a1"]
+amd64 = "https://www.python.org/ftp/python/3.12.0/python-3.12.0a1-embed-amd64.zip"
+arm64 = "https://www.python.org/ftp/python/3.12.0/python-3.12.0a1-embed-arm64.zip"
+x86 = "https://www.python.org/ftp/python/3.12.0/python-3.12.0a1-embed-win32.zip"
+
+[versions."3.12.0a2"]
+amd64 = "https://www.python.org/ftp/python/3.12.0/python-3.12.0a2-embed-amd64.zip"
+arm64 = "https://www.python.org/ftp/python/3.12.0/python-3.12.0a2-embed-arm64.zip"
+x86 = "https://www.python.org/ftp/python/3.12.0/python-3.12.0a2-embed-win32.zip"
+
+[versions."3.12.0a3"]
+amd64 = "https://www.python.org/ftp/python/3.12.0/python-3.12.0a3-embed-amd64.zip"
+arm64 = "https://www.python.org/ftp/python/3.12.0/python-3.12.0a3-embed-arm64.zip"
+x86 = "https://www.python.org/ftp/python/3.12.0/python-3.12.0a3-embed-win32.zip"

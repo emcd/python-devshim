@@ -31,7 +31,6 @@ from .. import base as __
 
 # Note: Need to explicitly declare __getattr__-synthesized module attributes
 #       to avoid issues with MyPy and Pylint.
-locations: _typ.Any
 version_definitions: _typ.Any
 
 
@@ -42,20 +41,23 @@ class Language( __.Language ):
     title = 'Python'
 
     @classmethod
-    def provide_version_class( class_ ): return LanguageVersion
+    def derive_actual_version( class_, version ):
+        # TODO: Validate version argument.
+        # PEP 440 package versions also seem to hold for Python versions,
+        # so we use a package version representation for language versions.
+        from packaging.version import Version
+        return Version( version )
+
+    @classmethod
+    def provide_descriptor_class( class_ ): return LanguageDescriptor
 
 __.register_language( Language )
 
 
-class LanguageVersion( __.LanguageVersion ):
-    ''' Manager for Python language versions. '''
+class LanguageDescriptor( __.LanguageDescriptor ):
+    ''' Python language manifestation descriptor. '''
 
     language = Language
-
-    # TODO: Roll up into base class.
-    @classmethod
-    def provide_records_directory( class_ ):
-        return __.locations.data / 'python'
 
     # TODO: Roll up into base class.
     @classmethod

@@ -34,17 +34,19 @@ from . import base as __
 
 def install_python_packages( process_environment, identifier = None ):
     ''' Installs required Python packages into virtual environment. '''
+    from shlex import split as split_command
     from .base import execute_external
     raw, frozen, unpublished = generate_pip_requirements_text(
         identifier = identifier )
     execute_external(
-        'pip install --upgrade setuptools pip wheel',
+        split_command(
+            'python -m pip install --upgrade setuptools pip wheel' ),
         env = process_environment )
     if not identifier or not frozen:
         pip_options = [ ]
         if not identifier:
             pip_options.append( '--upgrade' )
-            pip_options.append( '--upgrade-strategy eager' )
+            pip_options.append( '--upgrade-strategy=eager' )
         execute_pip_with_requirements(
             process_environment, 'install', raw, pip_options = pip_options )
     else:
@@ -57,7 +59,9 @@ def install_python_packages( process_environment, identifier = None ):
     # Pip cannot currently mix editable and digest-bound requirements,
     # so we must install editable packages separately. (As of 2022-02-06.)
     # https://github.com/pypa/pip/issues/4995
-    execute_external( 'pip install --editable .', env = process_environment )
+    execute_external(
+        split_command( 'python -m pip install --editable .' ),
+        env = process_environment )
 
 
 def execute_pip_with_requirements(
@@ -69,16 +73,13 @@ def execute_pip_with_requirements(
     # Unfortunately, Pip does not support reading requirements from stdin,
     # as of 2022-01-02. To workaround, we need to write and then read
     # a temporary file. More details: https://github.com/pypa/pip/issues/7822
-    from shlex import quote as shell_quote
     from tempfile import NamedTemporaryFile
     with NamedTemporaryFile( mode = 'w+' ) as requirements_file:
         requirements_file.write( requirements )
         requirements_file.flush( )
         execute_external(
-            "pip {command} {options} --requirement {requirements_file}".format(
-                command = command,
-                options = ' '.join( pip_options ),
-                requirements_file = shell_quote( requirements_file.name ) ),
+            ( 'python', '-m', 'pip', command, *pip_options,
+              '--requirement', requirements_file.name ),
             env = process_environment )
 
 
@@ -287,9 +288,11 @@ def _ensure_python_packages( requirements ):
         requirements, cache = cache )
     if installable_requirements:
         from shlex import split as split_command
+        from sys import executable as python_path
         from .base import execute_external
         execute_external(
-            ( *split_command( 'pip install --upgrade --target' ),
+            ( python_path,
+              *split_command( '-m pip install --upgrade --target' ),
               cache, *installable_requirements ) )
 
 
@@ -298,8 +301,8 @@ def _filter_available_python_packages( requirements, cache = None ):
     if not cache: cache = _ensure_python_packages_cache( )
     # TODO? Use 'pip freeze --path' output instead.
     present_packages = frozenset(
-        path.name for path in cache.glob( '*' )
-        if path.suffix not in ( '.dist-info', ) )
+        _pep508_requirement_to_name( path.stem )
+        for path in cache.glob( '*.dist-info' ) )
     return tuple(
         requirement for requirement in requirements
         if _pep508_requirement_to_name( requirement ) not in present_packages )
@@ -382,7 +385,7 @@ def indicate_current_python_packages( environment ):
     from .base import execute_external
     entries = [ ]
     for line in execute_external(
-        split_command( 'pip freeze' ),
+        split_command( 'python -m pip freeze' ),
         capture_output = True, env = environment,
     ).stdout.strip( ).splitlines( ):
         if line.startswith( '#' ): continue
@@ -445,10 +448,18 @@ def retrieve_pypi_release_information( name, version, index_url = '' ): # pylint
             sleep( 2 ** attempts_count )
 
 
-_pep508_requirement_name_regex = _regex_compile( r'''^([\w\-]+)(.*)$''' )
 def _pep508_requirement_to_name( requirement ):
-    return _pep508_requirement_name_regex.match(
-        requirement ).group( 1 ).replace( '-', '_' )
+    def _return_name( name ): return ''.join( name ).replace( '-', '_' )
+    name = [ ]
+    after_hyphen = False
+    for char in requirement:
+        if not char.isalnum( ) and char not in '_-':
+            return _return_name( name )
+        if after_hyphen and char.isdigit( ): return _return_name( name )
+        if after_hyphen: name.append( '-' )
+        after_hyphen = '-' == char
+        if not after_hyphen: name.append( char )
+    return _return_name( name )
 
 
 class Version:

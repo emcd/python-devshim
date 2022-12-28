@@ -4,11 +4,6 @@ Prefer Prebuilt Python Executables
 * Pull from https://github.com/indygreg/python-build-standalone/releases/latest
   for multiple platforms.
 
-* Prefer `Windows embeddable packages
-  <https://docs.python.org/3/using/windows.html#the-embeddable-package>`_ for
-  that platform. Download from official Python "FTP" server:
-  https://www.python.org/ftp/python/.
-
 Fixes and Minor Improvements
 ===============================================================================
 

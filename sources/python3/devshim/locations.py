@@ -70,11 +70,13 @@ def calculate_user_directories( ):
     # TODO: Assert existence of 'platformdirs' package.
     from platformdirs import user_cache_path, user_data_path
     from .data import project_name
-    data_path = user_data_path( appname = project_name )
+    caches_location = user_cache_path( appname = project_name )
+    data_location = user_data_path( appname = project_name )
     return __.create_immutable_namespace( dict(
-        caches = user_cache_path( appname = project_name ),
-        data = data_path,
-        installations = data_path / 'installations',
+        artifacts = caches_location / 'artifacts',
+        caches = caches_location,
+        data = data_location,
+        installations = data_location / 'installations',
     ) )
 
 

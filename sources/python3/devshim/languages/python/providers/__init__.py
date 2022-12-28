@@ -21,4 +21,5 @@
 ''' Providers for the Python language. '''
 
 
-from .python_build import PythonBuild
+from .python_build import LanguageProvider as PythonBuild
+from .windows_embeddable import LanguageProvider as WindowsEmbeddable

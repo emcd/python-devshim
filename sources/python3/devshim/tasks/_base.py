@@ -144,9 +144,10 @@ class PythonVersionMultiplexer( ArgumentMultiplexer ):
         argument = binder.arguments[ self.argument_name ]
         from ..languages.python import Language
         if None is argument and self.enable_default:
-            versions = ( Language.detect_default_version( ).name, )
-        elif 'ALL' == argument: versions = Language.survey_versions( ).keys( )
-        else: versions = ( Language.validate_version( argument ), )
+            versions = ( Language.detect_default_descriptor( ).name, )
+        elif 'ALL' == argument:
+            versions = Language.survey_descriptors( ).keys( )
+        else: versions = ( Language.validate_descriptor( argument ), )
         for version in versions:
             binder.arguments.update( { self.argument_name: version } )
             yield version, binder.args, binder.kwargs

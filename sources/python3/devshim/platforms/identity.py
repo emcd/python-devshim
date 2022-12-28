@@ -24,23 +24,62 @@
     or PEP 508 environment identifier for package installation manifests. '''
 
 
-import platform as _platform
+# TODO? Maybe rename to 'derive_*' from 'calculate_*'.
+
+
 import sys as _sys
 
+from ..base import environment_variable_prefix as _prefix
 
-cpu_architecture = _platform.machine( )
 implementation_name = _sys.implementation.name
-system_type = _platform.system( ).lower( )
 
 
 def calculate_bdist_compatibility_identifier( ):
     ''' Returns summary identifier for binary distribution compatibility. '''
     return '--'.join( (
         calculate_python_abi_identifier( ),
-        system_type,
-        calculate_system_abi_identifier( ),
-        cpu_architecture
+        calculate_platform_identifier( ),
     ) )
+
+
+def extract_cpu_identifier( ):
+    ''' Extracts and normalizes identifier for CPU architecture. '''
+    from os import environ as current_process_environment
+    from platform import machine as query_cpu_architecture
+    architecture = current_process_environment.get(
+        f"{_prefix}_CPU_ARCHITECTURE",
+        query_cpu_architecture( ) ).lower( )
+    # TODO: Normalize. E.g. aarch64 -> arm64, amd64 -> x86-64
+    return architecture
+
+
+def extract_os_class( ):
+    ''' Extracts OS class. (I.e., POSIX or NT.) '''
+    from os import environ as current_process_environment, name
+    return current_process_environment.get(
+        f"{_prefix}_OS_CLASS", name ).lower( )
+
+
+def calculate_platform_identifier( ):
+    ''' Calculates platform name from OS kernel and CPU architecture. '''
+    # TODO? Process flag to make complete system ABI identifier
+    #       with relevant C library or language VM name.
+    from os import environ as current_process_environment
+    from platform import (
+        architecture as query_os_kernel_architecture,
+        system as query_os_kernel_name,
+    )
+    cpu_architecture = extract_cpu_identifier( )
+    os_kernel_architecture = query_os_kernel_architecture( )
+    os_kernel_name = current_process_environment.get(
+        f"{_prefix}_OS_KERNEL_NAME",
+        query_os_kernel_name( ) ).lower( )
+    os_kernel_address_size = current_process_environment.get(
+        f"{_prefix}_OS_KERNEL_ADDRESS_SIZE",
+        os_kernel_architecture[ 0 ] ).lower( )
+    os_kernel_specifier = '-'.join( filter( None, (
+        os_kernel_name, os_kernel_address_size ) ) )
+    return '--'.join( ( os_kernel_specifier, cpu_architecture ) )
 
 
 def calculate_python_abi_identifier( ):
@@ -68,12 +107,14 @@ def calculate_python_abi_extras( ):
 
 def calculate_system_abi_identifier( ):
     ''' System library linkage and virtual machine information. '''
+    import platform
+    system_type = platform.system( ).lower( )
     if system_type not in ( 'java', 'windows', ):
-        return '-'.join( _platform.libc_ver( ) )
+        return '-'.join( platform.libc_ver( ) )
     if 'windows' == system_type:
         return '-'.join( (
-            *reversed( _platform.architecture( ) ),
-            _platform.win32_ver( )[ 1 ] ) )
+            *reversed( platform.architecture( ) ),
+            platform.win32_ver( )[ 1 ] ) )
     # TODO: Implement: java
     # TODO: Implement: emscripten/wasi
     raise NotImplementedError
@@ -86,8 +127,7 @@ def calculate_pep508_environment_identifier( ):
         <https://www.python.org/dev/peps/pep-0508/#environment-markers>`. '''
     return '--'.join( (
         calculate_pep508_python_identifier( ),
-        system_type,
-        cpu_architecture
+        calculate_platform_identifier( ),
     ) )
 
 

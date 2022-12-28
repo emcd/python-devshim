@@ -20,32 +20,32 @@ runs:
       if: "${{ 'true' == inputs.use-versions-update }}"
       uses: actions/download-artifact@v3
       with:
-        name: python-versions
-        path: .local/data/devshim/languages/python
+        name: python-descriptors
+        path: .local/data/devshim/languages/python/descriptors
     - name: Select Python Version
       run: |
         set -eu
         if [[ -z '${{ inputs.python-version }}' ]]; then
-            echo "DEVSHIM_PYTHON_VERSION=$(/usr/bin/python3 develop.py show.python)" >>${GITHUB_ENV}
+            echo "DEVSHIM_PYTHON_DESCRIPTOR=$(/usr/bin/python3 develop.py show.python)" >>${GITHUB_ENV}
         else
-            echo "DEVSHIM_PYTHON_VERSION=${{ inputs.python-version }}" >>${GITHUB_ENV}
+            echo "DEVSHIM_PYTHON_DESCRIPTOR=${{ inputs.python-version }}" >>${GITHUB_ENV}
         fi
       shell: bash
     - name: Access Cache for Python and Virtual Environment
       id: python-cache
       uses: actions/cache@v3
       with:
-        key: python--${{ env.DEVSHIM_PYTHON_VERSION }}--${{ runner.os }}--${{ hashFiles('.local/configuration/pypackages.fixtures.toml') }}
+        key: python--${{ env.DEVSHIM_PYTHON_DESCRIPTOR }}--${{ runner.os }}--${{ hashFiles('.local/configuration/pypackages.fixtures.toml') }}
         path: |
           ~/.local/share/devshim/installations/python
           .local/environments
     - name: Install Python
       if: "${{ 'true' != steps.python-cache.outputs.cache-hit }}"
-      run: /usr/bin/python3 develop.py install.python --version ${{ env.DEVSHIM_PYTHON_VERSION }}
+      run: /usr/bin/python3 develop.py install.python --version ${{ env.DEVSHIM_PYTHON_DESCRIPTOR }}
       shell: bash
     - name: Create Virtual Environment
       if: "${{ 'true' != steps.python-cache.outputs.cache-hit }}"
       run: |
         set -eu
-        /usr/bin/python3 develop.py build.python-venv --version ${{ env.DEVSHIM_PYTHON_VERSION }}
+        /usr/bin/python3 develop.py build.python-venv --version ${{ env.DEVSHIM_PYTHON_DESCRIPTOR }}
       shell: bash

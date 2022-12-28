@@ -18,22 +18,21 @@
 #============================================================================#
 
 
-''' Management of Python versions via :command:`python-build`. '''
+''' Management of Python installations via :command:`python-build`. '''
 
 
 from . import base as __
 
 
-class PythonBuild( __.LanguageProvider ):
-    ''' Works with ``python-build`` program from Pyenv. '''
+supportable_features = ( 'cindervm', 'pyston-lite', 'tracerefs', )
+supportable_implementations = ( 'cpython', 'pypy', )
+supportable_platforms = ( 'posix', )
+
+class LanguageProvider( __.LanguageProvider ):
+    ''' Uses ``python-build`` program from Pyenv to manage installations. '''
 
     language = __.Language
     name = 'python-build'
-    supportable_features = (
-        'cindervm', 'pyston-lite', 'tracerefs',
-    )
-    supportable_implementations = ( 'cpython', 'pypy', )
-    supportable_platforms = ( 'posix', )
 
     @classmethod
     def discover_current_version( class_, definition ):
@@ -45,6 +44,7 @@ class PythonBuild( __.LanguageProvider ):
         pb_definition_names = execute_external(
             ( _data.pb_executable_location, '--definitions' ),
             capture_output = True ).stdout.strip( ).split( '\n' )
+        # TODO: Filter prerelease versions by default, but allow override.
         pb_definition_name_candidates = [
             pb_definition_name for pb_definition_name in pb_definition_names
             if pb_definition_name.startswith( pb_definition_name_base ) ]
@@ -52,29 +52,30 @@ class PythonBuild( __.LanguageProvider ):
             # TODO: Use exception factory.
             raise RuntimeError
         pb_definition_name = pb_definition_name_candidates[ -1 ]
-        return _parse_implementation_version( pb_definition_name )
+        return class_.language.derive_actual_version(
+            _parse_implementation_version( pb_definition_name ) )
 
     @classmethod
     def is_supportable_base_version( class_, version ):
-        from ....base import naively_parse_version
-        return ( 3, 7 ) <= naively_parse_version( version )
+        version = class_.language.derive_actual_version( version )
+        return _data.supportable_base_version <= version
 
     @classmethod
     def is_supportable_feature( class_, feature ):
-        return feature in class_.supportable_features
+        return feature in supportable_features
 
     @classmethod
     def is_supportable_implementation( class_, implementation ):
-        return implementation in class_.supportable_implementations
+        return implementation in supportable_implementations
 
     @classmethod
     def is_supportable_platform( class_, platform = None ):
         if None is platform:
-            import os
-            platform = os.name
-        return platform in class_.supportable_platforms
+            from ....platforms.identity import extract_os_class
+            platform = extract_os_class( )
+        return platform in supportable_platforms
 
-    def install( self ):
+    def install( self, force = False ):
         ''' Compiles and installs Python via ``python-build``. '''
         _ensure_installer( )
         pb_definition_name = self._calculate_pb_definition_name( )
@@ -82,8 +83,8 @@ class PythonBuild( __.LanguageProvider ):
         subprocess_environment = current_process_environment.copy( )
         self._modify_environment_from_features( subprocess_environment )
         directory = self.installation_location
-        # TODO: Allow 'clean' flag to override.
-        if directory.exists( ): return self
+        if not force and directory.exists( ): return self
+        # TODO: Attempt to unlink directory tree.
         from ....base import execute_external
         execute_external(
             ( _data.pb_executable_location, pb_definition_name, directory ),
@@ -92,11 +93,11 @@ class PythonBuild( __.LanguageProvider ):
         return self
 
     def _calculate_pb_definition_name( self ):
-        version_definition = self.version.definition
-        version_record = self.version.record
-        base_version = version_definition[ 'base-version' ]
-        implementation_name = version_definition[ 'implementation' ]
-        implementation_version = version_record[ 'implementation-version' ]
+        definition = self.descriptor.definition
+        record = self.descriptor.record
+        base_version = definition[ 'base-version' ]
+        implementation_name = definition[ 'implementation' ]
+        implementation_version = record[ 'implementation-version' ]
         if 'cpython' == implementation_name: return implementation_version
         if implementation_name in ( 'pypy', ):
             return (
@@ -105,20 +106,20 @@ class PythonBuild( __.LanguageProvider ):
         return f"{implementation_name}-{implementation_version}"
 
     def _modify_environment_from_features( self, environment ):
-        for feature in self.version.features.values( ):
+        for feature in self.descriptor.features.values( ):
             feature.modify_provider_environment( environment )
 
     def _execute_post_installation_activities( self ):
         # Per-feature activities, such as site customization.
-        for feature in self.version.features.values( ):
+        for feature in self.descriptor.features.values( ):
             feature.modify_installation( self.installation_location )
 
-__.register_provider_class( PythonBuild )
+__.register_provider_class( LanguageProvider )
 
 
-def _calculate_pb_definition_name_base( version_definition ):
-    base_version = version_definition[ 'base-version' ]
-    implementation_name = version_definition[ 'implementation' ]
+def _calculate_pb_definition_name_base( definition ):
+    base_version = definition[ 'base-version' ]
+    implementation_name = definition[ 'implementation' ]
     if 'cpython' == implementation_name: return base_version
     if implementation_name in ( 'pypy', ):
         return f"{implementation_name}{base_version}-"
@@ -178,6 +179,9 @@ def _parse_implementation_version( pb_definition_name ):
     return result.group( 'implementation_version' )
 
 
+def _prepare_supportable_base_version( ):
+    return __.Language.derive_actual_version( '3.7' )
+
 def _produce_calculators( ):
     def calculate_pbil( ):
         from ....data import user_directories
@@ -190,6 +194,7 @@ def _produce_calculators( ):
         pb_executable_location = ( lambda:
             _data.pb_installation_location / 'bin/python-build' ),
         pb_repository_location = calculate_pbrl,
+        supportable_base_version = _prepare_supportable_base_version,
     )
 
 _data = __.produce_accretive_cacher( _produce_calculators )
