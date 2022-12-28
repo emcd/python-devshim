@@ -33,6 +33,32 @@ from types import (
 # pylint: enable=unused-import
 
 
+def naively_parse_version( version ):
+    ''' Naively splits version on periods and converts parts to integers.
+
+        Leaves non-convertible parts as strings. '''
+    # TODO: Validate version.
+    return tuple( map(
+        lambda part: int( part ) if part.isdigit( ) else part,
+        version.split( '.' ) ) )
+
+
+def compare_version( left, right, parser = naively_parse_version ):
+    ''' Properly compares two version strings.
+
+        I.e., 3.10 < 3.7 if comparison is lexicographic.
+        But, 3.10 > 3.7 with this version comparison.
+
+        If left > right, then returns 1.
+        If left == right, then returns 0.
+        If left < right, then returns -1. '''
+    # TODO: Validate parser.
+    left = parser( left )
+    right = parser( right )
+    if left == right: return 0
+    return 1 if left > right else -1
+
+
 def create_immutable_namespace( source ):
     ''' Creates immutable namespace from dictionary or simple namespace. '''
     from inspect import isfunction as is_function

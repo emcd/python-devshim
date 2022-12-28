@@ -54,8 +54,8 @@ class LanguageVersion( __.LanguageVersion ):
 
     # TODO: Roll up into base class.
     @classmethod
-    def provide_records_location( class_ ):
-        return __.locations.data / 'python.toml'
+    def provide_records_directory( class_ ):
+        return __.locations.data / 'python'
 
     # TODO: Roll up into base class.
     @classmethod

@@ -21,7 +21,7 @@ runs:
       uses: actions/download-artifact@v3
       with:
         name: python-versions
-        path: .local/data/devshim/languages
+        path: .local/data/devshim/languages/python
     - name: Select Python Version
       run: |
         set -eu
