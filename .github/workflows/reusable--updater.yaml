@@ -29,7 +29,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: python-versions
-          path: .local/data/devshim/languages/python.toml
+          path: .local/data/devshim/languages/python/
 
 
   update-python-packages:
@@ -40,7 +40,8 @@ jobs:
         python-version: ${{ fromJSON(inputs.python-versions-json) }}
     steps:
       - name: Prepare Python Virtual Environment
-        uses: emcd/python-devshim/.github/actions/python-venv@master
+        #uses: emcd/python-devshim/.github/actions/python-venv@master
+        uses: emcd/python-devshim/.github/actions/python-venv@gh-actions
         with:
           python-version: '${{ matrix.python-version }}'
           use-versions-update: true
@@ -65,7 +66,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prepare Python Virtual Environment
-        uses: emcd/python-devshim/.github/actions/python-venv@master
+        #uses: emcd/python-devshim/.github/actions/python-venv@master
+        uses: emcd/python-devshim/.github/actions/python-venv@gh-actions
         with:
           use-versions-update: true
       - name: Freshen Git Modules

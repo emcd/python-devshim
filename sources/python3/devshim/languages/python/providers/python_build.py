@@ -39,8 +39,8 @@ class PythonBuild( __.LanguageProvider ):
     def discover_current_version( class_, definition ):
         # TODO: Validate version definition.
         _ensure_installer( )
-        pb_definition_name_base = class_._calculate_pb_definition_name_base(
-            definition )
+        pb_definition_name_base = (
+            _calculate_pb_definition_name_base( definition ) )
         from ....base import execute_external
         pb_definition_names = execute_external(
             ( _data.pb_executable_location, '--definitions' ),
@@ -56,7 +56,8 @@ class PythonBuild( __.LanguageProvider ):
 
     @classmethod
     def is_supportable_base_version( class_, version ):
-        return ( 3, 7 ) <= tuple( map( int, version.split( '.' ) ) )
+        from ....base import naively_parse_version
+        return ( 3, 7 ) <= naively_parse_version( version )
 
     @classmethod
     def is_supportable_feature( class_, feature ):
@@ -72,11 +73,6 @@ class PythonBuild( __.LanguageProvider ):
             import os
             platform = os.name
         return platform in class_.supportable_platforms
-
-    def __init__( self, version ):
-        super( ).__init__( version )
-        # TODO: Assert viability of features + implementation + platform.
-        self.installation_location = self._derive_installation_location( )
 
     def install( self ):
         ''' Compiles and installs Python via ``python-build``. '''
@@ -95,24 +91,6 @@ class PythonBuild( __.LanguageProvider ):
         self._execute_post_installation_activities( )
         return self
 
-    def _derive_installation_location( self ):
-        version_definition = self.version.definition
-        version_record = self.version.record
-        from platform import (
-            machine as cpu_architecture, system as os_kernel_name )
-        feature_names = '+'.join( self.version.features.keys( ) )
-        installation_name = '--'.join( filter( None, (
-            "{implementation}-{base_version}".format(
-                implementation = version_definition[ 'implementation' ],
-                base_version = version_definition[ 'base-version' ] ),
-            version_record[ 'implementation-version' ],
-            feature_names,
-            os_kernel_name( ).lower( ),
-            cpu_architecture( ) ) ) )
-        from ....data import user_directories
-        return user_directories.installations.joinpath(
-            'python', 'python-build', installation_name )
-
     def _calculate_pb_definition_name( self ):
         version_definition = self.version.definition
         version_record = self.version.record
@@ -126,15 +104,6 @@ class PythonBuild( __.LanguageProvider ):
                 f"{implementation_version}" )
         return f"{implementation_name}-{implementation_version}"
 
-    @classmethod
-    def _calculate_pb_definition_name_base( class_, version_definition ):
-        base_version = version_definition[ 'base-version' ]
-        implementation_name = version_definition[ 'implementation' ]
-        if 'cpython' == implementation_name: return base_version
-        if implementation_name in ( 'pypy', ):
-            return f"{implementation_name}{base_version}-"
-        return f"{implementation_name}-"
-
     def _modify_environment_from_features( self, environment ):
         for feature in self.version.features.values( ):
             feature.modify_provider_environment( environment )
@@ -145,6 +114,15 @@ class PythonBuild( __.LanguageProvider ):
             feature.modify_installation( self.installation_location )
 
 __.register_provider_class( PythonBuild )
+
+
+def _calculate_pb_definition_name_base( version_definition ):
+    base_version = version_definition[ 'base-version' ]
+    implementation_name = version_definition[ 'implementation' ]
+    if 'cpython' == implementation_name: return base_version
+    if implementation_name in ( 'pypy', ):
+        return f"{implementation_name}{base_version}-"
+    return f"{implementation_name}-"
 
 
 def _ensure_installer( ):

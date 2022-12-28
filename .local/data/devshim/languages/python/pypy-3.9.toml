@@ -1,0 +1,5 @@
+format-version = 1
+
+[platforms.linux--x86_64]
+implementation-version = "7.3.10"
+provider = "python-build"
