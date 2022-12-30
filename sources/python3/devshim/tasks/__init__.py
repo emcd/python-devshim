@@ -43,12 +43,14 @@ def ease(
 def install_git_hooks( ):
     ''' Installs hooks to check goodness of code before commit. '''
     __.project_execute_external(
-        f"pre-commit install --config {__.paths.configuration.pre_commit} "
-        f"--hook-type pre-commit --install-hooks",
+        ( 'pre-commit', 'install', '--config',
+          __.paths.configuration.pre_commit, '--hook-type', 'pre-commit',
+         '--install-hooks' ),
         venv_specification = { } )
     __.project_execute_external(
-        f"pre-commit install --config {__.paths.configuration.pre_commit} "
-        f"--hook-type pre-push --install-hooks",
+        ( 'pre-commit', 'install', '--config',
+          __.paths.configuration.pre_commit, '--hook-type', 'pre-push',
+         '--install-hooks' ),
         venv_specification = { } )
 
 

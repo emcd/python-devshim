@@ -38,10 +38,6 @@ def install_python_packages( process_environment, identifier = None ):
     from .base import execute_external
     raw, frozen, unpublished = generate_pip_requirements_text(
         identifier = identifier )
-    execute_external(
-        split_command(
-            'python -m pip install --upgrade setuptools pip wheel' ),
-        env = process_environment )
     if not identifier or not frozen:
         pip_options = [ ]
         if not identifier:
@@ -60,7 +56,8 @@ def install_python_packages( process_environment, identifier = None ):
     # so we must install editable packages separately. (As of 2022-02-06.)
     # https://github.com/pypa/pip/issues/4995
     execute_external(
-        split_command( 'python -m pip install --editable .' ),
+        ( _derive_python_location( process_environment ),
+          *split_command( '-m pip install --editable .' ), ),
         env = process_environment )
 
 
@@ -70,15 +67,20 @@ def execute_pip_with_requirements(
     ''' Executes a Pip command with requirements. '''
     pip_options = pip_options or ( )
     from .base import execute_external
+    python_location = _derive_python_location( process_environment )
     # Unfortunately, Pip does not support reading requirements from stdin,
     # as of 2022-01-02. To workaround, we need to write and then read
     # a temporary file. More details: https://github.com/pypa/pip/issues/7822
     from tempfile import NamedTemporaryFile
-    with NamedTemporaryFile( mode = 'w+' ) as requirements_file:
+    # Must close but not delete on Windows to allow Pip to access file.
+    with NamedTemporaryFile(
+        mode = 'w+', delete = False
+    ) as requirements_file:
         requirements_file.write( requirements )
         requirements_file.flush( )
+        requirements_file.close( )
         execute_external(
-            ( 'python', '-m', 'pip', command, *pip_options,
+            ( python_location, '-m', 'pip', command, *pip_options,
               '--requirement', requirements_file.name ),
             env = process_environment )
 
@@ -209,6 +211,19 @@ def _canonicalize_pypackages_domain( domain ):
             domains.update( _canonicalize_pypackages_domain( domain_ ) )
         return domains
     __.expire( 'invalid state', f"Invalid domain: {domain!r}" )
+
+
+def _derive_python_location( process_environment ):
+    if 'OUR_VENV_NAME' not in process_environment: return 'python'
+    from .data import locations
+    from .environments import (
+        is_executable_in_venv, generate_venv_executable_location )
+    venv_path = locations.environments / process_environment[ 'OUR_VENV_NAME' ]
+    if not is_executable_in_venv( 'python', venv_path = venv_path ):
+        # TODO: Use exception factory.
+        raise RuntimeError(
+            f"Python not found in virtual environment: {venv_path}" )
+    return generate_venv_executable_location( 'python', venv_path = venv_path )
 
 
 def indicate_python_packages( identifier = None ):
@@ -385,7 +400,8 @@ def indicate_current_python_packages( environment ):
     from .base import execute_external
     entries = [ ]
     for line in execute_external(
-        split_command( 'python -m pip freeze' ),
+        ( _derive_python_location( environment ),
+          *split_command( '-m pip freeze' ), ),
         capture_output = True, env = environment,
     ).stdout.strip( ).splitlines( ):
         if line.startswith( '#' ): continue

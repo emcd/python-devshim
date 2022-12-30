@@ -77,35 +77,61 @@ class LanguageProvider( __.LanguageProvider ):
             platform = extract_os_class( )
         return 'nt' == platform
 
-    def install( self, force = False ): # pylint: disable=unused-argument
+    def derive_executables_location( self, name = None ):
+        if name in ( 'python', 'python.exe' ):
+            return self.installation_location / 'python.exe'
+        if name in ( 'pythonw', 'pythonw.exe' ):
+            return self.installation_location / 'pythonw.exe'
+        location = self.installation_location / 'Scripts'
+        if None is not name: return location / name
+        return location
+
+    def install( self, force = False ):
         ''' Installs Windows embeddable archive from python.org. '''
-        directory = self.installation_location
-        from ....base import eprint #, epprint
-        eprint( f"DEBUG: {directory}" )
-        if not force and directory.exists( ): return self
+        installation_location = self.installation_location
+        if not force and installation_location.exists( ): return self
         from ....platforms.identity import extract_cpu_identifier
         cpu = extract_cpu_identifier( )
         href = _summon_versions( )[
             self.descriptor.record[ 'implementation-version' ] ][ cpu ]
         archive_location = _retrieve_archive( href )
-        _extract_archive( archive_location, directory )
-        # TODO: Execute post-installation activities.
-        # TODO: Create {sys.base_prefix}/Lib/site-packages
-        #       Update {sys.base_prefix}/pythonNN._pth
-        #       Bootstrap latest Pip.
-        #       Install Virtualenv.
+        from zipfile import ZipFile
+        with ZipFile( archive_location ) as zipfile:
+            zipfile.extractall( path = installation_location )
+        self._execute_post_installation_activities( )
         return self
+
+    def _ensure_site_packages( self ):
+        installation_location = self.installation_location
+        python_pth_location = next(
+            installation_location.glob( 'python*._pth' ) )
+        python_stdlib_location = next(
+            installation_location.glob( 'python*.zip' ) )
+        with python_pth_location.open( 'w' ) as file:
+            file.write( _python_pth_template.format(
+                stdlib = python_stdlib_location.name ) )
+        python_location = installation_location / 'python.exe'
+        __.ensure_site_packages( installation_location, python_location )
+
+    def _execute_post_installation_activities( self ):
+        self._ensure_site_packages( )
+        # Per-feature activities, such as site customization.
+        for feature in self.descriptor.features.values( ):
+            feature.modify_installation( self.installation_location )
 
 __.register_provider_class( LanguageProvider )
 
 
-def _extract_archive( archive_location, installation_location ):
-    from zipfile import ZipFile
-    with ZipFile( archive_location ) as zipfile:
-        zipfile.extractall( path = installation_location )
+_python_pth_template = '''
+{stdlib}
+.
+
+import site
+'''
 
 
 def _retrieve_archive( href ):
+    # TODO: Used generalized URL retriever.
     from contextlib import ExitStack as ContextStack
     from urllib.request import Request as HttpRequest, urlopen as access_url
     archive_name = href.rsplit( '/', maxsplit = 1 )[ -1 ]

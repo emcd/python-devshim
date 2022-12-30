@@ -44,9 +44,9 @@ def build_python_venv( version, overwrite = False ):
     venv_path = ensure_directory( derive_venv_path( version, python_path ) )
     venv_options = [ ]
     if overwrite: venv_options.append( '--clear' )
-    venv_options_str = ' '.join( venv_options )
     from .base import execute_external
-    execute_external( f"{python_path} -m venv {venv_options_str} {venv_path}" )
+    execute_external( (
+        python_path, '-m', 'virtualenv', *venv_options, venv_path ) )
     _install_packages_into_venv( version, venv_path )
 
 
@@ -94,10 +94,16 @@ def is_executable_in_venv( name, venv_path = None, version = None ):
         pick up shims, such as Asdf uses. '''
     from os import F_OK, R_OK, X_OK, access as test_fs_access
     from pathlib import Path
+    from .fs_utilities import (
+        determine_executable_name_extensions,
+        determine_executables_location_part,
+    )
+    possible_names = determine_executable_name_extensions( name = name )
+    executables_part = determine_executables_location_part( )
     venv_path = Path( venv_path or derive_venv_path( version = version ) )
     if not venv_path.exists( ): return False
-    for path in ( venv_path / 'bin' ).iterdir( ):
-        if name != path.name: continue
+    for path in ( venv_path / executables_part ).iterdir( ):
+        if path.name not in possible_names: continue
         if test_fs_access( path, F_OK | R_OK | X_OK ): return True
     return False
 
@@ -107,8 +113,10 @@ def generate_venv_executable_location(
 ):
     ''' Generates expected location of executable in virtual environment. '''
     from pathlib import Path
+    from .fs_utilities import determine_executables_location_part
+    executables_part = determine_executables_location_part( )
     venv_path = Path( venv_path or derive_venv_path( version = version ) )
-    return venv_path / 'bin' / name
+    return venv_path / executables_part / name
 
 
 def venv_execute_external(
@@ -131,11 +139,13 @@ def derive_venv_variables(
     ''' Derives environment variables from Python virtual environment path. '''
     from os import environ as current_process_environment, pathsep
     from pathlib import Path
+    from .fs_utilities import determine_executables_location_part
+    executables_part = determine_executables_location_part( )
     venv_path = Path( venv_path or derive_venv_path( version = version ) )
     variables = ( variables or current_process_environment ).copy( )
     variables.pop( 'PYTHONHOME', None )
     variables[ 'PATH' ] = pathsep.join( (
-        str( venv_path / 'bin' ), variables[ 'PATH' ] ) )
+        str( venv_path / executables_part ), variables[ 'PATH' ] ) )
     variables[ 'VIRTUAL_ENV' ] = str( venv_path )
     variables[ 'OUR_VENV_NAME' ] = venv_path.name
     return variables

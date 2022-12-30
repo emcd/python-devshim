@@ -269,9 +269,16 @@ class LanguageDescriptor( metaclass = ABCFactory ):
 
             If a command name is given, then it is appended to the inferred
             executables location and returned. '''
-        location = self.infer_installation_location( ) / 'bin'
-        if None is not name: return location / name
-        return location
+        for provider in self.providers.values( ):
+            location = provider.derive_executables_location( name = name )
+            if not location.exists( ):
+                __.scribe.debug(
+                    f"Could not locate executables for {self} "
+                    f"by {provider.name}." )
+                continue
+            return location
+        # TODO: Use exception factory.
+        raise LookupError
 
     def infer_installation_location( self ):
         ''' Infers installation location of language manifestation. '''
@@ -527,6 +534,16 @@ class LanguageProvider( metaclass = ABCFactory ):
             str( self.descriptor.record[ 'implementation-version' ] ),
             feature_names,
             calculate_platform_identifier( ) ) ) )
+
+    @abstract
+    def derive_executables_location( self, name = None ):
+        ''' Derives location of executables for language installation.
+
+            If name argument is given, then that is processed and appended to
+            the executables location to result in the location of a particular
+            executable within the installation. '''
+        raise create_abstract_invocation_error(
+            self.derive_executables_location )
 
     @abstract
     def install( self ):

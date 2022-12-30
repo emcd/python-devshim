@@ -21,6 +21,39 @@
 ''' Filesystem utilities for development support. '''
 
 
+def determine_executable_name_extensions( name = None ):
+    ''' Determines possible executable name extensions for platform.
+
+        For POSIX platforms, this is an empty tuple. '''
+    from os import environ as current_process_environment
+    from .platforms.identity import extract_os_class
+    os_class = extract_os_class( )
+    if 'nt' == os_class:
+        extensions = tuple( map(
+            str.lower,
+            current_process_environment.get(
+                'PATHEXT',
+                '.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC' )
+            .split( ';' ) ) )
+    else: extensions = ( '', )
+    if None is name: return extensions
+    return tuple( map( lambda ext: f"{name}{ext}", extensions ) )
+
+
+def determine_executables_location_part( ):
+    ''' Determines standard executables location indicator for platform. '''
+    from .platforms.identity import extract_os_class
+    os_class = extract_os_class( )
+    if 'nt' == os_class: return 'Scripts'
+    return 'bin'
+
+
+def ensure_directory( path ):
+    ''' Ensures existence of directory, creating if necessary. '''
+    path.mkdir( parents = True, exist_ok = True )
+    return path
+
+
 def extract_tarfile( source, destination, selector = None ):
     ''' Extracts tar archive from source into destination.
 
@@ -66,12 +99,6 @@ def is_older_than( path, then ):
         when = ( DateTime.now( TimeZone.utc ) - then ).timestamp( )
     # TODO: Else, error.
     return inode.st_ctime < when
-
-
-def ensure_directory( path ):
-    ''' Ensures existence of directory, creating if necessary. '''
-    path.mkdir( parents = True, exist_ok = True )
-    return path
 
 
 def unlink_recursively( path ):

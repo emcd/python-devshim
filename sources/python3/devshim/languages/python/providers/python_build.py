@@ -75,6 +75,11 @@ class LanguageProvider( __.LanguageProvider ):
             platform = extract_os_class( )
         return platform in supportable_platforms
 
+    def derive_executables_location( self, name = None ):
+        location = self.installation_location / 'bin'
+        if None is not name: return location / name
+        return location
+
     def install( self, force = False ):
         ''' Compiles and installs Python via ``python-build``. '''
         _ensure_installer( )
@@ -105,14 +110,20 @@ class LanguageProvider( __.LanguageProvider ):
                 f"{implementation_version}" )
         return f"{implementation_name}-{implementation_version}"
 
-    def _modify_environment_from_features( self, environment ):
-        for feature in self.descriptor.features.values( ):
-            feature.modify_provider_environment( environment )
+    def _ensure_site_packages( self ):
+        installation_location = self.installation_location
+        python_location = installation_location / 'bin/python'
+        __.ensure_site_packages( installation_location, python_location )
 
     def _execute_post_installation_activities( self ):
+        self._ensure_site_packages( )
         # Per-feature activities, such as site customization.
         for feature in self.descriptor.features.values( ):
             feature.modify_installation( self.installation_location )
+
+    def _modify_environment_from_features( self, environment ):
+        for feature in self.descriptor.features.values( ):
+            feature.modify_provider_environment( environment )
 
 __.register_provider_class( LanguageProvider )
 
