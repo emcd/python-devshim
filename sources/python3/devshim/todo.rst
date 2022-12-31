@@ -1,9 +1,3 @@
-Prefer Prebuilt Python Executables
-===============================================================================
-
-* Pull from https://github.com/indygreg/python-build-standalone/releases/latest
-  for multiple platforms.
-
 Fixes and Minor Improvements
 ===============================================================================
 
@@ -14,41 +8,27 @@ Fixes and Minor Improvements
 * Download tarball from Github for ``semgrep-rules`` rather than relying on a
   Git submodule.
 
-* Add hook functions to make all package modules immutable via
-  :py:mod:`lockup`. Similarly to reparent classes to an immutability-enforcing
-  class factory class.
-
 * Add task control argument to support warning/skipping tasks which do not meet
   certain criteria, such as an installation not supporting them.
+
+* Pull from https://github.com/indygreg/python-build-standalone/releases/latest
+  for multiple platforms.
 
 * Use ``--no-binary`` option to :command:`pip` when ``abi-incompatible`` label
   is present on a language installation feature for a version.
 
-Remove Dependency on System ``pip``
-===============================================================================
+Virtual Environments Improvements
+================================================================================
 
-* Some OS distributions make a separate ``python3-pip`` package (or similar),
-  which might not be installed by default, even if Python 3 is.
+* Language Specifiers -> Virtual Environments
 
-* System Pip may also be out-of-date. Better to guarantee something recent.
+* Virtual environments are next layer above language manifestations. May need
+  to be aware of some language features during virtual environment
+  construction.
 
-* Can bootstrap local installation with ``urllib`` from
-  https://bootstrap.pypa.io/pip/.
-
-* Maybe place in :file:`.local/caches/devshim/packages/python3/<hash>`,
-  where ``hash`` is calculated from SHA-1 of :py:data:`sys.version` and
-  the result of :py:func:`platform.uname`. Override with
-  :envvar:`DEVSHIM_PYTHON3_PACKAGES_CACHE`.
-
-Remove Dependency on ``git``
-===============================================================================
-
-* Will not have to handle Git variants, like Sourcetree or TortoiseGit, or Git
-  bridges for other SCM systems, like `hg-git <https://hg-git.github.io/>`_.
-
-* Can use `Dulwich <https://www.dulwich.io/apidocs/>`_, which does not rely on
-  Git executable. Will also be more efficient to eliminate subprocess fork-exec
-  actions.
+* Virtual environments are constructed from language manifestation tools.
+  Anything installed in virtual environments must be installed by virtual
+  environment tools.
 
 More Linters
 ===============================================================================
@@ -65,22 +45,8 @@ More Linters
 
 * `Tryceratops <https://github.com/guilatrova/tryceratops>`_
 
-Installable Devshim Wrapper Script
-===============================================================================
-
-* Detects whether it is in a devshim-enabled directory tree.
-
-* May also be segue to providing devshim as a package.
-
-* Can just make :file:`develop.py` an installable script and have it act as a
-  common interface for execution in-tree or from an installed package.
-
 Restructure Package Dependencies Format
 ===============================================================================
-
-* Linters, test tools, and other utilities should be optional installation
-  dependencies for the Devshim package. Packages which have Devshim as a
-  development dependency can specify these options via the ``[]`` syntax.
 
 * Devshim should probe which options have been installed to generate list of
   available commands for direct consumption and for what the metacommands

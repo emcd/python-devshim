@@ -59,7 +59,6 @@ def assemble( ):
     locations.environments = locations.local / 'environments'
     locations.scm_modules = _calculate_scm_modules_locations( locations )
     locations.state = _calculate_state_locations( locations )
-    locations.scripts = _calculate_scripts_locations( locations )
     locations.sources = _calculate_sources_locations( locations )
     locations.tests = _calculate_tests_locations( locations )
     return __.create_immutable_namespace( locations )
@@ -94,17 +93,12 @@ def _calculate_artifacts_locations( locations ):
 
 def _calculate_caches_locations( locations ):
     caches_path = locations.local / 'caches'
-    packages_path = caches_path / 'packages'
     return __.SimpleNamespace(
         SELF = caches_path,
         DEV = __.SimpleNamespace(
             repositories = caches_path / f"{__package__}/repositories",
         ),
         hypothesis = caches_path / 'hypothesis',
-        # TODO: Move 'packages' under 'DEV'.
-        packages = __.SimpleNamespace(
-            python3 = packages_path / 'python3',
-        ),
         setuptools = caches_path / 'setuptools',
         sphinx = caches_path / 'sphinx',
     )
@@ -148,19 +142,6 @@ def _calculate_scm_modules_locations( locations ):
     return __.SimpleNamespace(
         aux = locations.auxiliary / 'scm-modules',
         prj = locations.local / 'scm-modules',
-    )
-
-
-def _calculate_scripts_locations( locations ):
-    auxiliary_path = locations.auxiliary / 'scripts'
-    project_path = locations.project / 'scripts'
-    return __.SimpleNamespace(
-        aux = __.SimpleNamespace(
-            python3 = auxiliary_path / 'python3',
-        ),
-        prj = __.SimpleNamespace(
-            python3 = project_path / 'python3',
-        ),
     )
 
 

@@ -122,7 +122,8 @@ def module_introduce_accretive_cache( calculators_provider ):
         Any attribute name not in the dictionary results in an
         :py:exc:`AttributeError`. '''
     cache = { }
-    # TODO: Validate calculators provider.
+    from .develop import validate_calculators_provider
+    validate_calculators_provider( calculators_provider )
     calculators = DictionaryProxy( calculators_provider( ) )
 
     def module_getattr( name ):
@@ -135,31 +136,11 @@ def module_introduce_accretive_cache( calculators_provider ):
 
 
 def produce_accretive_cacher( calculators_provider ):
-    ''' Produces object which computes computes and caches values.
-
-        The ``calculators_provider`` argument must return a dictionary of cache
-        entry names with nullary invocables as the correspondent values. Each
-        invocable is a calculator which produces a value to populate the cache.
-        Any attribute name not in the dictionary results in an
-        :py:exc:`AttributeError`. '''
-    cache = { }
-    # TODO: Validate calculators provider.
-    calculators = DictionaryProxy( calculators_provider( ) )
-
-    # TODO: Class immutability.
-    class AccretiveCacher:
-        ''' Computes values on demand and caches them. '''
-
-        __slots__ = ( )
-
-        def __getattr__( self, name ):
-            if name not in calculators: raise AttributeError
-            if name not in cache: cache[ name ] = calculators[ name ]( )
-            return cache[ name ]
-
-        # TODO: Override __setattr__ and __delattr__ for object immutability.
-
-    return AccretiveCacher( )
+    ''' Produces object which computes and caches values. '''
+    from .develop import produce_accretive_cacher as producer
+    # TODO: Immutability on producer class.
+    # TODO: Interception of exceptions.
+    return producer( calculators_provider )
 
 
 @context_manager
@@ -221,9 +202,40 @@ def _select_narrative_functions( ):
 eprint, epprint = _select_narrative_functions( )
 
 
-# TODO: Provide appropriate logging handler.
+def _acquire_driver_module( ): # pylint: disable=inconsistent-return-statements
+    from sys import modules
+    from . import develop as develop_
+    if '__main__' in modules:
+        module = modules[ '__main__' ]
+        # If we are being run by our own driver, then access it directly.
+        if develop_.package_name == getattr( module, 'package_name', None ):
+            return module
+    return
+
+driver_module = _acquire_driver_module( )
 
 
+def _enhance_narration( ):
+    ''' Enhances narrative functions as desired. '''
+    if None is driver_module: return
+    from logging import getLogger as acquire_scribe
+    from sys import stderr
+    from rich.console import Console
+    from rich.logging import RichHandler
+    scribe_ = acquire_scribe( )
+    for handler in scribe_.handlers: scribe_.removeHandler( handler )
+    # TODO: Alter log format.
+    scribe_.addHandler( RichHandler(
+        console = Console( stderr = stderr == narration_target ),
+        rich_tracebacks = True,
+        show_time = False ) )
+    scribe_.debug( 'Rich logging enabled.' )
+
+_enhance_narration( )
+
+
+# TODO: Replace with 'develop.execute_subprocess' once narration target has
+#       received proper consideration.
 def execute_external( command_specification, **nomargs ):
     ''' Executes command in subprocess.
 
@@ -251,47 +263,17 @@ def execute_external( command_specification, **nomargs ):
     return run( command_specification, check = True, **options ) # nosec B603
 
 
-def _enumerate_exit_codes( ):
-    # Standardized on recommended BSD exit codes across all platforms.
-    # Windows seems to have no standard for application exit codes
-    # and its list of system error codes is massive. (And error codes are not
-    # necessarily exit codes.) Cannot rely on "constants" from Python standard
-    # library 'os' modules as they are mostly not cross-platform.
-    # Can also use custom codes between 1 and 63 for failures, as necessary.
-    # References:
-    #   https://docs.python.org/3/library/os.html#os.EX_OK
-    #   https://www.freebsd.org/cgi/man.cgi?query=sysexits&apropos=0&sektion=0&manpath=FreeBSD+4.3-RELEASE&format=html
-    #   https://tldp.org/LDP/abs/html/exitcodes.html
-    #   https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes?redirectedfrom=MSDN#system-error-codes
-    return {
-        'general failure':      1,
-        'invalid data':         65, # EX_DATAERR
-        'invalid state':        70, # EX_SOFTWARE
-        'invalid usage':        64, # EX_USAGE
-        'success':              0,  # EX_OK
-    }
-
-_exit_codes = _enumerate_exit_codes( )
-
-
+# TODO: Use exception factories instead of 'expire' function.
+#       Exception factory dependencies will be guaranteed,
+#       so no more special "early" initialization.
 def expire( exit_specifier, message ) -> _typ.NoReturn:
     # Preferred name would be 'exit' or 'quit' but those are Python builtins.
     # Could have named it 'die', which is short, sweet, and old school,
     # but other function names are Latin-based whereas 'die' is Germanic.
     # Pet peeve about linguistic consistency....
     ''' Logs message and exits current process. '''
-    from numbers import Integral
-    if isinstance( exit_specifier, Integral ):
-        exit_code = int( exit_specifier )
-    elif exit_specifier not in _exit_codes:
-        scribe.warning( f"Invalid exit code name {exit_specifier!r}." )
-        exit_code = _exit_codes[ 'general failure' ]
-    else: exit_code = _exit_codes[ exit_specifier ]
-    message = str( message )
-    if 0 == exit_code: scribe.info( message )
-    # TODO: Python 3.8: stacklevel = 2
-    else: scribe.critical( message, stack_info = True )
-    raise SystemExit( exit_code )
+    from .develop import Exit
+    raise Exit( exit_specifier, message )
 
 
 def _configure( ):
@@ -302,7 +284,7 @@ def _configure( ):
     configuration_ = DictionaryProxy( dict(
         auxiliary_path = auxiliary_path,
         project_path = Path( current_process_environment.get(
-            '_DEVSHIM_PROJECT_PATH', auxiliary_path ) ).resolve( ),
+            'DEVSHIM_PROJECT_LOCATION', auxiliary_path ) ).resolve( ),
         scribe = _create_scribe( ),
     ) )
     return configuration_
@@ -315,7 +297,7 @@ def _create_scribe( ):
     scribe_.addHandler( NullHandler( ) )
     from os import environ as current_process_environment
     scribe_.setLevel( current_process_environment.get(
-        '_DEVSHIM_RECORD_LEVEL', INFO ) )
+        'DEVSHIM_RECORD_LEVEL', INFO ) )
     return scribe_
 
 configuration = _configure( )

@@ -67,27 +67,3 @@ requirement = 'hypothesis'
 
 [[development.test]]
 requirement = 'pytest'
-
-[[development.user-interface]]
-requirement = 'beautifulsoup4'
-
-[[development.user-interface]]
-requirement = 'build'
-
-[[development.user-interface]]
-requirement = 'invoke'
-
-[[development.user-interface]]
-requirement = 'platformdirs'
-
-[[development.user-interface]]
-requirement = 'pre-commit'
-
-[[development.user-interface]]
-requirement = 'rich'
-
-[[development.user-interface]]
-requirement = 'shellingham'
-
-[[development.user-interface]]
-requirement = 'tomli-w'

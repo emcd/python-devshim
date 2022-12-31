@@ -177,8 +177,7 @@ class LanguageDescriptor( metaclass = ABCFactory ):
     @classmethod
     def persist_records( class_, name, records ):
         ''' Persists language descriptor records. '''
-        from ..packages import ensure_import_package
-        tomli_w = ensure_import_package( 'tomli-w' )
+        from tomli_w import dump as persist
         location = class_.infer_records_location( name )
         location.parent.mkdir( exist_ok = True, parents = True )
         records = {
@@ -191,7 +190,7 @@ class LanguageDescriptor( metaclass = ABCFactory ):
         document = { 'format-version': 1, 'platforms': records }
         with location.open( 'wb' ) as file:
             # TODO: Write comment header to warn about machine-generated code.
-            tomli_w.dump( document, file )
+            persist( document, file )
 
     @classmethod
     def provide_definition( class_, descriptor ):
@@ -224,12 +223,11 @@ class LanguageDescriptor( metaclass = ABCFactory ):
         ''' Summons records for language descriptor. '''
         location = class_.infer_records_location( name )
         if not location.exists( ): class_.create_record( name )
-        from ..packages import ensure_import_package
-        tomllib = ensure_import_package( 'tomllib' )
+        from tomli import load as summon
         with location.open( 'rb' ) as file:
             # TODO: Check format version and update records format,
             #       if necessary.
-            records = tomllib.load( file )[ 'platforms' ]
+            records = summon( file )[ 'platforms' ]
         records = {
             platform_name: DictionaryProxy( {
                 'implementation-version':

@@ -23,15 +23,25 @@
     May be ABI compatibility identifier for binary distributions
     or PEP 508 environment identifier for package installation manifests. '''
 
+# NOTE: This module should not use anything from the package in which it is
+#       contained, because it is intended to be run as a standalone script in
+#       addition to being a fundamental module for the containing package.
 
 # TODO? Maybe rename to 'derive_*' from 'calculate_*'.
 
 
 import sys as _sys
 
-from ..base import environment_variable_prefix as _prefix
 
 implementation_name = _sys.implementation.name
+
+
+def _determine_prefix( ):
+    from pathlib import Path
+    if None is __package__: return Path( __file__ ).parent.parent.name
+    return __package__.split( '.', maxsplit = 1 )[ 0 ]
+
+_prefix = _determine_prefix( )
 
 
 def calculate_bdist_compatibility_identifier( ):
@@ -169,3 +179,26 @@ dispatch_table = _DictionaryProxy( {
     'bdist-compatibility':  calculate_bdist_compatibility_identifier,
     'pep508-environment':   calculate_pep508_environment_identifier,
 } )
+
+
+def main( ):
+    ''' Prints identifier label for active Python process. '''
+    _setup_python_search_paths( )
+    from argparse import ArgumentParser
+    cli_parser = ArgumentParser( )
+    cli_parser.add_argument( '--mode',
+        default = 'bdist-compatibility', metavar = 'MODE',
+        choices = dispatch_table.keys( )
+    )
+    cli_arguments = cli_parser.parse_args( )
+    print( dispatch_table[ cli_arguments.mode ]( ) )
+
+
+def _setup_python_search_paths( ):
+    from pathlib import Path
+    from sys import path as python_search_paths
+    common_path = Path( __file__ ).parent.parent.parent
+    python_search_paths.insert( 0, str( common_path / 'sources' / 'python3' ) )
+
+
+if '__main__' == __name__: main( )

@@ -21,6 +21,11 @@
 ''' Filesystem utilities for development support. '''
 
 
+# pylint: disable=unused-import
+from .develop import ensure_directory
+# pylint: enable=unused-import
+
+
 def determine_executable_name_extensions( name = None ):
     ''' Determines possible executable name extensions for platform.
 
@@ -46,12 +51,6 @@ def determine_executables_location_part( ):
     os_class = extract_os_class( )
     if 'nt' == os_class: return 'Scripts'
     return 'bin'
-
-
-def ensure_directory( path ):
-    ''' Ensures existence of directory, creating if necessary. '''
-    path.mkdir( parents = True, exist_ok = True )
-    return path
 
 
 def extract_tarfile( source, destination, selector = None ):

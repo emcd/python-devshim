@@ -42,8 +42,10 @@ def pep508_identify_python( version = None ):
 
 def identify_python( mode, python_path ):
     ''' Reports compatibility identifier for Python at given path. '''
+    # TODO: Use 'importlib-resources' to locate this script.
     from ..data import paths
-    detector_path = paths.scripts.aux.python3 / 'identify-python.py'
+    detector_path = (
+        paths.sources.aux.python3 / 'devshim/platforms/identity.py' )
     from ..base import execute_external
     return execute_external(
         ( python_path, detector_path, '--mode', mode ),

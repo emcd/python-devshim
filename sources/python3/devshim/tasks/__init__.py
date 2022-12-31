@@ -114,10 +114,6 @@ def clean_tool_caches( include_development_support = False ):
     from itertools import chain
     anchors = __.paths.caches.SELF.glob( '*' )
     ignorable_paths = set( __.paths.caches.SELF.glob( '*/.gitignore' ) )
-    if not include_development_support:
-        support_cache_path = __.paths.caches.packages.python3
-        ignorable_paths.add( support_cache_path )
-        ignorable_paths.update( support_cache_path.rglob( '*' ) )
     dirs_stack = [ ]
     for path in chain.from_iterable( map(
         lambda anchor: anchor.rglob( '*' ), anchors
@@ -130,7 +126,11 @@ def clean_tool_caches( include_development_support = False ):
     while dirs_stack: dirs_stack.pop( ).rmdir( )
     # Regenerate development support packages cache, if necessary.
     if include_development_support:
+        from ..develop import ensure_packages_cache
+        from ..fs_utilities import unlink_recursively
         from ..packages import ensure_python_packages
+        support_cache_path = ensure_packages_cache( 'post' )
+        unlink_recursively( support_cache_path )
         ensure_python_packages( domain = 'development' )
 
 
@@ -146,7 +146,7 @@ def clean_python_packages( version = None ):
     )
     if not is_executable_in_venv( 'pip', version = version ):
         __.scribe.error(
-            f"Detected corrupt virtual environment for Python {version!r}." )
+            f"Absent or corrupt virtual environment for Python {version!r}." )
         __.scribe.info(
             f"Rebuilding virtual environment for Python {version!r}." )
         build_python_venv_( version, overwrite = True )
@@ -387,7 +387,6 @@ def lint_semgrep( version = None ):
 
 _lint_targets_default = (
     __.paths.sources.prj.python3,
-    __.paths.scripts.prj.python3,
     __.paths.tests.prj.python3,
     __.paths.project / 'develop.py',
     __.paths.project / 'setup.py',

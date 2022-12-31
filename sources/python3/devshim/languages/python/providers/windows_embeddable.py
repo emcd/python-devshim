@@ -185,15 +185,14 @@ def _discover_versions( ):
 
 
 def _persist_versions( records ):
-    from ....packages import ensure_import_package
-    tomli_w = ensure_import_package( 'tomli-w' )
+    from tomli_w import dump as persist
     location = _data.locations.version_records
     location.parent.mkdir( exist_ok = True, parents = True )
     records = { str( version ): data for version, data in records.items( ) }
     document = { 'format-version': 1, 'versions': records }
     with location.open( 'wb' ) as file:
         # TODO: Write comment header to warn about machine-generated code.
-        tomli_w.dump( document, file )
+        persist( document, file )
 
 
 def _summon_versions( ):
@@ -207,11 +206,10 @@ def _summon_versions( ):
     if must_discover:
         versions = _discover_versions( )
         _persist_versions( versions )
-    from ....packages import ensure_import_package
-    tomllib = ensure_import_package( 'tomllib' )
+    from tomli import load as summon
     with location.open( 'rb' ) as file:
         # TODO: Check format version and update records format, if necessary.
-        records = tomllib.load( file )[ 'versions' ]
+        records = summon( file )[ 'versions' ]
     return __.DictionaryProxy( {
         __.Language.derive_actual_version( version ): data
         for version, data in records.items( ) } )

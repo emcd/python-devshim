@@ -37,42 +37,11 @@ from . import (
     platforms,
     project,
     scm_utilities,
-    # TODO: tasks,
+    tasks,
     user_interface,
 )
 
-
-def complete_initialization( scribe = None ):
-    ''' Performs complete initialization of package.
-
-        Normal module imports, as part of importing the package, are intended
-        to be non-intrusive and lightweight. By contrast, this function will
-        bootstrap missing dependencies, populate data caches, and set
-        immutability upon the package members. '''
-    from .packages import ensure_python_packages
-    ensure_python_packages(
-        domain = ( 'construction', 'development.user-interface', ) )
-    # TODO: Remove or conceal dependency on Invoke so that latent import
-    #       is not necessary.
-    from . import tasks # pylint: disable=unused-import
-    if None is not scribe: _enhance_narration( scribe )
-    # TODO: Tell exception factories to start using Omniexception.
-    _reclassify_modules( )
-
-def _enhance_narration( scribe ):
-    ''' Enhances narrative functions as desired. '''
-    from sys import stderr
-    from rich.console import Console
-    from rich.logging import RichHandler
-    from .base import narration_target
-    for handler in scribe.handlers: scribe.removeHandler( handler )
-    # TODO: Alter log format.
-    scribe.addHandler( RichHandler(
-        console = Console( stderr = stderr == narration_target ),
-        rich_tracebacks = True,
-        show_time = False ) )
-    scribe.debug( 'Rich logging enabled.' )
-
+# TODO: Reclassify each module in its own code.
 def _reclassify_modules( ):
     ''' Reclassifies package for attribute concealment and immutability. '''
     from types import ModuleType as Module

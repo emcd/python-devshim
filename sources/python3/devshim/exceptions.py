@@ -58,8 +58,6 @@ def provide_exception_factory( name ):
         Returns factory which is bound to use the exception class provider from
         this module. '''
     complete_name = f"create_{name}_exception".replace( ' ', '_' )
-    from .packages import assert_python_packages
-    assert_python_packages( ( 'lockup', ) )
     from lockup.exceptionality import our_factories as standard_factories
     if complete_name in globals( ):
         # nosemgrep: python.lang.security.dangerous-globals-use

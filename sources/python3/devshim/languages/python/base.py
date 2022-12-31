@@ -67,10 +67,9 @@ class LanguageDescriptor( __.LanguageDescriptor ):
 
 def _summon_version_definitions( ):
     # TODO? Use 'importlib-resources' to access default definitions.
-    from ...packages import ensure_import_package
-    tomllib = ensure_import_package( 'tomllib' )
+    from tomli import load as summon
     with ( __.locations.configuration / 'python.toml' ).open( 'rb' ) as file:
-        document = tomllib.load( file )
+        document = summon( file )
     # TODO: Check format version and dispatch accordingly.
     return DictionaryProxy( document.get( 'versions', { } ) )
 

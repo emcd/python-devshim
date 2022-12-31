@@ -27,7 +27,6 @@
 
 
 from re import compile as _regex_compile
-from types import MappingProxyType as _DictionaryProxy
 
 from . import base as __
 
@@ -115,7 +114,6 @@ def ensure_python_packages( domain = '*', excludes = ( ) ):
     scribe.info(
         "Ensuring packages for domains: {domains}".format(
             domains = ', '.join( domains.keys( ) ) ) )
-    _ensure_essential_python_packages( )
     requirements = extract_python_package_requirements(
         indicate_python_packages( )[ 0 ], domains )
     from collections.abc import Sequence as AbstractSequence
@@ -123,9 +121,10 @@ def ensure_python_packages( domain = '*', excludes = ( ) ):
         __.expire(
             'invalid state',
             f"Python package exclusions not a sequence: {excludes!r}" )
+    from packaging.requirements import Requirement
     requirements = tuple(
         requirement for requirement in requirements
-        if _pep508_requirement_to_name( requirement ) not in excludes )
+        if Requirement( requirement ).name not in excludes )
     _ensure_python_packages( requirements )
 
 
@@ -232,7 +231,6 @@ def indicate_python_packages( identifier = None ):
         First return value is contents of packages specifications file.
         Second return value is list of dependency fixtures for the given
         platform identifier. Will be empty if none is given. '''
-    assert_python_packages( ( 'tomli', ) )
     from tomli import load
     from .data import paths
     fixtures_path = paths.configuration.pypackages_fixtures
@@ -248,46 +246,6 @@ def indicate_python_packages( identifier = None ):
     return specifications, fixtures
 
 
-def assert_python_packages( requirements ):
-    ''' Asserts availability of packages to active Python. '''
-    # If in virtual environment that we allegedly created,
-    # then assume necessary packages are installed.
-    from .environments import in_our_python_environment
-    if in_our_python_environment: return
-    cache = _ensure_python_packages_cache( )
-    installable_requirements = _filter_available_python_packages(
-        requirements, cache = cache )
-    if not installable_requirements: return
-    from .base import expire
-    names = ', '.join(
-        map( _pep508_requirement_to_name, installable_requirements ) )
-    expire( 'invalid state', f"Packages absent from local cache: {names}" )
-
-
-def ensure_import_package( name ):
-    ''' Ensures package is available for import and imports it.
-
-        Translates aliases for forward compatibility. '''
-    name = _package_aliases.get( name, name )
-    _ensure_python_packages( ( name, ) )
-    legal_name = name.replace( '-', '_' )
-    from importlib import import_module
-    # nosemgrep: python.lang.security.audit.non-literal-import
-    return import_module( legal_name )
-
-
-_package_aliases = _DictionaryProxy( {
-    'tomllib': 'tomli', # TODO: Python 3.11: Remove.
-} )
-
-
-def _ensure_essential_python_packages( ):
-    ''' Ensures availability of essential packages in cache. '''
-    # Ensure Tomli so that 'pyproject.toml' and 'pypackages.toml' can be read.
-    # TODO: Python 3.11: Remove this explicit dependency.
-    _ensure_python_packages( ( 'tomli', ) )
-
-
 def _ensure_python_packages( requirements ):
     ''' Ensures availability of packages to active Python. '''
     # If in virtual environment that we allegedly created,
@@ -298,43 +256,12 @@ def _ensure_python_packages( requirements ):
     # which should have already ensured packages from 'build-requires'.
     try: import pip # pylint: disable=unused-import
     except ImportError: return
-    cache = _ensure_python_packages_cache( )
-    installable_requirements = _filter_available_python_packages(
-        requirements, cache = cache )
-    if installable_requirements:
-        from shlex import split as split_command
-        from sys import executable as python_path
-        from .base import execute_external
-        execute_external(
-            ( python_path,
-              *split_command( '-m pip install --upgrade --target' ),
-              cache, *installable_requirements ) )
-
-
-def _filter_available_python_packages( requirements, cache = None ):
-    ''' Only accepts Pip requirements for packages not in cache. '''
-    if not cache: cache = _ensure_python_packages_cache( )
-    # TODO? Use 'pip freeze --path' output instead.
-    present_packages = frozenset(
-        _pep508_requirement_to_name( path.stem )
-        for path in cache.glob( '*.dist-info' ) )
-    return tuple(
-        requirement for requirement in requirements
-        if _pep508_requirement_to_name( requirement ) not in present_packages )
-
-
-def _ensure_python_packages_cache( ):
-    ''' Ensures availability of packages cache for active Python. '''
-    from .data import paths
-    from .fs_utilities import ensure_directory
-    from .platforms import active_python_abi_label
-    cache = ensure_directory(
-        paths.caches.packages.python3 / active_python_abi_label )
-    cache_ = str( cache )
-    from sys import path as python_search_paths
-    if cache_ not in python_search_paths:
-        python_search_paths.insert( 0, cache_ )
-    return cache
+    from packaging.requirements import Requirement
+    from .develop import ensure_packages, ensure_packages_cache
+    requirements = tuple(
+        ( Requirement( requirement ).name, requirement )
+        for requirement in requirements )
+    ensure_packages( ensure_packages_cache( 'post' ), requirements )
 
 
 def record_python_packages_fixtures( identifier, fixtures ):

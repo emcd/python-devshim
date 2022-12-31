@@ -51,7 +51,7 @@ def github_retrieve_tarball( repository_qname, git_ref, destination ):
                 tarball_path.parent.mkdir( parents = True )
             tarball = contexts.enter_context( tarball_path.open( 'wb' ) )
             tarball.write( http_reader.read( ) )
-        # TODO: Look for 'read' method rather than RawIOBase.
+        # TODO: Look for 'write' method rather than RawIOBase.
         elif isinstance( destination, RawIOBase ):
             destination.write( http_reader.read( ) )
         elif callable( destination ): destination( http_reader )

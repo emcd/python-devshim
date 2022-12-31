@@ -88,23 +88,6 @@ class BdistWheelCommand( _BdistWheelCommand ):
         self.dist_dir = str( paths.artifacts.wheels ) # pylint: disable=attribute-defined-outside-init
 
 
-def _generate_nominative_arguments( ):
-    ''' Generates nominative arguments to 'setuptools.setup'. '''
-    return dict(
-        install_requires = _generate_installation_requirements( ),
-    )
-
-
-def _generate_installation_requirements( ):
-    ''' Generates installation requirements from local configuration. '''
-    from devshim.packages import (
-        extract_python_package_requirements,
-        indicate_python_packages,
-    )
-    return extract_python_package_requirements(
-        indicate_python_packages( )[ 0 ], domain = 'installation' )
-
-
 # https://docs.python.org/3/distutils/setupscript.html#writing-the-setup-script
 from setuptools import setup
 setup(
@@ -114,5 +97,4 @@ setup(
         'egg_info': EggInfoCommand,
         'sdist': SdistCommand,
     },
-    **_generate_nominative_arguments( )
 )

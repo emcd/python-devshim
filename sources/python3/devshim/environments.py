@@ -26,6 +26,9 @@
 # pylint: disable=cyclic-import
 
 
+from . import base as __
+
+
 def _probe_our_python_environment( ):
     ''' Is execution within Python environment created by this package? '''
     from os import environ as current_process_environment
@@ -37,9 +40,14 @@ in_our_python_environment = _probe_our_python_environment( )
 def build_python_venv( version, overwrite = False ):
     ''' Creates virtual environment for requested Python version. '''
     from .languages.python import Language
-    python_path = (
-        Language.produce_descriptor( version )
-        .infer_executables_location( name = 'python' ) )
+    descriptor = Language.produce_descriptor( version )
+    try: python_path = descriptor.infer_executables_location( name = 'python' )
+    except Exception: # pylint: disable=broad-except
+        __.scribe.error(
+            f"Absent or corrupt installation for Python {version!r}." )
+        __.scribe.info( f"Reinstalling Python {version!r}." )
+        descriptor.install( force = True )
+        python_path = descriptor.infer_executables_location( name = 'python' )
     from .fs_utilities import ensure_directory
     venv_path = ensure_directory( derive_venv_path( version, python_path ) )
     venv_options = [ ]
@@ -59,6 +67,7 @@ def _install_packages_into_venv( version, venv_path ):
     )
     install_python_packages( process_environment )
     fixtures = calculate_python_packages_fixtures( process_environment )
+    # TODO: Get PEP 508 platform identity from language descriptor.
     from .platforms import pep508_identify_python
     identifier = pep508_identify_python( version = version )
     record_python_packages_fixtures( identifier, fixtures )
@@ -100,7 +109,8 @@ def is_executable_in_venv( name, venv_path = None, version = None ):
     )
     possible_names = determine_executable_name_extensions( name = name )
     executables_part = determine_executables_location_part( )
-    venv_path = Path( venv_path or derive_venv_path( version = version ) )
+    try: venv_path = Path( venv_path or derive_venv_path( version = version ) )
+    except Exception: return False # pylint: disable=broad-except
     if not venv_path.exists( ): return False
     for path in ( venv_path / executables_part ).iterdir( ):
         if path.name not in possible_names: continue
