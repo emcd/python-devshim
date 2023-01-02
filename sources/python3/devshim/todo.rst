@@ -17,6 +17,9 @@ Fixes and Minor Improvements
 * Use ``--no-binary`` option to :command:`pip` when ``abi-incompatible`` label
   is present on a language installation feature for a version.
 
+* Pre-commit check to ensure :file:`develop.py` and
+  :file:`sources/python3/devshim/develop.py` are the same.
+
 Virtual Environments Improvements
 ================================================================================
 

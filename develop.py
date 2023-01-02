@@ -82,6 +82,8 @@ from collections.abc import (
     Sequence as AbstractSequence,
 )
 from contextlib import contextmanager as context_manager
+from datetime import (
+    datetime as DateTime, timedelta as TimeDelta, timezone as TimeZone, )
 from functools import partial as partial_function
 from pathlib import Path
 from re import compile as regex_compile
@@ -247,18 +249,16 @@ def ensure_directory( path ):
 
 def ensure_packages( packages_location, requirements ):
     ''' Ensure all packages in cohort exist and are recent. '''
-    must_install = False
-    # TODO: Force reinstall if cache is too old.
+    if is_older_than( packages_location, TimeDelta( days = 1 ) ):
+        return _ensure_packages( packages_location, requirements )
     # In-cache package installation directories can be anything. E.g.,
-    # 'beautifulsoup4' -> 'bs4'.
-    # Names of in-cache distinfo directories start with the names of packages
-    # with hyphens converted to underscores. E.g., 'pre-commit' ->
-    # 'pre_commit'.
-    # Aside from parsing the 'top-level.txt' files in the distinfo directories
-    # to discover package installation directories and verifying them, we are
-    # forced to perform O(m*n) iteration to match package names. Our only
-    # succor in this situation is that we can stop iteration at first cache
-    # miss.
+    # 'beautifulsoup4' -> 'bs4'. Names of in-cache distinfo directories start
+    # with the names of packages with hyphens converted to underscores. E.g.,
+    # 'pre-commit' -> 'pre_commit'. Aside from parsing the 'top-level.txt'
+    # files in the distinfo directories to discover package installation
+    # directories and verifying them, we are forced to perform O(m*n) iteration
+    # to match package names. Our only succor in this situation is that we can
+    # stop iteration at first cache miss.
     distinfo_names = tuple(
         location.name for location in packages_location.glob( '*.dist-info' ) )
     for name, _ in requirements:
@@ -267,12 +267,11 @@ def ensure_packages( packages_location, requirements ):
         name_ = "{name}-".format( name = name.replace( '-', '_' ) )
         for distinfo_name in distinfo_names:
             if distinfo_name.startswith( name_ ): break
-        else: must_install = True
-        if must_install: break
-    if not must_install: return
+        else: return _ensure_packages( packages_location, requirements )
+
+def _ensure_packages( location, requirements ):
     install_packages(
-        packages_location,
-        tuple( requirement for _, requirement in requirements ) )
+        location, tuple( requirement for _, requirement in requirements ) )
 
 
 def ensure_packages_cache( label ):
@@ -410,12 +409,24 @@ def install_packages( packages_location, requirements ):
     elif isinstance( requirements, str ):
         requirements = ( requirements, )
     _acquire_scribe( ).info(
-        f"Installing Python packages to {packages_location!r}." )
+        f"Installing Python packages to '{packages_location}'." )
     # Force reinstall to help ensure sanity.
     execute_python_subprocess(
         ( installer_location, 'install', '--target', packages_location,
           '--force-reinstall', '--upgrade', '--upgrade-strategy=eager',
           *requirements ) )
+
+
+def is_older_than( path, then ):
+    ''' Is file system entity older than delta time from now? '''
+    if isinstance( then, DateTime ): when = then.timestamp( )
+    elif isinstance( then, TimeDelta ):
+        when = ( DateTime.now( TimeZone.utc ) - then ).timestamp( )
+    else:
+        raise Exit(
+            'invalid data',
+            f"Expected time delta or absolute datetime; received {then!r}" )
+    return path.stat( ).st_ctime < when
 
 
 def produce_accretive_cacher( calculators_provider ):
@@ -514,7 +525,6 @@ def ensure_scm_modules( project_path ):
 # TODO: Replace with '_ensure_git_submodule'.
 def _attempt_clone_scm_modules( project_path ):
     ''' Attempts to clone SCM modules. '''
-    # TODO: Bootstrap Dulwich and remove Git dependency.
     from shutil import which
     git_path = which( 'git' )
     if None is git_path:
@@ -606,8 +616,9 @@ def _derive_environment_variable_name( *parts ):
 def _ensure_pip( ):
     artifacts_location = ensure_artifacts_cache( 'pre' )
     location = artifacts_location / 'pip.pyz'
-    # TODO: Check age of location.
-    if location.exists( ): return location
+    if location.exists( ):
+        if not is_older_than( location, TimeDelta( days = 1 ) ):
+            return location
     _retrieve_pip( location )
     return location
 

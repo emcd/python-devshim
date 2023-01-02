@@ -22,7 +22,7 @@
 
 
 # pylint: disable=unused-import
-from .develop import ensure_directory
+from .develop import ensure_directory, is_older_than
 # pylint: enable=unused-import
 
 
@@ -85,19 +85,6 @@ def extract_tarfile( source, destination, selector = None ):
         members = tuple( filter( selector, tarball.getmembers( ) ) )
         tarball.extractall( path = destination, members = members )
     return members
-
-
-def is_older_than( path, then ):
-    ''' Is file system entity older than delta time from now? '''
-    inode = path.stat( )
-    from datetime import (
-        datetime as DateTime, timedelta as TimeDelta, timezone as TimeZone,
-    )
-    if isinstance( then, DateTime ): when = then.timestamp( )
-    elif isinstance( then, TimeDelta ):
-        when = ( DateTime.now( TimeZone.utc ) - then ).timestamp( )
-    # TODO: Else, error.
-    return inode.st_ctime < when
 
 
 def unlink_recursively( path ):
