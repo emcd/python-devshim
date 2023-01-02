@@ -90,9 +90,10 @@ from re import compile as regex_compile
 from types import MappingProxyType as DictionaryProxy
 
 
-package_name = 'devshim'
+pypi_package_name = 'devshim'
+package_name = pypi_package_name.replace( '-', '_' )
 __version__ = '1.0a202210291425'
-repository_name = f"python-{package_name}"
+repository_name = f"python-{pypi_package_name}"
 
 
 locations: _typ.Any
@@ -208,13 +209,19 @@ def discover_repository_apex_directory( ):
         In essence, this emulates ``git rev-parse --show-toplevel``,
         but without using that command, which we do not wish to assume is
         available to us. '''
-    # TODO: Consider other repository markers, if bridged to Git.
+    # TODO? Consider other repository type markers, if bridged to Git.
     from os import environ as current_process_environment
+    from os.path import pathsep
     if 'GIT_WORK_TREE' in current_process_environment:
         return Path( 'GIT_WORK_TREE' ).resolve( strict = True )
     location = Path( ).resolve( )
-    # TODO? Support 'GIT_CEILING_DIRECTORIES'.
-    ceilings = ( Path.home( ), location.root, )
+    ceilings = frozenset( (
+        Path.home( ), Path( location.root ),
+        *(  Path( ceiling ).resolve( )
+            for ceiling in filter(
+                None,
+                current_process_environment
+                .get( 'GIT_CEILING_DIRECTORIES', '' ).split( pathsep ) ) ) ) )
     while location not in ceilings:
         if ( location / '.git' ).is_dir( ): return location
         location = location.parent
@@ -345,12 +352,15 @@ def http_retrieve_url( url, destination ):
         try: _http_retrieve_url( request, destination )
         except UrlError as exc:
             scribe.error( f"Failed to retrieve data from {url!r}." )
-            if isinstance( exc, HttpError ):
-                if HttpStatus.NOT_FOUND.value == exc.code: raise
-                # TODO: Honor backoff request with time from header.
-            if attempts_count_max == attempts_count: raise
             # Exponential backoff with collision-breaking jitter.
             backoff_time = 2 ** attempts_count + 2 * random( ) # nosec: B311
+            if isinstance( exc, HttpError ):
+                if HttpStatus.NOT_FOUND.value == exc.code: raise
+                if HttpStatus.TOO_MANY_REQUESTS.value == exc.code:
+                    backoff_time = float(
+                        exc.headers.get( 'Retry-After', backoff_time ) )
+                    if 120 < backoff_time: raise # Do not wait too long.
+            if attempts_count_max == attempts_count: raise
             scribe.info(
                 f"Will attempt retrieval from {url!r} again "
                 f"in {backoff_time} seconds." )
@@ -395,24 +405,24 @@ def imports_from_cache( location ):
     #       May need to create custom import hook and insert it into first slot
     #       of import hooks.
     # XXX: Temporarily modify modules search paths.
+    from site import addsitedir
     from sys import path as modules_search_paths
+    addsitedir( str( location ) ) # Ensure '.pth' files are processed.
     modules_search_paths.insert( 0, str( location ) )
     yield
     modules_search_paths.remove( str( location ) )
 
 
-def install_packages( packages_location, requirements ):
+def install_packages( location, requirements ):
     ''' Installs Python packages into drectory. '''
-    installer_location = _ensure_pip( )
     if isinstance( requirements, Path ):
         requirements = ( '--requirement', requirements )
     elif isinstance( requirements, str ):
         requirements = ( requirements, )
-    _acquire_scribe( ).info(
-        f"Installing Python packages to {packages_location!r}." )
+    _acquire_scribe( ).info( f"Installing Python packages to '{location}'." )
     # Force reinstall to help ensure sanity.
     execute_python_subprocess(
-        ( installer_location, 'install', '--target', packages_location,
+        ( _ensure_pip( ), 'install', '--target', location,
           '--force-reinstall', '--upgrade', '--upgrade-strategy=eager',
           *requirements ) )
 
@@ -477,36 +487,6 @@ def validate_calculators_provider( provider ):
     return provider
 
 
-def _acquire_cranial_matter( ):
-    species, location = _locate_cranial_matter( )
-    if 'remote' == species:
-        _ensure_main_packages(
-            _data.locations.repository_apex / 'pyproject.toml' )
-    elif 'submodule' == species:
-        # TODO: _ensure_git_submodule( location )
-        _ensure_main_packages( location / 'pyproject.toml' )
-    elif 'package' == species:
-        try: import devshim # pylint: disable=cyclic-import,unused-import
-        except ImportError: pass # TODO: _install_me( )
-
-
-def _ensure_main_packages( configuration_location ):
-    _ensure_pre_packages( )
-    with imports_from_cache( ensure_packages_cache( 'pre' ) ):
-        from packaging.requirements import Requirement
-        from tomli import load
-    with configuration_location.open( 'rb' ) as file:
-        configuration = load( file )
-    # Note: Development dependencies are not processed here.
-    #       Those are installed by the brain into virtual environments.
-    # TODO? Support for optional dependencies.
-    requirements = tuple(
-        ( Requirement( requirement ).name, requirement ) for requirement
-        in configuration[ 'project' ][ 'dependencies' ] )
-    ensure_packages( ensure_packages_cache( 'main' ), requirements )
-    # TODO: Install editable wheel from sources.
-
-
 # TODO: Replace with '_ensure_git_submodule'.
 def ensure_scm_modules( project_path ):
     ''' Ensures SCM modules have been cloned. '''
@@ -540,15 +520,6 @@ def _attempt_clone_scm_modules( project_path ):
 
 def configure_auxiliary( project_path ):
     ''' Locates and configures development support modules. '''
-    # TODO: Remove packages path once work has been completed to ensure
-    #       package requirements are met from here.
-    auxiliary_path = project_path.joinpath(
-        '.local', 'scm-modules', 'python-devshim' )
-    packages_path = (
-        auxiliary_path if auxiliary_path.is_dir( )
-        else project_path ) / 'sources' / 'python3'
-    from sys import path as python_search_paths
-    python_search_paths.insert( 0, str( packages_path ) )
     _add_environment_entry( ( 'project', 'location' ), project_path )
     with imports_from_cache( ensure_packages_cache( 'main' ) ):
         import devshim # pylint: disable=cyclic-import,unused-import
@@ -563,6 +534,21 @@ def main( ):
         from invoke import Collection, Program
         from devshim import tasks # pylint: disable=cyclic-import
         Program( namespace = Collection.from_module( tasks ) ).run( )
+
+
+def _acquire_cranial_matter( ):
+    species, location = _locate_cranial_matter( )
+    if 'remote' == species:
+        location = _data.locations.repository_apex
+        _ensure_me_as_editable_wheel( location )
+        _ensure_main_packages( location / 'pyproject.toml' )
+    elif 'submodule' == species:
+        # TODO: _ensure_git_submodule( location )
+        _ensure_me_as_editable_wheel( location )
+        _ensure_main_packages( location / 'pyproject.toml' )
+    elif 'package' == species:
+        try: import devshim # pylint: disable=cyclic-import,unused-import
+        except ImportError: pass # TODO: _install_me( )
 
 
 def _acquire_scribe( ):
@@ -611,6 +597,35 @@ def _configure_base_scribe( ):
 def _derive_environment_variable_name( *parts ):
     ''' Derives environment variable name from parts and package name. '''
     return '_'.join( map( str.upper, ( package_name, *parts ) ) )
+
+
+# TODO? Remove. May not be needed because editable wheel installs dependencies.
+#       If we remove this, we need to ensure that dependencies stay fresh.
+def _ensure_main_packages( configuration_location ):
+    _ensure_pre_packages( )
+    with imports_from_cache( ensure_packages_cache( 'pre' ) ):
+        from packaging.requirements import Requirement
+        from tomli import load
+    with configuration_location.open( 'rb' ) as file:
+        configuration = load( file )
+    # Note: Development dependencies are not processed here.
+    #       Those are installed by the brain into virtual environments.
+    # TODO? Support for optional dependencies.
+    requirements = tuple(
+        ( Requirement( requirement ).name, requirement ) for requirement
+        in configuration[ 'project' ][ 'dependencies' ] )
+    ensure_packages( ensure_packages_cache( 'main' ), requirements )
+
+
+def _ensure_me_as_editable_wheel( project_location ):
+    packages_location = ensure_packages_cache( 'main' )
+    distinfo_location = (
+        packages_location / f"{package_name}-{__version__}.dist-info" )
+    if distinfo_location.exists( ): return
+    execute_python_subprocess(
+        ( _ensure_pip( ), 'install', '--editable', project_location,
+          '--force-reinstall', '--upgrade', '--upgrade-strategy=eager',
+          '--target', packages_location, ) )
 
 
 def _ensure_pip( ):

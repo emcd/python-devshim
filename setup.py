@@ -23,6 +23,11 @@
 def _configure( ):
     from pathlib import Path
     project_path = Path( __file__ ).parent
+    # If we are building editable wheel, we cannot reference it.
+    # Therefore, we need to look directly at the sources as long as we rely on
+    # them as part of their own package build process.
+    from sys import path as modules_locations
+    modules_locations.insert( 0, str( project_path / 'sources/python3' ) )
     from importlib.util import module_from_spec, spec_from_file_location
     module_spec = spec_from_file_location(
         '_develop', project_path / 'develop.py' )

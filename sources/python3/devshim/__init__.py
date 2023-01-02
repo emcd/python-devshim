@@ -21,9 +21,6 @@
 ''' Development support modules. '''
 
 
-# TODO: __version__
-
-
 from . import (
     base,
     data,
@@ -40,6 +37,8 @@ from . import (
     tasks,
     user_interface,
 )
+
+from .develop import __version__
 
 # TODO: Reclassify each module in its own code.
 def _reclassify_modules( ):
