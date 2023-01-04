@@ -256,7 +256,7 @@ def ensure_directory( path ):
 
 def ensure_packages( packages_location, requirements ):
     ''' Ensure all packages in cohort exist and are recent. '''
-    if is_older_than( packages_location, TimeDelta( days = 1 ) ):
+    if is_dirent_older_than( packages_location, TimeDelta( days = 1 ) ):
         return _ensure_packages( packages_location, requirements )
     # In-cache package installation directories can be anything. E.g.,
     # 'beautifulsoup4' -> 'bs4'. Names of in-cache distinfo directories start
@@ -427,7 +427,7 @@ def install_packages( location, requirements ):
           *requirements ) )
 
 
-def is_older_than( path, then ):
+def is_dirent_older_than( path, then ):
     ''' Is file system entity older than delta time from now? '''
     if isinstance( then, DateTime ): when = then.timestamp( )
     elif isinstance( then, TimeDelta ):
@@ -436,7 +436,28 @@ def is_older_than( path, then ):
         raise Exit(
             'invalid data',
             f"Expected time delta or absolute datetime; received {then!r}" )
-    return path.stat( ).st_ctime < when
+    # Windows apparently does not track file metadata change time (ctime);
+    # instead file birth time is substituted for ctime on that platform.
+    # Therefore, we rely on file content modification time (mtime).
+    # This provides the desired behavior in nearly all cases anyway.
+    return path.stat( ).st_mtime < when
+
+
+def replace_file_if_older_than( destination, source ):
+    ''' If source file is newer than destination, then replace destination. '''
+    if not source.is_file( ):
+        raise Exit(
+            'invalid state',
+            f"Cannot replace destination '{destination}' "
+            f"with non-existent source file '{source}'." )
+    must_replace = False
+    must_replace = must_replace or not destination.exists( )
+    must_replace = must_replace or (
+        source.stat( ).st_mtime > destination.stat( ).st_mtime )
+    if not must_replace: return
+    if destination.exists( ): destination.unlink( )
+    from shutil import copyfile
+    copyfile( source, destination )
 
 
 def produce_accretive_cacher( calculators_provider ):
@@ -518,9 +539,16 @@ def _attempt_clone_scm_modules( project_path ):
         cwd = project_path )
 
 
+# TODO: Rename. Maybe 'prepare'.
 def configure_auxiliary( project_path ):
     ''' Locates and configures development support modules. '''
     _add_environment_entry( ( 'project', 'location' ), project_path )
+    # XXX: Ensure that we have copy of this module in the package.
+    #      Should not be necessary if we have a common entrypoint.
+    me_location = Path( __file__ )
+    replace_file_if_older_than(
+        ( project_path / f"sources/python3/devshim/{me_location.name}" ),
+        me_location )
     with imports_from_cache( ensure_packages_cache( 'main' ) ):
         import devshim # pylint: disable=cyclic-import,unused-import
 
@@ -540,12 +568,16 @@ def _acquire_cranial_matter( ):
     species, location = _locate_cranial_matter( )
     if 'remote' == species:
         location = _data.locations.repository_apex
-        _ensure_me_as_editable_wheel( location )
-        _ensure_main_packages( location / 'pyproject.toml' )
     elif 'submodule' == species:
         # TODO: _ensure_git_submodule( location )
+        pass
+    if species in ( 'remote', 'submodule', ):
         _ensure_me_as_editable_wheel( location )
         _ensure_main_packages( location / 'pyproject.toml' )
+        me_location = Path( __file__ )
+        replace_file_if_older_than(
+            ( location / f"sources/python3/devshim/{me_location.name}" ),
+            me_location )
     elif 'package' == species:
         try: import devshim # pylint: disable=cyclic-import,unused-import
         except ImportError: pass # TODO: _install_me( )
@@ -632,7 +664,7 @@ def _ensure_pip( ):
     artifacts_location = ensure_artifacts_cache( 'pre' )
     location = artifacts_location / 'pip.pyz'
     if location.exists( ):
-        if not is_older_than( location, TimeDelta( days = 1 ) ):
+        if not is_dirent_older_than( location, TimeDelta( days = 1 ) ):
             return location
     _retrieve_pip( location )
     return location

@@ -22,7 +22,7 @@
 
 
 # pylint: disable=unused-import
-from .develop import ensure_directory, is_older_than
+from .develop import ensure_directory
 # pylint: enable=unused-import
 
 
@@ -85,6 +85,20 @@ def extract_tarfile( source, destination, selector = None ):
         members = tuple( filter( selector, tarball.getmembers( ) ) )
         tarball.extractall( path = destination, members = members )
     return members
+
+
+def is_older_than( path, then ):
+    ''' Is file system entity older than delta time from now? '''
+    # TODO: Intercept 'Exit' error and convert it.
+    from .develop import is_dirent_older_than as actual_function
+    return actual_function( path, then )
+
+
+def replace_file_if_older_than( destination, source ):
+    ''' If source file is newer than destination, then replace destination. '''
+    # TODO: Intercept 'Exit' error and convert it.
+    from .develop import replace_file_if_older_than as actual_function
+    return actual_function( destination, source )
 
 
 def unlink_recursively( path ):
