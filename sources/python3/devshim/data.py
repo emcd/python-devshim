@@ -54,4 +54,8 @@ def _invoke( name ):
     return getattr( module, invocable_name )( )
 
 
-__getattr__ = __.module_introduce_accretive_cache( _provide_calculators )
+_data = __.produce_accretive_cacher( _provide_calculators )
+__getattr__ = _data.__getattr__
+
+
+__.reclassify_module( __name__ )

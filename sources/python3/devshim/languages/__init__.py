@@ -22,6 +22,7 @@
 # TODO? Expand to management of language environments and tasks.
 
 
+from . import base
 from . import python
 
 from .base import (
@@ -32,3 +33,6 @@ from .base import (
     survey_languages,
     survey_provider_classes,
 )
+
+
+base.reclassify_module( __name__ )

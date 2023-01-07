@@ -21,7 +21,11 @@
 ''' Management of Python language installations. '''
 
 
+from . import base
 from . import features
 from . import providers
 
 from .base import Language
+
+
+base.reclassify_module( __name__ )

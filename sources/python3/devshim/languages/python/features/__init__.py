@@ -21,4 +21,9 @@
 ''' Installation features for the Python language. '''
 
 
+from . import base
+
 from .tracerefs import TraceRefs
+
+
+base.reclassify_module( __name__ )

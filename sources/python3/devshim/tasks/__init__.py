@@ -109,7 +109,7 @@ def clean_pycaches( ):
 
 
 @__.task( 'Clean: Tool Caches' )
-def clean_tool_caches( include_development_support = False ):
+def clean_tool_caches( ):
     ''' Clears the caches used by code generation and testing utilities. '''
     from itertools import chain
     anchors = __.paths.caches.SELF.glob( '*' )
@@ -124,14 +124,6 @@ def clean_tool_caches( include_development_support = False ):
             continue
         path.unlink( )
     while dirs_stack: dirs_stack.pop( ).rmdir( )
-    # Regenerate development support packages cache, if necessary.
-    if include_development_support:
-        from ..develop import ensure_packages_cache
-        from ..fs_utilities import unlink_recursively
-        from ..packages import ensure_python_packages
-        support_cache_path = ensure_packages_cache( 'post' )
-        unlink_recursively( support_cache_path )
-        ensure_python_packages( domain = 'development' )
 
 
 @__.task(
@@ -944,3 +936,6 @@ namespace.add_collection( __.TaskCollection(
 namespace.add_collection( __.TaskCollection(
     'xp',
 ) )
+
+
+__.reclassify_module( __name__ )

@@ -21,7 +21,10 @@
 ''' Classes of exceptions emitted by the functionality of this package. '''
 
 
-class Omniexception( BaseException ):
+from lockup import Class as _Class, reclassify_module as _reclassify_module
+
+
+class Omniexception( BaseException, metaclass = _Class ):
     ''' Base for all exceptions in the package. '''
 
     # TODO: Inject functionality from refactored 'lockup.exceptionality'.
@@ -191,3 +194,6 @@ def _inject_exception_labels( extra_data, exception_labels ):
     extra_arguments[ 'exception_labels' ] = exception_labels
     extra_arguments[ 'exception_labels' ].update( extra_data.exception_labels )
     return extra_arguments
+
+
+_reclassify_module( __name__ )

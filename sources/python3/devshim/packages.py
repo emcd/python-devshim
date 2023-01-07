@@ -118,8 +118,8 @@ def ensure_python_packages( domain = '*', excludes = ( ) ):
         indicate_python_packages( )[ 0 ], domains )
     from collections.abc import Sequence as AbstractSequence
     if not isinstance( excludes, AbstractSequence ):
-        __.expire(
-            'invalid state',
+        # TODO: Use exception factory.
+        raise RuntimeError(
             f"Python package exclusions not a sequence: {excludes!r}" )
     from packaging.requirements import Requirement
     requirements = tuple(
@@ -169,8 +169,8 @@ def _validate_pypackages_format_version( specifications ):
     ''' Validates 'pypackages.toml' file format version and returns it. '''
     version = specifications.get( 'format-version', 1 )
     if 1 != version:
-        __.expire(
-            'invalid data',
+        # TODO: Use exception factory.
+        raise ValueError(
             f"Invalid Python packages manifest format version: {version!r}" )
     return version
 
@@ -182,8 +182,8 @@ def _extract_python_package_requirement( specification ):
     if isinstance( specification, Dictionary ):
         # TODO: Validate that requirement entry exists.
         return specification[ 'requirement' ]
-    __.expire(
-        'invalid state',
+    # TODO: Use exception factory.
+    raise RuntimeError(
         "Invalid package specification type {class_!r}.".format(
             class_ = type( specification ) ) )
 
@@ -209,7 +209,8 @@ def _canonicalize_pypackages_domain( domain ):
         for domain_ in domain:
             domains.update( _canonicalize_pypackages_domain( domain_ ) )
         return domains
-    __.expire( 'invalid state', f"Invalid domain: {domain!r}" )
+    # TODO: Use exception factory.
+    raise RuntimeError( 'invalid state', f"Invalid domain: {domain!r}" )
 
 
 def _derive_python_location( process_environment ):
@@ -256,12 +257,11 @@ def _ensure_python_packages( requirements ):
     # which should have already ensured packages from 'build-requires'.
     try: import pip # pylint: disable=unused-import
     except ImportError: return
-    from packaging.requirements import Requirement
-    from .develop import ensure_packages, ensure_packages_cache
-    requirements = tuple(
-        ( Requirement( requirement ).name, requirement )
-        for requirement in requirements )
-    ensure_packages( ensure_packages_cache( 'post' ), requirements )
+    execute_pip_with_requirements(
+        __.current_process_environment,
+        'install',
+        '\n'.join( requirements ),
+        pip_options = ( '--upgrade', '--upgrade-strategy=eager', ) )
 
 
 def record_python_packages_fixtures( identifier, fixtures ):
@@ -441,9 +441,8 @@ class Version:
 
     def __init__( self, stage, major, minor, patch ):
         if stage not in ( 'a', 'rc', 'f' ):
-            # TODO: Use 'expire' instead of 'invoke.Exit'.
-            from invoke import Exit
-            raise Exit( f"Bad stage: {stage}" )
+            # TODO: Use exception factory.
+            raise ValueError( f"Bad stage: {stage}" )
         self.stage = stage
         self.major = int( major )
         self.minor = int( minor )
@@ -459,15 +458,14 @@ class Version:
     def as_bumped( self, piece ):
         ''' Returns a derivative of the version,
             altered according to current state and desired modification. '''
-        # TODO: Use 'expire' instead of 'invoke.Exit'.
-        from invoke import Exit
         Version_ = type( self )
         stage, major, minor, patch = (
             self.stage, self.major, self.minor, self.patch )
         if 'stage' == piece:
             if 'a' == stage: return Version_( 'rc', major, minor, 1 )
             if 'rc' == stage: return Version_( 'f', major, minor, 0 )
-            raise Exit( 'Cannot bump last stage.' )
+            # TODO: Use exception factory.
+            raise ValueError( 'Cannot bump last stage.' )
         from datetime import datetime as DateTime
         timestamp = DateTime.utcnow( ).strftime( '%Y%m%d%H%M' )
         if 'patch' == piece:
@@ -478,4 +476,8 @@ class Version:
             return Version_( 'a', major + 1, 0, timestamp )
         if 'minor' == piece:
             return Version_( 'a', major, minor + 1, timestamp )
-        raise Exit( f"Unknown kind of piece: {piece}" )
+        # TODO: Use exception factory.
+        raise ValueError( f"Unknown kind of piece: {piece}" )
+
+
+__.reclassify_module( __name__ )

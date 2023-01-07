@@ -182,3 +182,6 @@ def derive_venv_path( version = None, python_path = None ):
         'bdist-compatibility', python_path = python_path )
     from .data import paths
     return ( paths.environments / abi_label ).resolve( )
+
+
+__.reclassify_module( __name__ )

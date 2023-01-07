@@ -21,6 +21,9 @@
 ''' Management of development platforms. '''
 
 
+from .. import base as __
+
+
 def identify_active_python( mode ):
     ''' Reports compatibility identifier for active Python. '''
     from .identity import dispatch_table
@@ -50,3 +53,6 @@ def identify_python( mode, python_path ):
     return execute_external(
         ( python_path, detector_path, '--mode', mode ),
         capture_output = True ).stdout.strip( )
+
+
+__.reclassify_module( __name__ )

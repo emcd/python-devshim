@@ -21,22 +21,19 @@
 ''' Filesystem utilities for development support. '''
 
 
-# pylint: disable=unused-import
-from .develop import ensure_directory
-# pylint: enable=unused-import
+from . import base as __
 
 
 def determine_executable_name_extensions( name = None ):
     ''' Determines possible executable name extensions for platform.
 
         For POSIX platforms, this is an empty tuple. '''
-    from os import environ as current_process_environment
     from .platforms.identity import extract_os_class
     os_class = extract_os_class( )
     if 'nt' == os_class:
         extensions = tuple( map(
             str.lower,
-            current_process_environment.get(
+            __.current_process_environment.get(
                 'PATHEXT',
                 '.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC' )
             .split( ';' ) ) )
@@ -51,6 +48,14 @@ def determine_executables_location_part( ):
     os_class = extract_os_class( )
     if 'nt' == os_class: return 'Scripts'
     return 'bin'
+
+
+def ensure_directory( path ):
+    ''' Ensures existence of directory, creating if necessary. '''
+    # NOTE: Similar implementation exists in 'develop.py'.
+    #       Improvements should be reflected in both places.
+    path.mkdir( parents = True, exist_ok = True )
+    return path
 
 
 def extract_tarfile( source, destination, selector = None ):
@@ -89,16 +94,21 @@ def extract_tarfile( source, destination, selector = None ):
 
 def is_older_than( path, then ):
     ''' Is file system entity older than delta time from now? '''
-    # TODO: Intercept 'Exit' error and convert it.
-    from .develop import is_dirent_older_than as actual_function
-    return actual_function( path, then )
-
-
-def replace_file_if_older_than( destination, source ):
-    ''' If source file is newer than destination, then replace destination. '''
-    # TODO: Intercept 'Exit' error and convert it.
-    from .develop import replace_file_if_older_than as actual_function
-    return actual_function( destination, source )
+    # NOTE: Similar implementation exists in 'develop.py'.
+    #       Improvements should be reflected in both places.
+    from datetime import (
+        datetime as DateTime, timedelta as TimeDelta, timezone as TimeZone, )
+    if isinstance( then, DateTime ): when = then.timestamp( )
+    elif isinstance( then, TimeDelta ):
+        when = ( DateTime.now( TimeZone.utc ) - then ).timestamp( )
+    else:
+        # TODO: Use exception factory.
+        raise ValueError
+    # Windows apparently does not track file metadata change time (ctime);
+    # instead file birth time is substituted for ctime on that platform.
+    # Therefore, we rely on file content modification time (mtime).
+    # This provides the desired behavior in nearly all cases anyway.
+    return path.stat( ).st_mtime < when
 
 
 def unlink_recursively( path ):
@@ -118,3 +128,6 @@ def unlink_recursively( path ):
             continue
         child_path.unlink( )
     while dirs_stack: dirs_stack.pop( ).rmdir( )
+
+
+__.reclassify_module( __name__ )

@@ -27,6 +27,8 @@ import re
 from shlex import split as split_command
 from types import MappingProxyType as DictionaryProxy
 
+from lockup import reclassify_module
+
 from ....base import execute_external, produce_accretive_cacher
 from ...base import LanguageProvider, register_provider_class
 from ..base import Language
@@ -63,3 +65,6 @@ def retrieve_pip_installer( installation_location ):
         installer = contexts.enter_context( installer_location.open( 'wb' ) )
         installer.write( http_reader.read( ) )
     return installer_location
+
+
+reclassify_module( __name__ )

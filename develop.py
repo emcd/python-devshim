@@ -85,6 +85,7 @@ from contextlib import contextmanager as context_manager
 from datetime import (
     datetime as DateTime, timedelta as TimeDelta, timezone as TimeZone, )
 from functools import partial as partial_function
+from os import environ as current_process_environment
 from pathlib import Path
 from re import compile as regex_compile
 from types import MappingProxyType as DictionaryProxy
@@ -94,9 +95,6 @@ pypi_package_name = 'devshim'
 package_name = pypi_package_name.replace( '-', '_' )
 __version__ = '1.0a202210291425'
 repository_name = f"python-{pypi_package_name}"
-
-
-locations: _typ.Any
 
 
 class Exit( SystemExit ):
@@ -173,7 +171,6 @@ def derive_caches_location( label ):
     ''' Derives cache location according to platform and cache identifier. '''
     # Cannot assume that we can import 'platformdirs', so we emulate the
     # relevant portion of that package.
-    from os import environ as current_process_environment
     from sys import platform
     if 'win32' == platform:
         # TODO: Use query for 'CSIDL_LOCAL_APPDATA'.
@@ -210,7 +207,6 @@ def discover_repository_apex_directory( ):
         but without using that command, which we do not wish to assume is
         available to us. '''
     # TODO? Consider other repository type markers, if bridged to Git.
-    from os import environ as current_process_environment
     from os.path import pathsep
     if 'GIT_WORK_TREE' in current_process_environment:
         return Path( 'GIT_WORK_TREE' ).resolve( strict = True )
@@ -230,7 +226,6 @@ def discover_repository_apex_directory( ):
 
 def discover_repository_records_directory( ):
     ''' Discovers records directory of repository. '''
-    from os import environ as current_process_environment
     # Note: 'FileNotFoundError' exceptions are allowed to propagate by design.
     records_location = (
         Path(
@@ -250,6 +245,8 @@ def ensure_artifacts_cache( label ):
 
 def ensure_directory( path ):
     ''' Ensures existence of directory, creating if necessary. '''
+    # NOTE: Similar implementation exists in package.
+    #       Improvements should be reflected in both places.
     path.mkdir( parents = True, exist_ok = True )
     return path
 
@@ -294,7 +291,7 @@ def execute_python_subprocess(
     ''' Executes command with same executable as active interpreter.
 
         Also adds special packages cache to :envvar:`PYTHONPATH`. '''
-    from os import environ as current_process_environment, pathsep
+    from os.path import pathsep
     from sys import executable as python_location
     command_specification = _normalize_command_specification(
         command_specification )
@@ -313,6 +310,8 @@ def execute_python_subprocess(
 
 def execute_subprocess( command_specification, **nomargs ):
     ''' Executes command in subprocess. '''
+    # NOTE: Similar implementation exists in package.
+    #       Improvements should be reflected in both places.
     command_specification = _normalize_command_specification(
         command_specification )
     from subprocess import run # nosec: B404
@@ -429,6 +428,8 @@ def install_packages( location, requirements ):
 
 def is_dirent_older_than( path, then ):
     ''' Is file system entity older than delta time from now? '''
+    # NOTE: Similar implementation exists in package.
+    #       Improvements should be reflected in both places.
     if isinstance( then, DateTime ): when = then.timestamp( )
     elif isinstance( then, TimeDelta ):
         when = ( DateTime.now( TimeZone.utc ) - then ).timestamp( )
@@ -443,23 +444,6 @@ def is_dirent_older_than( path, then ):
     return path.stat( ).st_mtime < when
 
 
-def replace_file_if_older_than( destination, source ):
-    ''' If source file is newer than destination, then replace destination. '''
-    if not source.is_file( ):
-        raise Exit(
-            'invalid state',
-            f"Cannot replace destination '{destination}' "
-            f"with non-existent source file '{source}'." )
-    must_replace = False
-    must_replace = must_replace or not destination.exists( )
-    must_replace = must_replace or (
-        source.stat( ).st_mtime > destination.stat( ).st_mtime )
-    if not must_replace: return
-    if destination.exists( ): destination.unlink( )
-    from shutil import copyfile
-    copyfile( source, destination )
-
-
 def produce_accretive_cacher( calculators_provider ):
     ''' Produces object which computes and caches values.
 
@@ -468,8 +452,10 @@ def produce_accretive_cacher( calculators_provider ):
         invocable is a calculator which produces a value to populate the cache.
         Any attribute name not in the dictionary results in an
         :py:exc:`AttributeError`. '''
+    # NOTE: Similar implementation exists in package.
+    #       Improvements should be reflected in both places.
     cache = { }
-    validate_calculators_provider( calculators_provider )
+    validate_cache_calculators_provider( calculators_provider )
     calculators = DictionaryProxy( calculators_provider( ) )
 
     class AccretiveCacher:
@@ -482,7 +468,15 @@ def produce_accretive_cacher( calculators_provider ):
             if name not in cache: cache[ name ] = calculators[ name ]( )
             return cache[ name ]
 
-        # TODO: Override __setattr__ and __delattr__ for object immutability.
+        def __setattr__( self, name, value ):
+            raise Exit(
+                'invalid state',
+                "Cannot assign attributes on cacher object." )
+
+        def __delattr__( self, name ):
+            raise Exit(
+                'invalid state',
+                "Cannot remove attributes from cacher object." )
 
     return AccretiveCacher( )
 
@@ -498,8 +492,10 @@ def summon_git_repository_configuration( ):
     return ConfigFile.from_path( str( configuration_location ) )
 
 
-def validate_calculators_provider( provider ):
+def validate_cache_calculators_provider( provider ):
     ''' Validates provider of calculators for accretive cacher. '''
+    # NOTE: Similar implementation exists in package.
+    #       Improvements should be reflected in both places.
     if not callable( provider ):
         raise Exit(
             'invalid data',
@@ -543,14 +539,8 @@ def _attempt_clone_scm_modules( project_path ):
 def configure_auxiliary( project_path ):
     ''' Locates and configures development support modules. '''
     _add_environment_entry( ( 'project', 'location' ), project_path )
-    # XXX: Ensure that we have copy of this module in the package.
-    #      Should not be necessary if we have a common entrypoint.
-    me_location = Path( __file__ )
-    replace_file_if_older_than(
-        ( project_path / f"sources/python3/devshim/{me_location.name}" ),
-        me_location )
     with imports_from_cache( ensure_packages_cache( 'main' ) ):
-        import devshim # pylint: disable=cyclic-import,unused-import
+        import devshim # pylint: disable=unused-import
 
 
 def main( ):
@@ -560,7 +550,7 @@ def main( ):
     configure_auxiliary( _data.locations.repository_apex )
     with imports_from_cache( ensure_packages_cache( 'main' ) ):
         from invoke import Collection, Program
-        from devshim import tasks # pylint: disable=cyclic-import
+        from devshim import tasks
         Program( namespace = Collection.from_module( tasks ) ).run( )
 
 
@@ -573,14 +563,14 @@ def _acquire_cranial_matter( ):
         pass
     if species in ( 'remote', 'submodule', ):
         _ensure_me_as_editable_wheel( location )
+        # Installing editable wheel also installs dependencies.
+        # However, we want to ensure that the dependencies are up-to-date.
         _ensure_main_packages( location / 'pyproject.toml' )
-        me_location = Path( __file__ )
-        replace_file_if_older_than(
-            ( location / f"sources/python3/devshim/{me_location.name}" ),
-            me_location )
     elif 'package' == species:
-        try: import devshim # pylint: disable=cyclic-import,unused-import
-        except ImportError: pass # TODO: _install_me( )
+        try:
+            import devshim # pylint: disable=unused-import
+            # TODO? Check for sufficient version. If not, then install.
+        except ImportError: _install_me( )
 
 
 def _acquire_scribe( ):
@@ -593,7 +583,6 @@ def _add_environment_entry( parts, value ):
     ''' Inserts entry into current process environment.
 
         Entry name is derived from parts and package name. '''
-    from os import environ as current_process_environment
     name = _derive_environment_variable_name( *parts )
     current_process_environment[ name ] = str( value )
     return name
@@ -602,7 +591,6 @@ def _add_environment_entry( parts, value ):
 def _configure_base_scribe( ):
     ''' Configures logging system and root logger. '''
     import logging
-    from os import environ as current_process_environment
     record_level_evariable_name = (
         _derive_environment_variable_name( 'record', 'level' ) )
     record_level_name_default = 'INFO'
@@ -700,6 +688,15 @@ def _extract_git_repository_urls( ):
     return DictionaryProxy( remotes ), DictionaryProxy( submodules )
 
 
+def _install_me( ):
+    ''' Installs package associated with this program. '''
+    # TODO? Prompt user for confirmation since this is intrusive.
+    execute_python_subprocess(
+        ( _ensure_pip( ), 'install', '--user',
+          '--force-reinstall', '--upgrade', '--upgrade-strategy=eager',
+          pypi_package_name ) )
+
+
 _our_repository_regex = regex_compile(
     rf'''^.*github.com(?:[:/])[^/]+/{repository_name}(?:.git)?''' )
 def _locate_cranial_matter( ):
@@ -781,6 +778,7 @@ def _retrieve_pip( location ):
 
 
 _data = produce_accretive_cacher( _provide_calculators )
+__getattr__ = _data.__getattr__
 
 
 if '__main__' == __name__: main( )

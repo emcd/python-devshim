@@ -21,21 +21,19 @@
 ''' Provides user interface for development support activity. '''
 
 
-from types import MappingProxyType as _DictionaryProxy
+from . import base as __
 
 
 def render_boxed_title( title, supplement = None ):
     ''' Renders box around title to diagnostic stream. '''
     if None is supplement: specific_title = title
     else: specific_title = f"{title} ({supplement})"
-    from .base import eprint
-    eprint( format_boxed_title( specific_title ) )
+    __.eprint( format_boxed_title( specific_title ) )
 
 
 def format_boxed_title( title ):
     ''' Formats box around title as string. '''
-    from os import environ as current_process_environment
-    columns_count = int( current_process_environment.get( 'COLUMNS', 79 ) )
+    columns_count = int( __.current_process_environment.get( 'COLUMNS', 79 ) )
     icolumns_count = columns_count - 2
     content_template = (
         '\N{BOX DRAWINGS DOUBLE VERTICAL}{fill}'
@@ -82,14 +80,14 @@ def generate_cli_functions( shell_name, function_name, with_completions ):
 
 def _provide_default_shell_name( ):
     ''' Attempt reasonable inference of shell name from environment. '''
-    from os import environ as active_process_environment, name as os_name
-    if 'posix' == os_name: return active_process_environment[ 'SHELL' ]
-    if 'nt' == os_name: return active_process_environment[ 'COMSPEC' ]
+    from os import name as os_name
+    if 'posix' == os_name: return __.current_process_environment[ 'SHELL' ]
+    if 'nt' == os_name: return __.current_process_environment[ 'COMSPEC' ]
     raise NotImplementedError( f"OS {os_name!r} support not available." )
 
 
 # TODO? Detect when outside of the project directory tree.
-invocation_code_table = _DictionaryProxy( {
+invocation_code_table = __.DictionaryProxy( {
     'bash': '''
         function {function_name} {{
             "{python_path}" "{shim_path}" "$@"
@@ -104,9 +102,12 @@ invocation_code_table = _DictionaryProxy( {
         }}''',
 } )
 
-completion_code_table = _DictionaryProxy( {
+completion_code_table = __.DictionaryProxy( {
     # TODO: Implement.
 } )
 
 # TODO? direnv configuration snippets to allow devshim to operate
 #       in any supported directory.
+
+
+__.reclassify_module( __name__ )

@@ -21,6 +21,9 @@
 ''' Management of project. '''
 
 
+from . import base as __
+
+
 def discover_name( ):
     ''' Returns project name, as parsed from local configuration. '''
     return discover_information( )[ 'name' ]
@@ -42,3 +45,6 @@ def discover_information( ):
     # TODO: Tool should be 'devshim'.
     information.update( tables[ 'tool' ][ 'SELF' ] )
     return information
+
+
+__.reclassify_module( __name__ )

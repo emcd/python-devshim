@@ -209,3 +209,7 @@ def _produce_calculators( ):
     )
 
 _data = __.produce_accretive_cacher( _produce_calculators )
+__getattr__ = _data.__getattr__
+
+
+__.reclassify_module( __name__ )

@@ -38,16 +38,7 @@ from . import (
     user_interface,
 )
 
-from .develop import __version__
+__version__ = '1.0a202210291425'
 
-# TODO: Reclassify each module in its own code.
-def _reclassify_modules( ):
-    ''' Reclassifies package for attribute concealment and immutability. '''
-    from types import ModuleType as Module
-    from lockup import reclassify_module
-    for attribute in globals( ):
-        if not isinstance( attribute, Module ): continue
-        if hasattr( attribute, 'complete_initialization' ):
-            attribute.complete_initialization( )
-        reclassify_module( attribute )
-    reclassify_module( __package__ )
+
+base.reclassify_module( __name__ )

@@ -17,24 +17,16 @@ def _configure( ):
     module = module_from_spec( module_spec )
     module_spec.loader.exec_module( module )
     module.configure_auxiliary( project_path )
-
-_configure( )
-
-
-def _install_prerequisite_packages( ):
-    # Hack to install documentation requirements for ReadTheDocs builder.
-    # (Better than maintaining a separate 'requirements.txt'.)
     from os import environ as current_process_environment
-    from devshim.data import paths
     if 'True' != current_process_environment.get( 'READTHEDOCS', 'False' ):
         return
+    # Hack to install documentation requirements for ReadTheDocs builder.
+    # (Better than maintaining a separate 'requirements.txt'.)
     from devshim.packages import ensure_python_packages
     ensure_python_packages(
         domain = 'development.documentation', excludes = ( 'sphinx', ) )
-    from sys import path as python_search_paths
-    python_search_paths.insert( 0, str( paths.sources.prj.python3 ) )
 
-_install_prerequisite_packages( )
+_configure( )
 
 
 # -- Project information -----------------------------------------------------

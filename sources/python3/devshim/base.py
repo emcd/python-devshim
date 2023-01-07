@@ -20,7 +20,6 @@
 
 ''' Fundamental constants and utilities for development support. '''
 
-import typing as _typ
 
 # pylint: disable=unused-import
 from collections.abc import (
@@ -29,40 +28,14 @@ from collections.abc import (
 )
 from contextlib import contextmanager as context_manager
 from functools import partial as partial_function
+from os import environ as current_process_environment
 from types import (
     MappingProxyType as DictionaryProxy,
     SimpleNamespace,
 )
+
+from lockup import Class, reclassify_module
 # pylint: enable=unused-import
-
-
-environment_variable_prefix = __package__.upper( )
-
-
-def naively_parse_version( version ):
-    ''' Naively splits version on periods and converts parts to integers.
-
-        Leaves non-convertible parts as strings. '''
-    # TODO: Validate version.
-    return tuple( map(
-        lambda part: int( part ) if part.isdigit( ) else part,
-        version.split( '.' ) ) )
-
-
-def compare_version( left, right, parser = naively_parse_version ):
-    ''' Properly compares two version strings.
-
-        I.e., 3.10 < 3.7 if comparison is lexicographic.
-        But, 3.10 > 3.7 with this version comparison.
-
-        If left > right, then returns 1.
-        If left == right, then returns 0.
-        If left < right, then returns -1. '''
-    # TODO: Validate parser.
-    left = parser( left )
-    right = parser( right )
-    if left == right: return 0
-    return 1 if left > right else -1
 
 
 def create_immutable_namespace( source ):
@@ -113,34 +86,54 @@ def create_registrar( validator ):
     return Registrar( )
 
 
-def module_introduce_accretive_cache( calculators_provider ):
-    ''' Produces module __getattr__ which computes and caches values.
+def produce_accretive_cacher( calculators_provider ):
+    ''' Produces object which computes and caches values.
 
         The ``calculators_provider`` argument must return a dictionary of cache
         entry names with nullary invocables as the correspondent values. Each
         invocable is a calculator which produces a value to populate the cache.
         Any attribute name not in the dictionary results in an
         :py:exc:`AttributeError`. '''
+    # NOTE: Similar implementation exists in 'develop.py'.
+    #       Improvements should be reflected in both places.
     cache = { }
-    from .develop import validate_calculators_provider
-    validate_calculators_provider( calculators_provider )
+    _validate_cache_calculators_provider( calculators_provider )
     calculators = DictionaryProxy( calculators_provider( ) )
 
-    def module_getattr( name ):
+    # TODO: Class immutability.
+    class AccretiveCacher:
         ''' Computes values on demand and caches them. '''
-        if name not in calculators: raise AttributeError
-        if name not in cache: cache[ name ] = calculators[ name ]( )
-        return cache[ name ]
 
-    return module_getattr
+        __slots__ = ( )
+
+        def __getattr__( self, name ):
+            if name not in calculators: raise AttributeError
+            if name not in cache: cache[ name ] = calculators[ name ]( )
+            return cache[ name ]
+
+        def __setattr__( self, name, value ):
+            # TODO: Use exception factory.
+            raise AttributeError(
+                "Cannot assign attributes to cacher object." )
+
+        def __delattr__( self, name ):
+            # TODO: Use exception factory.
+            raise AttributeError(
+                "Cannot remove attributes from cacher object." )
+
+    return AccretiveCacher( )
 
 
-def produce_accretive_cacher( calculators_provider ):
-    ''' Produces object which computes and caches values. '''
-    from .develop import produce_accretive_cacher as producer
-    # TODO: Immutability on producer class.
-    # TODO: Interception of exceptions.
-    return producer( calculators_provider )
+def _validate_cache_calculators_provider( provider ):
+    ''' Validates provider of calculators for accretive cacher. '''
+    # NOTE: Similar implementation exists in 'develop.py'.
+    #       Improvements should be reflected in both places.
+    if not callable( provider ):
+        # TODO: Use exception factory.
+        raise ValueError(
+            f"Calculators provider for accretive cache must be invocable." )
+    # TODO: Further validate calculators provider.
+    return provider
 
 
 @context_manager
@@ -153,13 +146,80 @@ def springy_chdir( new_path ):
     chdir( old_path )
 
 
+# TODO: Rename to 'execute_subprocess'.
+# TODO: Absorb improvements from 'develop.py'.
+def execute_external( command_specification, **nomargs ):
+    ''' Executes command in subprocess.
+
+        Raises exception on non-zero exit code. '''
+    # NOTE: Similar implementation exists in 'develop.py'.
+    #       Improvements should be reflected in both places.
+    options = dict( text = True )
+    from subprocess import run # nosec B404
+    from sys import stdout, stderr
+    options.update( nomargs )
+    if not options.get( 'capture_output', False ):
+        if stdout is narration_target: options[ 'stderr' ] = stdout
+        else: options[ 'stdout' ] = stderr
+    if { 'stdout', 'stderr' } & options.keys( ):
+        options.pop( 'capture_output', None )
+    options.pop( 'check', None )
+    if isinstance( command_specification, str ):
+        from shlex import split as split_command
+        command_specification = split_command( command_specification )
+    # TODO: Python 3.8: Remove. Has support for WindowsPath.
+    elif isinstance( command_specification, AbstractSequence ):
+        command_specification = tuple( map( str, command_specification ) )
+    # TODO? Handle pseudo-TTY requests with 'ptyprocess.PtyProcess'.
+    # TODO? Intercept 'subprocess.SubprocessError'.
+    scribe.debug( f"Executing {command_specification!r} with {options!r}." )
+    # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-audit
+    return run( command_specification, check = True, **options ) # nosec B603
+
+
+def _configure( ):
+    ''' Configures development support. '''
+    from pathlib import Path
+    auxiliary_path = Path( __file__ ).parent.parent.parent.parent.resolve( )
+    configuration_ = DictionaryProxy( dict(
+        auxiliary_path = auxiliary_path,
+        project_path = Path( current_process_environment.get(
+            'DEVSHIM_PROJECT_LOCATION', auxiliary_path ) ).resolve( ),
+        scribe = _create_scribe( ),
+    ) )
+    return configuration_
+
+def _create_scribe( ):
+    ''' Initializes logger for package. '''
+    from logging import INFO, NullHandler, getLogger as get_logger
+    scribe_ = get_logger( __package__ )
+    # https://docs.python.org/3/howto/logging.html#configuring-logging-for-a-library
+    scribe_.addHandler( NullHandler( ) )
+    scribe_.setLevel( current_process_environment.get(
+        'DEVSHIM_RECORD_LEVEL', INFO ) )
+    return scribe_
+
+configuration = _configure( )
+scribe = configuration[ 'scribe' ]
+
+
+def _check_main_module_compatibility( ):
+    from sys import modules
+    if '__main__' in modules:
+        module = modules[ '__main__' ]
+        # TODO? Check version compatibility.
+        return __package__ == getattr( module, 'package_name', None )
+    return False
+
+main_module_compatibility = _check_main_module_compatibility( )
+
+
 def _detect_ci_environment( ):
     ''' Returns name of current continuous integration environment.
 
         If none is detected, returns empty string.
 
         This is not inteded to be used to Volkswagen test results. '''
-    from os import environ as current_process_environment
     if 'CI' in current_process_environment: return 'Github Actions'
     return ''
 
@@ -202,22 +262,9 @@ def _select_narrative_functions( ):
 eprint, epprint = _select_narrative_functions( )
 
 
-def _acquire_driver_module( ): # pylint: disable=inconsistent-return-statements
-    from sys import modules
-    from . import develop as develop_
-    if '__main__' in modules:
-        module = modules[ '__main__' ]
-        # If we are being run by our own driver, then access it directly.
-        if develop_.package_name == getattr( module, 'package_name', None ):
-            return module
-    return
-
-driver_module = _acquire_driver_module( )
-
-
 def _enhance_narration( ):
     ''' Enhances narrative functions as desired. '''
-    if None is driver_module: return
+    if not main_module_compatibility: return
     from logging import getLogger as acquire_scribe
     from sys import stderr
     from rich.console import Console
@@ -234,76 +281,4 @@ def _enhance_narration( ):
 _enhance_narration( )
 
 
-# TODO: Replace with 'develop.execute_subprocess' once narration target has
-#       received proper consideration.
-def execute_external( command_specification, **nomargs ):
-    ''' Executes command in subprocess.
-
-        Raises exception on non-zero exit code. '''
-    options = dict( text = True )
-    from subprocess import run # nosec B404
-    from sys import stdout, stderr
-    options.update( nomargs )
-    if not options.get( 'capture_output', False ):
-        if stdout is narration_target: options[ 'stderr' ] = stdout
-        else: options[ 'stdout' ] = stderr
-    if { 'stdout', 'stderr' } & options.keys( ):
-        options.pop( 'capture_output', None )
-    options.pop( 'check', None )
-    if isinstance( command_specification, str ):
-        from shlex import split as split_command
-        command_specification = split_command( command_specification )
-    # TODO: Python 3.8: Remove. Has support for WindowsPath.
-    elif isinstance( command_specification, AbstractSequence ):
-        command_specification = tuple( map( str, command_specification ) )
-    # TODO? Handle pseudo-TTY requests with 'ptyprocess.PtyProcess'.
-    # TODO? Intercept 'subprocess.SubprocessError'.
-    scribe.debug( f"Executing {command_specification!r} with {options!r}." )
-    # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-audit
-    return run( command_specification, check = True, **options ) # nosec B603
-
-
-# TODO: Use exception factories instead of 'expire' function.
-#       Exception factory dependencies will be guaranteed,
-#       so no more special "early" initialization.
-def expire( exit_specifier, message ) -> _typ.NoReturn:
-    # Preferred name would be 'exit' or 'quit' but those are Python builtins.
-    # Could have named it 'die', which is short, sweet, and old school,
-    # but other function names are Latin-based whereas 'die' is Germanic.
-    # Pet peeve about linguistic consistency....
-    ''' Logs message and exits current process. '''
-    from .develop import Exit
-    raise Exit( exit_specifier, message )
-
-
-def _configure( ):
-    ''' Configures development support. '''
-    from pathlib import Path
-    auxiliary_path = Path( __file__ ).parent.parent.parent.parent.resolve( )
-    from os import environ as current_process_environment
-    configuration_ = DictionaryProxy( dict(
-        auxiliary_path = auxiliary_path,
-        project_path = Path( current_process_environment.get(
-            'DEVSHIM_PROJECT_LOCATION', auxiliary_path ) ).resolve( ),
-        scribe = _create_scribe( ),
-    ) )
-    return configuration_
-
-def _create_scribe( ):
-    ''' Initializes logger for package. '''
-    from logging import INFO, NullHandler, getLogger as get_logger
-    scribe_ = get_logger( __package__ )
-    # https://docs.python.org/3/howto/logging.html#configuring-logging-for-a-library
-    scribe_.addHandler( NullHandler( ) )
-    from os import environ as current_process_environment
-    scribe_.setLevel( current_process_environment.get(
-        'DEVSHIM_RECORD_LEVEL', INFO ) )
-    return scribe_
-
-configuration = _configure( )
-scribe = configuration[ 'scribe' ]
-
-
-def assert_sanity( ):
-    ''' Assert that operational environment is sane. '''
-    # TODO: Implement.
+reclassify_module( __name__ )

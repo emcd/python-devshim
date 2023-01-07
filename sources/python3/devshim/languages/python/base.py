@@ -25,7 +25,9 @@ import typing as _typ
 
 from types import MappingProxyType as DictionaryProxy
 
-from ...base import module_introduce_accretive_cache
+from lockup import reclassify_module
+
+from ...base import produce_accretive_cacher
 from .. import base as __
 
 
@@ -79,4 +81,8 @@ def _provide_calculators( ):
         version_definitions = _summon_version_definitions,
     )
 
-__getattr__ = module_introduce_accretive_cache( _provide_calculators )
+_data = produce_accretive_cacher( _provide_calculators )
+__getattr__ = _data.__getattr__
+
+
+reclassify_module( __name__ )

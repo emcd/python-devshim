@@ -27,10 +27,12 @@ import typing as _typ
 from abc import ABCMeta as ABCFactory, abstractmethod as abstract
 from types import MappingProxyType as DictionaryProxy
 
+from lockup import reclassify_module
+
 from .. import base as __
 from ..base import (
     create_immutable_namespace,
-    module_introduce_accretive_cache,
+    produce_accretive_cacher,
 )
 from ..exceptions import (
     create_abstract_invocation_error,
@@ -654,7 +656,8 @@ def _provide_calculators( ):
         locations = _calculate_locations,
     )
 
-__getattr__ = __.module_introduce_accretive_cache( _provide_calculators )
+_data = __.produce_accretive_cacher( _provide_calculators )
+__getattr__ = _data.__getattr__
 
-# TODO: Setup proxy 'me' to this module itself for more natural access to
-#       computed attributes.
+
+reclassify_module( __name__ )

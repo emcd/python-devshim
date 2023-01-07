@@ -1,6 +1,7 @@
 [build-system]
 requires = [
   'invoke',
+  'lockup',
   'setuptools>=61.0.0',  # Has 'pyproject.toml' support!
   'tomli',
   'wheel',

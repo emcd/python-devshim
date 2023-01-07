@@ -181,3 +181,6 @@ def _calculate_tests_locations( locations ):
             python3 = project_path / 'python3',
         ),
     )
+
+
+__.reclassify_module( __name__ )
