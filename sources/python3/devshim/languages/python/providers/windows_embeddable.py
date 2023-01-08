@@ -131,21 +131,12 @@ import site
 
 
 def _retrieve_archive( href ):
-    # TODO: Used generalized URL retriever.
-    from contextlib import ExitStack as ContextStack
-    from urllib.request import Request as HttpRequest, urlopen as access_url
     archive_name = href.rsplit( '/', maxsplit = 1 )[ -1 ]
     archive_location = _data.locations.archives / archive_name
     archive_location.parent.mkdir( exist_ok = True, parents = True )
     if archive_location.exists( ) and _verify_archive( archive_location ):
         return archive_location
-    contexts = ContextStack( )
-    http_request = HttpRequest( href )
-    with contexts:
-        http_reader = contexts.enter_context( access_url( http_request ) ) # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected
-        # TODO: Handle retries.
-        archive = contexts.enter_context( archive_location.open( 'wb' ) )
-        archive.write( http_reader.read( ) )
+    __.http_retrieve_url( href, archive_location )
     # TODO: Verify archive and raise error on failed verification.
     return archive_location
 
@@ -159,12 +150,11 @@ def _verify_archive( location ):
 
 
 def _discover_versions( ):
-    from urllib.request import Request as HttpRequest, urlopen as access_url
     from bs4 import BeautifulSoup
-    http_request = HttpRequest( 'https://www.python.org/downloads/windows' )
-    with access_url( http_request ) as http_reader: # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected
-        # TODO: Handle retries.
-        html = BeautifulSoup( http_reader.read( ).decode( ), 'html.parser' )
+    html = BeautifulSoup(
+        __.http_retrieve_url(
+            'https://www.python.org/downloads/windows' ).decode( ),
+        'html.parser' )
     versions = [ ]
     for hyperlink in html.find_all( 'a' ):
         href = hyperlink.get( 'href' )

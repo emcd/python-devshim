@@ -29,6 +29,7 @@ from collections.abc import (
 from contextlib import contextmanager as context_manager
 from functools import partial as partial_function
 from os import environ as current_process_environment
+from pathlib import Path
 from types import (
     MappingProxyType as DictionaryProxy,
     SimpleNamespace,
@@ -84,6 +85,18 @@ def create_registrar( validator ):
             return self.visor
 
     return Registrar( )
+
+
+def derive_class_fqname( class_ ):
+    ''' Derives fully-qualified class name from class object. '''
+    # NOTE: Similar implementation exists in 'develop.py'.
+    #       Improvements should be reflected in both places.
+    from inspect import isclass as is_class
+    if not is_class( class_ ):
+        # TODO: Use exception factory.
+        raise ValueError(
+            f"Cannot fully-qualified class name for non-class {class_!r}." )
+    return '.'.join( ( class_.__module__, class_.__qualname__ ) )
 
 
 def produce_accretive_cacher( calculators_provider ):
@@ -179,7 +192,6 @@ def execute_external( command_specification, **nomargs ):
 
 def _configure( ):
     ''' Configures development support. '''
-    from pathlib import Path
     auxiliary_path = Path( __file__ ).parent.parent.parent.parent.resolve( )
     configuration_ = DictionaryProxy( dict(
         auxiliary_path = auxiliary_path,

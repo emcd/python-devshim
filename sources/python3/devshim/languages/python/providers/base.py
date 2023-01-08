@@ -30,6 +30,7 @@ from types import MappingProxyType as DictionaryProxy
 from lockup import reclassify_module
 
 from ....base import execute_external, produce_accretive_cacher
+from ....http_utilities import retrieve_url as http_retrieve_url
 from ...base import LanguageProvider, register_provider_class
 from ..base import Language
 # pylint: enable=unused-import
@@ -49,21 +50,12 @@ def ensure_site_packages( installation_location, python_location ):
 
 def retrieve_pip_installer( installation_location ):
     ''' Fetches 'get-pip.py' to bootstrap Pip installation. '''
-    # TODO: Used generalized URL retriever.
     # TODO: Use cached copy if sufficiently recent.
-    from contextlib import ExitStack as ContextStack
-    from urllib.request import (
-        Request as HttpRequest, urlopen as access_url, )
-    installer_location = installation_location / 'get-pip.py'
-    contexts = ContextStack( )
     # Note: Could use 'pip.pyz' instead, but that is experimental and would
     #       still require a proper Pip installation afterwards.
-    http_request = HttpRequest( 'https://bootstrap.pypa.io/get-pip.py' )
-    with contexts:
-        http_reader = contexts.enter_context( access_url( http_request ) ) # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected
-        # TODO: Handle retries.
-        installer = contexts.enter_context( installer_location.open( 'wb' ) )
-        installer.write( http_reader.read( ) )
+    installer_location = installation_location / 'get-pip.py'
+    http_retrieve_url(
+        'https://bootstrap.pypa.io/get-pip.py', installer_location )
     return installer_location
 
 

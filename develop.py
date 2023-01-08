@@ -192,6 +192,8 @@ def derive_caches_location( label ):
 
 def derive_class_fqname( class_ ):
     ''' Derives fully-qualified class name from class object. '''
+    # NOTE: Similar implementation exists in package.
+    #       Improvements should be reflected in both places.
     from inspect import isclass as is_class
     if not is_class( class_ ):
         raise Exit(
@@ -330,7 +332,7 @@ def execute_subprocess( command_specification, **nomargs ):
     return run( command_specification, check = True, **options ) # nosec: B603
 
 
-def http_retrieve_url( url, destination ):
+def http_retrieve_url( url, destination = None, headers = None ): # pylint: disable=too-many-statements
     ''' Retrieves URL into destination via Hypertext Transfer Protocol.
 
         The destination may be a path-like object, an object with a ``write``
@@ -338,46 +340,60 @@ def http_retrieve_url( url, destination ):
         from an object with a ``read`` method. The callable must take two
         positional arguments, which will be the HTTP reader object and the
         context stack that ensures proper resource cleanup. '''
+    # NOTE: Similar implementation exists in package.
+    #       Improvements should be reflected in both places.
     from http import HTTPStatus as HttpStatus
     from random import random
     from time import sleep
-    from urllib.error import HTTPError as HttpError, URLError as UrlError
+    from urllib.error import HTTPError as HttpError
     from urllib.request import Request as HttpRequest
-    scribe = _acquire_scribe( )
     destination = _normalize_retrieval_destination( destination )
-    request = HttpRequest( url )
+    headers = headers or { } # TODO: Validate headers.
+    request = HttpRequest( url, headers = headers )
     attempts_count_max = 2
     for attempts_count in range( attempts_count_max + 1 ):
-        try: _http_retrieve_url( request, destination )
-        except UrlError as exc:
-            scribe.error( f"Failed to retrieve data from {url!r}." )
+        try: return _http_retrieve_url( request, destination )
+        except HttpError as exc:
+            _data.scribe.error( f"Failed to retrieve data from {url!r}." )
             # Exponential backoff with collision-breaking jitter.
             backoff_time = 2 ** attempts_count + 2 * random( ) # nosec: B311
-            if isinstance( exc, HttpError ):
-                if HttpStatus.NOT_FOUND.value == exc.code: raise
-                if HttpStatus.TOO_MANY_REQUESTS.value == exc.code:
-                    backoff_time = float(
-                        exc.headers.get( 'Retry-After', backoff_time ) )
-                    if 120 < backoff_time: raise # Do not wait too long.
+            if HttpStatus.TEMPORARY_REDIRECT.value == exc.code:
+                url = exc.headers[ 'Location' ]
+                _data.scribe.debug( f"Temporary redirect to {url!r}." )
+                return http_retrieve_url( url, destination, headers )
+            if HttpStatus.PERMANENT_REDIRECT.value == exc.code:
+                url = exc.headers[ 'Location' ]
+                _data.scribe.warning( f"Permanent redirect to {url!r}." )
+                return http_retrieve_url( url, destination, headers )
+            if HttpStatus.NOT_FOUND.value == exc.code: raise
+            if HttpStatus.TOO_MANY_REQUESTS.value == exc.code:
+                backoff_time = float(
+                    exc.headers.get( 'Retry-After', backoff_time ) )
+                if 120 < backoff_time: raise # Do not wait too long.
             if attempts_count_max == attempts_count: raise
-            scribe.info(
+            _data.scribe.info(
                 f"Will attempt retrieval from {url!r} again "
                 f"in {backoff_time} seconds." )
             sleep( backoff_time )
+    raise Exit( 'invalid state' )
 
 def _http_retrieve_url( request, destination ):
+    # NOTE: Similar implementation exists in package.
+    #       Improvements should be reflected in both places.
     from contextlib import ExitStack as ContextStack
     from urllib.request import urlopen as access_url
     contexts = ContextStack( )
     with contexts:
         # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected
         http_reader = contexts.enter_context( access_url( request ) )
+        if None is destination: return http_reader.read( )
+        if callable( destination ): return destination( http_reader, contexts )
         if isinstance( destination, Path ):
             file = contexts.enter_context( destination.open( 'wb' ) )
             file.write( http_reader.read( ) )
         elif callable( getattr( destination, 'write', None ) ):
             destination.write( http_reader.read( ) )
-        elif callable( destination ): destination( http_reader, contexts )
+        return destination
 
 
 def import_module( packages_location, module_name ):
@@ -729,10 +745,13 @@ def _normalize_command_specification( command_specification ):
 
 
 def _normalize_retrieval_destination( destination ):
+    # NOTE: Similar implementation exists in package.
+    #       Improvements should be reflected in both places.
     if isinstance( destination, str ): destination = Path( destination )
     if isinstance( destination, Path ) and not destination.exists( ):
         destination.parent.mkdir( exist_ok = True, parents = True )
     if not any( (
+        None is destination,
         isinstance( destination, Path ),
         callable( getattr( destination, 'write', None ) ),
         callable( destination )
@@ -751,6 +770,7 @@ def _provide_calculators( ):
             lambda: produce_accretive_cacher( _provide_configurations ) ),
         locations = (
             lambda: produce_accretive_cacher( _provide_locations ) ),
+        scribe = _acquire_scribe,
     )
 
 

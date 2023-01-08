@@ -367,28 +367,18 @@ def aggregate_pypi_release_digests( name, version, index_url = '' ):
 def retrieve_pypi_release_information( name, version, index_url = '' ): # pylint: disable=inconsistent-return-statements,too-many-locals
     ''' Retrieves information about specific release on PyPI. '''
     index_url = index_url or 'https://pypi.org'
-    from http import HTTPStatus as HttpStatus
     from json import load
-    from time import sleep
-    from urllib.error import HTTPError as HttpError, URLError as UrlError
-    from urllib.request import Request as HttpRequest, urlopen as access_url
+    from .http_utilities import retrieve_url
     # https://warehouse.pypa.io/api-reference/json.html#release
-    url = f"{index_url}/pypi/{name}/json"
-    request = HttpRequest( url, headers = { 'Accept': 'application/json', } )
-    attempts_count_max = 2
-    for attempts_count in range( attempts_count_max + 1 ):
-        try:
-            with access_url( request ) as http_reader: # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected
-                return load( http_reader )[ 'releases' ][ version ]
-        except KeyError:
-            __.scribe.error( f"No version {version!r} of package {name!r}." )
-            raise
-        except UrlError as exc:
-            __.scribe.error( f"Failed to retrieve data from {url!r}." )
-            if isinstance( exc, HttpError ):
-                if HttpStatus.NOT_FOUND.value == exc.code: raise
-            if attempts_count_max == attempts_count: raise
-            sleep( 2 ** attempts_count )
+    try:
+        return retrieve_url(
+            f"{index_url}/pypi/{name}/json",
+            lambda http_reader, contexts: load( http_reader ),
+            headers = { 'Accept': 'application/json', }
+        )[ 'releases' ][ version ]
+    except KeyError:
+        __.scribe.error( f"No version {version!r} of package {name!r}." )
+        raise
 
 
 def _pep508_requirement_to_name( requirement ):
