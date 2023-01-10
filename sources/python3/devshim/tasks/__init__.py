@@ -17,10 +17,12 @@
 #                                                                            #
 #============================================================================#
 
+
 ''' Project maintenance tasks. '''
 
 
 from . import _base as __
+from . import linters
 
 
 # https://www.sphinx-doc.org/en/master/man/sphinx-build.html
@@ -369,12 +371,13 @@ def lint_semgrep( version = None ):
     if not test_package_executable( 'semgrep', process_environment ): return
     files = _lint_targets_default
     files_str = ' '.join( map( lambda path: str( path.resolve( ) ), files ) )
-    sgconfig_base_path = __.paths.scm_modules.aux / 'semgrep-rules'
-    sgconfig_python_path = ( sgconfig_base_path / 'python/lang' ).resolve( )
+    from .linters.semgrep import update_rules
+    rules_location = update_rules( )
+    python_rules_location = ( rules_location / 'python/lang' ).resolve( )
     __.execute_external(
         #f"strace -ff -tt --string-limit=120 --output=strace/semgrep "
-        f"semgrep --config {sgconfig_python_path} --error --use-git-ignore "
-        f"{files_str}", cwd = sgconfig_base_path, env = process_environment )
+        f"semgrep --config {python_rules_location} --error --use-git-ignore "
+        f"{files_str}", cwd = rules_location, env = process_environment )
 
 
 _lint_targets_default = (

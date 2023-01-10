@@ -19,12 +19,14 @@
 
 
 ''' Classes of exceptions emitted by the functionality of this package. '''
+# TODO? Merge into 'base' module.
 
 
-from lockup import Class as _Class, reclassify_module as _reclassify_module
+from lockup import reclassify_module as _reclassify_module
 
 
-class Omniexception( BaseException, metaclass = _Class ):
+# TODO: Class immutability (after Mypy bug is fixed).
+class Omniexception( BaseException ):
     ''' Base for all exceptions in the package. '''
 
     # TODO: Inject functionality from refactored 'lockup.exceptionality'.

@@ -5,9 +5,6 @@ Fixes and Minor Improvements
   Install 'sitecustomize.py' files for module auto-loading.
   https://docs.python.org/3/library/site.html
 
-* Download tarball from Github for ``semgrep-rules`` rather than relying on a
-  Git submodule.
-
 * Add task control argument to support warning/skipping tasks which do not meet
   certain criteria, such as an installation not supporting them.
 
@@ -15,7 +12,14 @@ Fixes and Minor Improvements
   for multiple platforms.
 
 * Use ``--no-binary`` option to :command:`pip` when ``abi-incompatible`` label
-  is present on a language installation feature for a version.
+  is present on a language installation feature for a version. May also need to
+  pass alternative headers and libraries locations to Setuptools via Pip
+  options.
+
+* Fix rendering of Unicode box segment characters on terminals that do not
+  support the UTF-8 encoding properly.
+  - https://github.com/rprichard/winpty/issues/38
+  - https://github.com/rprichard/winpty/issues/105
 
 Virtual Environments Improvements
 ================================================================================
