@@ -38,7 +38,7 @@ from . import (
     user_interface,
 )
 
-__version__ = '1.0a202210291425'
+__version__ = '1.0a202301141418'
 
 
 base.reclassify_module( __name__ )

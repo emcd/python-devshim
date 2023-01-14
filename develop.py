@@ -93,7 +93,7 @@ from types import MappingProxyType as DictionaryProxy
 
 pypi_package_name = 'devshim'
 package_name = pypi_package_name.replace( '-', '_' )
-__version__ = '1.0a202210291425'
+__version__ = '1.0a202301141418'
 repository_name = f"python-{pypi_package_name}"
 
 
