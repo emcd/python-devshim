@@ -30,18 +30,14 @@ implementation = 'cpython'
 providers = [ 'windows-embeddable', 'python-build', ]
 title = 'Python 3.11'
 
-[versions.'cpython-3.8--tracerefs']
-base-version = '3.8'
-features = [ 'tracerefs', ]
-implementation = 'cpython'
-providers = [ 'python-build', ]
-title = 'Python 3.8 +TRACEREFS'
-
-[versions.'pypy-3.7']
-base-version = '3.7'
-implementation = 'pypy'
-providers = [ 'python-build', ]
-title = 'PyPy 3.7'
+# TODO: Enable after issues with no-binary installations with Pip have
+#       been resolved.
+#[versions.'cpython-3.8--tracerefs']
+#base-version = '3.8'
+#features = [ 'tracerefs', ]
+#implementation = 'cpython'
+#providers = [ 'python-build', ]
+#title = 'Python 3.8 +TRACEREFS'
 
 [versions.'pypy-3.8']
 base-version = '3.8'

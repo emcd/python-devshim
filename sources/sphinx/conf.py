@@ -16,7 +16,7 @@ def _configure( ):
         '_develop', project_path / 'develop.py' )
     module = module_from_spec( module_spec )
     module_spec.loader.exec_module( module )
-    module.configure_auxiliary( project_path )
+    module.prepare( project_path )
     from os import environ as current_process_environment
     if 'True' != current_process_environment.get( 'READTHEDOCS', 'False' ):
         return

@@ -20,25 +20,37 @@
 ''' Setuptools configuration and support. '''
 
 
-def _configure( ):
-    from pathlib import Path
-    project_path = Path( __file__ ).parent
-    # If we are building editable wheel, we cannot reference it.
-    # Therefore, we need to look directly at the sources as long as we rely on
-    # them as part of their own package build process.
-    from sys import path as modules_locations
-    modules_locations.insert( 0, str( project_path / 'sources/python3' ) )
-    from importlib.util import module_from_spec, spec_from_file_location
-    module_spec = spec_from_file_location(
-        '_develop', project_path / 'develop.py' )
-    module = module_from_spec( module_spec )
-    module_spec.loader.exec_module( module )
-    module.configure_auxiliary( project_path )
+def _prepare( ):
     if False: # pylint: disable=using-constant-test
         from os import environ as current_process_environment
         current_process_environment[ 'DISTUTILS_DEBUG' ] = 'True'
+    from pathlib import Path
+    project_location = Path( __file__ ).parent
+    from importlib.util import module_from_spec, spec_from_file_location
+    module_spec = spec_from_file_location(
+        '_develop', project_location / 'develop.py' )
+    module = module_from_spec( module_spec )
+    module_spec.loader.exec_module( module )
+    # Only want to ensure our dependencies. Cannot invoke a full preparation as
+    # that would lead to a cycle from trying to install an editable wheel of
+    # ourself while trying to build a wheel of ourself.
+    module.ensure_main_packages( project_location / 'pyproject.toml' )
+    from sys import path as modules_locations
+    sources_location = project_location / 'sources/python3'
+    # Only want our main cache and our sources on the modules search path long
+    # enough to ensure successful import of our own sources to assist in build
+    # preparation. Do not want to see ourself or our dependencies during actual
+    # build of package or anytime afterwards (such as virtual environment
+    # construction) as this can lead to conflicts.
+    modules_locations.insert( 0, str( sources_location ) )
+    with module.imports_from_cache(
+        module.ensure_packages_cache( 'main' )
+    ):
+        from devshim.data import paths
+    modules_locations.remove( str( sources_location ) )
+    return paths
 
-_configure( )
+_paths = _prepare( )
 
 
 # Overridden Setuptools Command Attributes
@@ -54,8 +66,7 @@ class BuildCommand( _BuildCommand ): # pylint: disable=too-many-ancestors
     def initialize_options( self ):
         ''' Override 'build_base' attribute. '''
         _BuildCommand.initialize_options( self )
-        from devshim.data import paths
-        self.build_base = str( paths.caches.setuptools )
+        self.build_base = str( _paths.caches.setuptools )
 
 
 from setuptools.command.egg_info import egg_info as _EggInfoCommand
@@ -67,8 +78,7 @@ class EggInfoCommand( _EggInfoCommand ):
     def initialize_options( self ):
         ''' Override 'egg_base' attribute. '''
         _EggInfoCommand.initialize_options( self )
-        from devshim.data import paths
-        self.egg_base = str( paths.caches.setuptools ) # pylint: disable=attribute-defined-outside-init
+        self.egg_base = str( _paths.caches.setuptools ) # pylint: disable=attribute-defined-outside-init
 
 
 from setuptools.command.sdist import sdist as _SdistCommand
@@ -78,8 +88,7 @@ class SdistCommand( _SdistCommand ): # pylint: disable=too-many-ancestors
     def initialize_options( self ):
         ''' Override 'dist_dir' attribute. '''
         _SdistCommand.initialize_options( self )
-        from devshim.data import paths
-        self.dist_dir = str( paths.artifacts.sdists )
+        self.dist_dir = str( _paths.artifacts.sdists )
 
 
 from wheel.bdist_wheel import bdist_wheel as _BdistWheelCommand
@@ -89,8 +98,7 @@ class BdistWheelCommand( _BdistWheelCommand ):
     def initialize_options( self ):
         ''' Override 'dist_dir' attribute. '''
         _BdistWheelCommand.initialize_options( self )
-        from devshim.data import paths
-        self.dist_dir = str( paths.artifacts.wheels ) # pylint: disable=attribute-defined-outside-init
+        self.dist_dir = str( _paths.artifacts.wheels ) # pylint: disable=attribute-defined-outside-init
 
 
 # https://docs.python.org/3/distutils/setupscript.html#writing-the-setup-script

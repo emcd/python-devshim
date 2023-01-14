@@ -11,11 +11,6 @@ Fixes and Minor Improvements
 * Pull from https://github.com/indygreg/python-build-standalone/releases/latest
   for multiple platforms.
 
-* Use ``--no-binary`` option to :command:`pip` when ``abi-incompatible`` label
-  is present on a language installation feature for a version. May also need to
-  pass alternative headers and libraries locations to Setuptools via Pip
-  options.
-
 * Fix rendering of Unicode box segment characters on terminals that do not
   support the UTF-8 encoding properly.
   - https://github.com/rprichard/winpty/issues/38
@@ -97,6 +92,16 @@ Remove Dependency on ``invoke``
 * Possibly use `Typer <https://typer.tiangolo.com/>`_ as partial replacement.
 
 * Async execution fanout. (Nice to have. Limited use cases actually.)
+
+Github Actions
+===============================================================================
+
+* Write our own PR submitter to reduce supply chain vulnerability.
+
+* Write our own GPG key loader to reduce supply chain vulnerability.
+  - https://stackoverflow.com/a/57927025/14833542
+  - https://www.gnupg.org/documentation/manuals/gnupg/gpg_002dpreset_002dpassphrase.html
+  - https://www.gnupg.org/documentation/manuals/gnupg/Invoking-gpg_002dpreset_002dpassphrase.html#Invoking-gpg_002dpreset_002dpassphrase
 
 Provide In-Tree PEP 517 Build Backend
 ===============================================================================

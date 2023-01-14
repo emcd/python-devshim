@@ -20,6 +20,29 @@
 
 ''' Development support for virtual environments. '''
 
+# TODO: Support virtual environments for ABI-incompatible language
+#       materializations, such as CPython compiled with the 'TRACEREFS' macro.
+#       In the Python TRACEREFS case, one cannot simply install packages with
+#       the '--no-binary' option to 'pip install', because Setuptools-driven
+#       builds do not inherit that flag, thus picking up build requirements,
+#       such as Cython, that are not compatible with the TRACEREFS-imbued
+#       interpreter. (A further, more esoteric problem arises when installing
+#       build support tools into a side cache that is not part of the virtual
+#       environment, as part of building the project package as an editable
+#       wheel, and having a published wheel of the project package be a
+#       dependency of a tool in the side cache. This upsets Pip build tracking
+#       when it is forced to build the wheel, targeting the side cache, from
+#       source, as it has already registered the project package as needing to
+#       be built from source for installation as an editable wheel in the
+#       virtual environment. Using '--no-binary :all:' in conjuction with
+#       '--only-binary <whitelist>' does not mitigate the problem, because,
+#       although the options are not explicitly mutually-exclusive, the ':all:'
+#       cancels the whitelist.) Using packages, such as PyYAML (which is a
+#       dependency of a number of important, common packages), that are linked
+#       against the standard ABI (i.e., wheels from PyPI), rather than rebuilt
+#       from sources, results in a virtual environment that is mostly unusable
+#       and therefore also a non-starter.
+
 
 # Latent Dependencies:
 #   environments -> packages -> environments

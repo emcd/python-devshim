@@ -1,9 +1,6 @@
 [build-system]
 requires = [
-  'invoke',
-  'lockup',
   'setuptools>=61.0.0',  # Has 'pyproject.toml' support!
-  'tomli',
   'wheel',
 ]
 # Explicit build backend, in case we use frontend other than Pip or Pip default changes.
@@ -36,12 +33,10 @@ classifiers = [ # https://pypi.org/classifiers
 requires-python = '>= 3.7'
 dependencies = [
   'beautifulsoup4',
-  'build',
   'invoke',
   'lockup',
   'packaging',
   'platformdirs',
-  'pre-commit', # TODO: development dependency
   'rich',
   'shellingham',
   'tomli',  # TODO: Python 3.11: Use standard library 'tomllib'.

@@ -88,6 +88,7 @@ from functools import partial as partial_function
 from os import environ as current_process_environment
 from pathlib import Path
 from re import compile as regex_compile
+from shlex import split as split_command
 from types import MappingProxyType as DictionaryProxy
 
 
@@ -106,7 +107,7 @@ class Exit( SystemExit ):
     def __init__( self, exit_specifier = 0, message = '', labels = None ):
         # TODO: Reconsider whether side effects are desirable in initializer.
         # Creation of this signal must succeed.
-        try: scribe = _acquire_scribe( )
+        try: scribe = _data.scribe
         except: # pylint: disable=bare-except
             scribe = lambda *posargs, **nomargs: None
         exit_codes = _provide_exit_codes( )
@@ -185,7 +186,7 @@ def derive_caches_location( label ):
             or Path.home( ) / '.cache' )
     cache_identifier = calculate_cache_identifier( )
     location = location / package_name / label / cache_identifier
-    _acquire_scribe( ).debug( f"Caches Location: {location}" )
+    _data.scribe.debug( f"Caches Location: {location}" )
     _add_environment_entry( ( label, 'caches', 'location' ), location )
     return location
 
@@ -221,7 +222,7 @@ def discover_repository_apex_directory( ):
                 current_process_environment
                 .get( 'GIT_CEILING_DIRECTORIES', '' ).split( pathsep ) ) ) ) )
     while location not in ceilings:
-        if ( location / '.git' ).is_dir( ): return location
+        if ( location / '.git' ).exists( ): return location
         location = location.parent
     raise FileNotFoundError
 
@@ -229,11 +230,21 @@ def discover_repository_apex_directory( ):
 def discover_repository_records_directory( ):
     ''' Discovers records directory of repository. '''
     # Note: 'FileNotFoundError' exceptions are allowed to propagate by design.
+    apex_location = _data.locations.repository_apex
     records_location = (
         Path(
             current_process_environment.get( 'GIT_DIR' )
-            or ( _data.locations.repository_apex / '.git' ) )
+            or ( apex_location / '.git' ) )
         .resolve( strict = True ) )
+    # Account for indirection file in submodules.
+    if records_location.is_file( ):
+        with records_location.open( encoding = 'utf-8' ) as file:
+            for line in file:
+                if not line.startswith( 'gitdir: ' ): continue
+                records_location = (
+                    ( apex_location / line.split( ': ' )[ -1 ].strip( ) )
+                    .resolve( strict = True ) )
+                break
     if not records_location.is_dir( ): raise FileNotFoundError
     return records_location
 
@@ -251,6 +262,23 @@ def ensure_directory( path ):
     #       Improvements should be reflected in both places.
     path.mkdir( parents = True, exist_ok = True )
     return path
+
+
+def ensure_main_packages( configuration_location ):
+    ''' Ensures installation dependencies for package are in cache. '''
+    _ensure_pre_packages( )
+    with imports_from_cache( ensure_packages_cache( 'pre' ) ):
+        from packaging.requirements import Requirement
+        from tomli import load
+    with configuration_location.open( 'rb' ) as file:
+        configuration = load( file )
+    # Note: Development dependencies are not processed here.
+    #       Those are installed by the brain into virtual environments.
+    # TODO? Support for optional dependencies.
+    requirements = tuple(
+        ( Requirement( requirement ).name, requirement ) for requirement
+        in configuration[ 'project' ][ 'dependencies' ] )
+    ensure_packages( ensure_packages_cache( 'main' ), requirements )
 
 
 def ensure_packages( packages_location, requirements ):
@@ -318,7 +346,7 @@ def execute_subprocess( command_specification, **nomargs ):
         command_specification )
     from subprocess import run # nosec: B404
     from sys import stderr
-    scribe = _acquire_scribe( )
+    scribe = _data.scribe
     options = dict( text = True )
     options.update( nomargs )
     # Sanitize options.
@@ -434,7 +462,7 @@ def install_packages( location, requirements ):
         requirements = ( '--requirement', requirements )
     elif isinstance( requirements, str ):
         requirements = ( requirements, )
-    _acquire_scribe( ).info( f"Installing Python packages to '{location}'." )
+    _data.scribe.info( f"Installing Python packages to '{location}'." )
     # Force reinstall to help ensure sanity.
     execute_python_subprocess(
         ( _ensure_pip( ), 'install', '--target', location,
@@ -498,10 +526,21 @@ def produce_accretive_cacher( calculators_provider ):
 
 
 def summon_git_repository_configuration( ):
-    ''' Returns configuration object for current Git repository. '''
+    ''' Returns configuration object for Git repository. '''
     _ensure_pre_packages( )
     # Note: 'FileNotFoundError' exceptions are allowed to propagate by design.
     configuration_location = _data.locations.repository_records / 'config'
+    if not configuration_location.is_file( ): raise FileNotFoundError
+    with imports_from_cache( ensure_packages_cache( 'pre' ) ):
+        from dulwich.config import ConfigFile # pylint: disable=import-error
+    return ConfigFile.from_path( str( configuration_location ) )
+
+
+def summon_git_submodules_configuration( ):
+    ''' Returns configuration object for submodules of Git repository. '''
+    _ensure_pre_packages( )
+    # Note: 'FileNotFoundError' exceptions are allowed to propagate by design.
+    configuration_location = _data.locations.repository_apex / '.gitmodules'
     if not configuration_location.is_file( ): raise FileNotFoundError
     with imports_from_cache( ensure_packages_cache( 'pre' ) ):
         from dulwich.config import ConfigFile # pylint: disable=import-error
@@ -520,68 +559,31 @@ def validate_cache_calculators_provider( provider ):
     return provider
 
 
-# TODO: Replace with '_ensure_git_submodule'.
-def ensure_scm_modules( project_path ):
-    ''' Ensures SCM modules have been cloned. '''
-    for modules_path in (
-        project_path / '.local' / 'scm-modules',
-        project_path / 'scm-modules',
-    ):
-        if not modules_path.is_dir( ): continue
-        for module_path in modules_path.iterdir( ):
-            if not module_path.is_dir( ): continue
-            if 0 < len( tuple( module_path.iterdir( ) ) ):
-                _attempt_clone_scm_modules( project_path )
-                return
-
-
-# TODO: Replace with '_ensure_git_submodule'.
-def _attempt_clone_scm_modules( project_path ):
-    ''' Attempts to clone SCM modules. '''
-    from shutil import which
-    git_path = which( 'git' )
-    if None is git_path:
-        raise Exit(
-            'absent entity',
-            'Git must be installed to use development support tools.' )
-    scribe = _acquire_scribe( )
-    scribe.info( 'Cloning or updating Git modules.' )
-    execute_subprocess(
-        ( git_path, *'submodule update --init --recursive'.split( ' ' ) ),
-        cwd = project_path )
-
-
-# TODO: Rename. Maybe 'prepare'.
-def configure_auxiliary( project_path ):
-    ''' Locates and configures development support modules. '''
-    _add_environment_entry( ( 'project', 'location' ), project_path )
-    with imports_from_cache( ensure_packages_cache( 'main' ) ):
-        import devshim # pylint: disable=unused-import
-
-
 def main( ):
     ''' Entrypoint for development activity. '''
     _configure_base_scribe( )
-    _acquire_cranial_matter( )
-    configure_auxiliary( _data.locations.repository_apex )
+    prepare( _data.locations.repository_apex )
     with imports_from_cache( ensure_packages_cache( 'main' ) ):
-        from invoke import Collection, Program
-        from devshim import tasks
+        from invoke import Collection, Program # pylint: disable=import-error
+        from devshim import tasks # pylint: disable=import-error
         Program( namespace = Collection.from_module( tasks ) ).run( )
+
+
+def prepare( project_location ):
+    ''' Locates and prepares development support modules. '''
+    _add_environment_entry( ( 'project', 'location' ), project_location )
+    _acquire_cranial_matter( )
 
 
 def _acquire_cranial_matter( ):
     species, location = _locate_cranial_matter( )
-    if 'remote' == species:
-        location = _data.locations.repository_apex
-    elif 'submodule' == species:
-        # TODO: _ensure_git_submodule( location )
-        pass
+    if 'remote' == species: location = _data.locations.repository_apex
+    elif 'submodule' == species: _ensure_git_submodule( location )
     if species in ( 'remote', 'submodule', ):
         _ensure_me_as_editable_wheel( location )
         # Installing editable wheel also installs dependencies.
         # However, we want to ensure that the dependencies are up-to-date.
-        _ensure_main_packages( location / 'pyproject.toml' )
+        ensure_main_packages( location / 'pyproject.toml' )
     elif 'package' == species:
         try:
             import devshim # pylint: disable=unused-import
@@ -602,6 +604,22 @@ def _add_environment_entry( parts, value ):
     name = _derive_environment_variable_name( *parts )
     current_process_environment[ name ] = str( value )
     return name
+
+
+def _clone_git_submodule( submodule_location ):
+    ''' Clones Git submodule for package, if possible. '''
+    # Note: At the time of this writing (2023-01-14), Dulwich does not have
+    #       support for initializing Git submodules. So, we fallback to 'git',
+    #       if it is available.
+    from shutil import which
+    git_location = which( 'git' )
+    if not git_location: return False
+    _data.scribe.info( f"Updating Git submodule at {submodule_location}." )
+    execute_subprocess(
+        ( git_location,
+          *split_command( 'submodule update --init --recursive --' ),
+          submodule_location ) )
+    return True
 
 
 def _configure_base_scribe( ):
@@ -635,22 +653,15 @@ def _derive_environment_variable_name( *parts ):
     return '_'.join( map( str.upper, ( package_name, *parts ) ) )
 
 
-# TODO? Remove. May not be needed because editable wheel installs dependencies.
-#       If we remove this, we need to ensure that dependencies stay fresh.
-def _ensure_main_packages( configuration_location ):
-    _ensure_pre_packages( )
-    with imports_from_cache( ensure_packages_cache( 'pre' ) ):
-        from packaging.requirements import Requirement
-        from tomli import load
-    with configuration_location.open( 'rb' ) as file:
-        configuration = load( file )
-    # Note: Development dependencies are not processed here.
-    #       Those are installed by the brain into virtual environments.
-    # TODO? Support for optional dependencies.
-    requirements = tuple(
-        ( Requirement( requirement ).name, requirement ) for requirement
-        in configuration[ 'project' ][ 'dependencies' ] )
-    ensure_packages( ensure_packages_cache( 'main' ), requirements )
+def _ensure_git_submodule( location ):
+    ''' Ensures validity of git submodule for package, if possible. '''
+    valid = location.is_dir( )
+    valid = valid and 0 < len( tuple( location.iterdir( ) ) )
+    if not valid: valid = _clone_git_submodule( location )
+    if valid: return
+    raise Exit(
+        'invalid state',
+        f"Please initialize the Git submodule at '{location}'." )
 
 
 def _ensure_me_as_editable_wheel( project_location ):
@@ -661,6 +672,7 @@ def _ensure_me_as_editable_wheel( project_location ):
     execute_python_subprocess(
         ( _ensure_pip( ), 'install', '--editable', project_location,
           '--force-reinstall', '--upgrade', '--upgrade-strategy=eager',
+          #'--no-deps', '-vvv',
           '--target', packages_location, ) )
 
 
@@ -683,25 +695,28 @@ def _ensure_pre_packages( ):
         ) )
 
 
-def _extract_git_repository_urls( ):
+def _extract_git_remotes_urls( ):
     configuration = _data.configurations.git_repository
-    repository_location = _data.locations.repository_apex
     remotes = { }
-    submodules = { }
     for section in configuration.sections( ):
-        if b'remote' == section[ 0 ]:
-            for item in configuration.items( section ):
-                if b'url' != item[ 0 ]: continue
-                name = section[ 1 ].decode( )
-                remotes[ name ] = item[ 1 ].decode( )
-                break
-        elif b'submodule' == section[ 0 ]:
-            for item in configuration.items( section ):
-                if b'url' != item[ 0 ]: continue
-                location = repository_location / section[ 1 ].decode( )
-                submodules[ location ] = item[ 1 ].decode( )
-                break
-    return DictionaryProxy( remotes ), DictionaryProxy( submodules )
+        if b'remote' != section[ 0 ]: continue
+        for item in configuration.items( section ):
+            if b'url' != item[ 0 ]: continue
+            name = section[ 1 ].decode( )
+            remotes[ name ] = item[ 1 ].decode( )
+            break
+    return DictionaryProxy( remotes )
+
+
+def _extract_git_submodules_urls( ):
+    try: configuration = _data.configurations.git_submodules
+    except FileNotFoundError: return DictionaryProxy( { } )
+    repository_location = _data.locations.repository_apex
+    from dulwich.config import parse_submodules # pylint: disable=import-error
+    submodules = { }
+    for location, url, _ in parse_submodules( configuration ):
+        submodules[ repository_location / location.decode( ) ] = url.decode( )
+    return DictionaryProxy( submodules )
 
 
 def _install_me( ):
@@ -716,7 +731,9 @@ def _install_me( ):
 _our_repository_regex = regex_compile(
     rf'''^.*github.com(?:[:/])[^/]+/{repository_name}(?:.git)?''' )
 def _locate_cranial_matter( ):
-    try: remotes, submodules = _extract_git_repository_urls( )
+    try:
+        remotes = _extract_git_remotes_urls( )
+        submodules = _extract_git_submodules_urls( )
     except FileNotFoundError as exc:
         cwd = Path( ).resolve( )
         raise Exit(
@@ -731,7 +748,6 @@ def _locate_cranial_matter( ):
 
 def _normalize_command_specification( command_specification ):
     if isinstance( command_specification, str ):
-        from shlex import split as split_command
         return split_command( command_specification )
     # Ensure strings are being passed as arguments.
     # Although 'subprocess.run' can accept path-like objects on all platforms,
@@ -777,6 +793,7 @@ def _provide_calculators( ):
 def _provide_configurations( ):
     return dict(
         git_repository = summon_git_repository_configuration,
+        git_submodules = summon_git_submodules_configuration,
     )
 
 
@@ -793,7 +810,7 @@ def _provide_locations( ):
 
 def _retrieve_pip( location ):
     url = f"https://bootstrap.pypa.io/pip/{location.name}"
-    _acquire_scribe( ).info( f"Retrieving Pip from {url!r}." )
+    _data.scribe.info( f"Retrieving Pip from {url!r}." )
     http_retrieve_url( url, location )
 
 

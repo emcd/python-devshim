@@ -66,11 +66,9 @@ def assemble( ):
 
 def calculate_user_directories( ):
     ''' Calculates user directory locations in platform-specific manner. '''
-    # TODO: Assert existence of 'platformdirs' package.
     from platformdirs import user_cache_path, user_data_path
-    from .data import project_name
-    caches_location = user_cache_path( appname = project_name )
-    data_location = user_data_path( appname = project_name )
+    caches_location = user_cache_path( appname = __package__ )
+    data_location = user_data_path( appname = __package__ )
     return __.create_immutable_namespace( dict(
         artifacts = caches_location / 'artifacts',
         caches = caches_location,
