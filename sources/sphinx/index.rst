@@ -17,7 +17,7 @@
    +--------------------------------------------------------------------------+
 
 
-.. include:: README.rst
+.. include:: ../../README.rst
 
 
 Table of Contents
@@ -27,7 +27,7 @@ Table of Contents
    :maxdepth: 3
 
    license
-   CHANGELOG
+   changelog
 
 
 Indices
