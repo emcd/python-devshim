@@ -28,7 +28,7 @@ from collections.abc import (
 )
 from contextlib import contextmanager as context_manager
 from functools import partial as partial_function
-from os import environ as current_process_environment
+from os import environ as current_process_environment, name as os_class
 from pathlib import Path
 from types import (
     MappingProxyType as DictionaryProxy,
@@ -167,6 +167,8 @@ def execute_external( command_specification, **nomargs ):
         Raises exception on non-zero exit code. '''
     # NOTE: Similar implementation exists in 'develop.py'.
     #       Improvements should be reflected in both places.
+    command_specification = _normalize_command_specification(
+        command_specification )
     options = dict( text = True )
     from subprocess import run # nosec B404
     from sys import stdout, stderr
@@ -177,17 +179,55 @@ def execute_external( command_specification, **nomargs ):
     if { 'stdout', 'stderr' } & options.keys( ):
         options.pop( 'capture_output', None )
     options.pop( 'check', None )
-    if isinstance( command_specification, str ):
-        from shlex import split as split_command
-        command_specification = split_command( command_specification )
-    # TODO: Python 3.8: Remove. Has support for WindowsPath.
-    elif isinstance( command_specification, AbstractSequence ):
-        command_specification = tuple( map( str, command_specification ) )
     # TODO? Handle pseudo-TTY requests with 'ptyprocess.PtyProcess'.
     # TODO? Intercept 'subprocess.SubprocessError'.
     scribe.debug( f"Executing {command_specification!r} with {options!r}." )
     # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-audit
     return run( command_specification, check = True, **options ) # nosec B603
+
+
+def _normalize_command_specification( command_specification ):
+    # NOTE: Similar implementation exists in 'develop.py'.
+    #       Improvements should be reflected in both places.
+    if isinstance( command_specification, str ):
+        return split_command( command_specification )
+    # Ensure strings are being passed as arguments.
+    # Although 'subprocess.run' can accept path-like objects on all platforms,
+    # as of Python 3.8, there may be non-path-like objects as arguments that
+    # need to be converted to strings. So, we always convert.
+    if isinstance( command_specification, AbstractSequence ):
+        return tuple( map( str, command_specification ) )
+    # TODO: Use exception factory.
+    raise ValueError(
+        f"Invalid command specification {command_specification!r}" )
+
+
+def split_command( command_specification ):
+    ''' Splits command-line string into arguments in platform-aware manner. '''
+    # NOTE: Similar implementation exists in 'develop.py'.
+    #       Improvements should be reflected in both places.
+    # https://github.com/python/cpython/issues/44990
+    if 'nt' == os_class: return _windows_split_command( command_specification )
+    from shlex import split as posix_split_command
+    return posix_split_command( command_specification )
+
+def _windows_split_command( command_specification ):
+    ''' Splits command-line string into arguments by Windows rules. '''
+    # NOTE: Similar implementation exists in 'develop.py'.
+    #       Improvements should be reflected in both places.
+    # https://stackoverflow.com/a/35900070/14833542
+    # https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-commandlinetoargvw
+    import ctypes
+    arguments_count = ctypes.c_int( )
+    ctypes.windll.shell32.CommandLineToArgvW.restype = (
+        ctypes.POINTER( ctypes.c_wchar_p ) )
+    lpargs = (
+        ctypes.windll.shell32.CommandLineToArgvW(
+            command_specification, ctypes.byref( arguments_count ) ) )
+    arguments = [ lpargs[ i ] for i in range( arguments_count.value ) ]
+    # TODO: Use exception factory.
+    if ctypes.windll.kernel32.LocalFree( lpargs ): raise AssertionError
+    return arguments
 
 
 def _configure( ):

@@ -24,7 +24,6 @@
 # pylint: disable=unused-import
 import re
 
-from shlex import split as split_command
 from types import MappingProxyType as DictionaryProxy
 
 from lockup import reclassify_module
@@ -44,7 +43,7 @@ def ensure_site_packages( installation_location, python_location ):
         ( python_location, pip_installer_location, ),
         cwd = installation_location )
     execute_external(
-        ( python_location, *split_command( '-m pip install virtualenv' ), ),
+        ( python_location, *'-m pip install virtualenv'.split( ), ),
         cwd = installation_location )
 
 

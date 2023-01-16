@@ -33,7 +33,6 @@ from . import base as __
 
 def install_python_packages( process_environment, identifier = None ):
     ''' Installs required Python packages into virtual environment. '''
-    from shlex import split as split_command
     from .base import execute_external
     raw, frozen, unpublished = generate_pip_requirements_text(
         identifier = identifier )
@@ -56,7 +55,7 @@ def install_python_packages( process_environment, identifier = None ):
     # https://github.com/pypa/pip/issues/4995
     execute_external(
         ( _derive_python_location( process_environment ),
-          *split_command( '-m pip install --editable .' ), ),
+          *'-m pip install --editable .'.split( ), ),
         env = process_environment )
 
 
@@ -321,14 +320,13 @@ def indicate_current_python_packages( environment ):
     ''' Returns currently-installed Python packages. '''
     eggstractor = _regex_compile(
         r'''.*#egg=(?P<package_name>\w[\w\-]+\w)(?:&.*)?$''' )
-    from shlex import split as split_command
     from types import SimpleNamespace
     from packaging.requirements import Requirement
     from .base import execute_external
     entries = [ ]
     for line in execute_external(
         ( _derive_python_location( environment ),
-          *split_command( '-m pip freeze' ), ),
+          *'-m pip freeze'.split( ), ),
         capture_output = True, env = environment,
     ).stdout.strip( ).splitlines( ):
         if line.startswith( '#' ): continue

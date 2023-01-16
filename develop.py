@@ -88,7 +88,6 @@ from functools import partial as partial_function
 from os import environ as current_process_environment
 from pathlib import Path
 from re import compile as regex_compile
-from shlex import split as split_command
 from types import MappingProxyType as DictionaryProxy
 
 
@@ -525,6 +524,37 @@ def produce_accretive_cacher( calculators_provider ):
     return AccretiveCacher( )
 
 
+def split_command( command_specification ):
+    ''' Splits command-line string into arguments in platform-aware manner. '''
+    # NOTE: Similar implementation exists in 'develop.py'.
+    #       Improvements should be reflected in both places.
+    # https://github.com/python/cpython/issues/44990
+    from os import name as os_class
+    if 'nt' == os_class: return _windows_split_command( command_specification )
+    from shlex import split as posix_split_command
+    return posix_split_command( command_specification )
+
+def _windows_split_command( command_specification ):
+    ''' Splits command-line string into arguments by Windows rules. '''
+    # NOTE: Similar implementation exists in 'develop.py'.
+    #       Improvements should be reflected in both places.
+    # https://stackoverflow.com/a/35900070/14833542
+    # https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-commandlinetoargvw
+    import ctypes
+    arguments_count = ctypes.c_int( )
+    ctypes.windll.shell32.CommandLineToArgvW.restype = (
+        ctypes.POINTER( ctypes.c_wchar_p ) )
+    lpargs = (
+        ctypes.windll.shell32.CommandLineToArgvW(
+            command_specification, ctypes.byref( arguments_count ) ) )
+    arguments = [ lpargs[ i ] for i in range( arguments_count.value ) ]
+    if ctypes.windll.kernel32.LocalFree( lpargs ):
+        raise Exit(
+            'invalid state',
+            "Could not free command arguments buffer from Windows." )
+    return arguments
+
+
 def summon_git_repository_configuration( ):
     ''' Returns configuration object for Git repository. '''
     _ensure_pre_packages( )
@@ -617,7 +647,7 @@ def _clone_git_submodule( submodule_location ):
     _data.scribe.info( f"Updating Git submodule at {submodule_location}." )
     execute_subprocess(
         ( git_location,
-          *split_command( 'submodule update --init --recursive --' ),
+          *'submodule update --init --recursive --'.split( ),
           submodule_location ) )
     return True
 
@@ -747,6 +777,8 @@ def _locate_cranial_matter( ):
 
 
 def _normalize_command_specification( command_specification ):
+    # NOTE: Similar implementation exists in package.
+    #       Improvements should be reflected in both places.
     if isinstance( command_specification, str ):
         return split_command( command_specification )
     # Ensure strings are being passed as arguments.

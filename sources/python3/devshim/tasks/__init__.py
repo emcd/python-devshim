@@ -338,18 +338,17 @@ def lint_pylint( targets, checks, report = False, version = None ):
     # TODO: Check executable in decorator.
     from ..environments import test_package_executable
     if not test_package_executable( 'pylint', process_environment ): return
-    options_str = ' '.join( (
+    options = (
         f"--rcfile={__.paths.configuration.pyproject}",
         "--reports={}".format( 'no' if not report else 'yes' ),
         "--score={}".format( 'no' if targets or checks else 'yes' ),
-    ) )
+    )
     if not targets: targets = _lint_targets_default
-    targets_str = ' '.join( map( str, targets ) )
-    checks_str = (
-        "--disable=all --enable={}".format( ','.join( checks ) )
-        if checks else '' )
+    checks = (
+        ( '--disable=all', "--enable={}".format( ','.join( checks ) ), )
+        if checks else ( ) )
     __.project_execute_external(
-        f"pylint {options_str} {checks_str} --recursive=yes {targets_str}",
+        ( 'pylint', *options, *checks, '--recursive=yes', *targets ),
         env = process_environment )
 
 
@@ -591,11 +590,11 @@ def branch_release( remote = 'origin' ):
 @__.task( 'Code Format: YAPF' )
 def check_code_style( write_changes = False ):
     ''' Checks code style of new changes. '''
+    from ..base import split_command
     yapf_options = [ ]
     if write_changes: yapf_options.append( '--in-place --verbose' )
     yapf_options_string = ' '.join( yapf_options )
     from contextlib import ExitStack as ContextStack
-    from shlex import split as split_command
     from subprocess import Popen, PIPE # nosec B404
     process_environment = __.derive_venv_variables( )
     contexts = ContextStack( )
