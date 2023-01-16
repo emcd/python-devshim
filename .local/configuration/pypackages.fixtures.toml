@@ -768,6 +768,14 @@ digests = [
 ]
 
 [["cpython-3.10.9--linux-64bit--x86_64"]]
+name = "pep517"
+version = "0.13.0"
+digests = [
+    "sha256:4ba4446d80aed5b5eac6509ade100bff3e7943a8489de249654a5ae9b33ee35b",
+    "sha256:ae69927c5c172be1add9203726d4b84cf3ebad1edcd5f71fcdc746e66e829f59",
+]
+
+[["cpython-3.10.9--linux-64bit--x86_64"]]
 name = "pkginfo"
 version = "1.9.6"
 digests = [
@@ -1058,10 +1066,10 @@ digests = [
 
 [["cpython-3.10.9--linux-64bit--x86_64"]]
 name = "shellingham"
-version = "1.5.0.post1"
+version = "1.5.0"
 digests = [
-    "sha256:368bf8c00754fd4f55afb7bbb86e272df77e4dc76ac29dbcbb81a59e9fc15744",
-    "sha256:823bc5fb5c34d60f285b624e7264f4dda254bc803a3774a147bf99c0e3004a28",
+    "sha256:a8f02ba61b69baaa13facdba62908ca8690a94b8119b69f5ec5873ea85f7391b",
+    "sha256:72fb7f5c63103ca2cb91b23dee0c71fe8ad6fbfd46418ef17dbe40db51592dad",
 ]
 
 [["cpython-3.10.9--linux-64bit--x86_64"]]
@@ -2199,6 +2207,14 @@ digests = [
 ]
 
 [["cpython-3.11.1--linux-64bit--x86_64"]]
+name = "pep517"
+version = "0.13.0"
+digests = [
+    "sha256:4ba4446d80aed5b5eac6509ade100bff3e7943a8489de249654a5ae9b33ee35b",
+    "sha256:ae69927c5c172be1add9203726d4b84cf3ebad1edcd5f71fcdc746e66e829f59",
+]
+
+[["cpython-3.11.1--linux-64bit--x86_64"]]
 name = "pkginfo"
 version = "1.9.6"
 digests = [
@@ -2449,10 +2465,10 @@ digests = [
 
 [["cpython-3.11.1--linux-64bit--x86_64"]]
 name = "shellingham"
-version = "1.5.0.post1"
+version = "1.5.0"
 digests = [
-    "sha256:368bf8c00754fd4f55afb7bbb86e272df77e4dc76ac29dbcbb81a59e9fc15744",
-    "sha256:823bc5fb5c34d60f285b624e7264f4dda254bc803a3774a147bf99c0e3004a28",
+    "sha256:a8f02ba61b69baaa13facdba62908ca8690a94b8119b69f5ec5873ea85f7391b",
+    "sha256:72fb7f5c63103ca2cb91b23dee0c71fe8ad6fbfd46418ef17dbe40db51592dad",
 ]
 
 [["cpython-3.11.1--linux-64bit--x86_64"]]
@@ -3904,10 +3920,10 @@ digests = [
 
 [["cpython-3.7.16--linux-64bit--x86_64"]]
 name = "shellingham"
-version = "1.5.0.post1"
+version = "1.5.0"
 digests = [
-    "sha256:368bf8c00754fd4f55afb7bbb86e272df77e4dc76ac29dbcbb81a59e9fc15744",
-    "sha256:823bc5fb5c34d60f285b624e7264f4dda254bc803a3774a147bf99c0e3004a28",
+    "sha256:a8f02ba61b69baaa13facdba62908ca8690a94b8119b69f5ec5873ea85f7391b",
+    "sha256:72fb7f5c63103ca2cb91b23dee0c71fe8ad6fbfd46418ef17dbe40db51592dad",
 ]
 
 [["cpython-3.7.16--linux-64bit--x86_64"]]
@@ -5091,6 +5107,14 @@ digests = [
 ]
 
 [["cpython-3.8.16--linux-64bit--x86_64"]]
+name = "pep517"
+version = "0.13.0"
+digests = [
+    "sha256:4ba4446d80aed5b5eac6509ade100bff3e7943a8489de249654a5ae9b33ee35b",
+    "sha256:ae69927c5c172be1add9203726d4b84cf3ebad1edcd5f71fcdc746e66e829f59",
+]
+
+[["cpython-3.8.16--linux-64bit--x86_64"]]
 name = "pkginfo"
 version = "1.9.6"
 digests = [
@@ -5389,10 +5413,10 @@ digests = [
 
 [["cpython-3.8.16--linux-64bit--x86_64"]]
 name = "shellingham"
-version = "1.5.0.post1"
+version = "1.5.0"
 digests = [
-    "sha256:368bf8c00754fd4f55afb7bbb86e272df77e4dc76ac29dbcbb81a59e9fc15744",
-    "sha256:823bc5fb5c34d60f285b624e7264f4dda254bc803a3774a147bf99c0e3004a28",
+    "sha256:a8f02ba61b69baaa13facdba62908ca8690a94b8119b69f5ec5873ea85f7391b",
+    "sha256:72fb7f5c63103ca2cb91b23dee0c71fe8ad6fbfd46418ef17dbe40db51592dad",
 ]
 
 [["cpython-3.8.16--linux-64bit--x86_64"]]
@@ -6538,6 +6562,14 @@ digests = [
 ]
 
 [["cpython-3.9.16--linux-64bit--x86_64"]]
+name = "pep517"
+version = "0.13.0"
+digests = [
+    "sha256:4ba4446d80aed5b5eac6509ade100bff3e7943a8489de249654a5ae9b33ee35b",
+    "sha256:ae69927c5c172be1add9203726d4b84cf3ebad1edcd5f71fcdc746e66e829f59",
+]
+
+[["cpython-3.9.16--linux-64bit--x86_64"]]
 name = "pkginfo"
 version = "1.9.6"
 digests = [
@@ -6828,10 +6860,10 @@ digests = [
 
 [["cpython-3.9.16--linux-64bit--x86_64"]]
 name = "shellingham"
-version = "1.5.0.post1"
+version = "1.5.0"
 digests = [
-    "sha256:368bf8c00754fd4f55afb7bbb86e272df77e4dc76ac29dbcbb81a59e9fc15744",
-    "sha256:823bc5fb5c34d60f285b624e7264f4dda254bc803a3774a147bf99c0e3004a28",
+    "sha256:a8f02ba61b69baaa13facdba62908ca8690a94b8119b69f5ec5873ea85f7391b",
+    "sha256:72fb7f5c63103ca2cb91b23dee0c71fe8ad6fbfd46418ef17dbe40db51592dad",
 ]
 
 [["cpython-3.9.16--linux-64bit--x86_64"]]
@@ -8009,6 +8041,14 @@ digests = [
 ]
 
 [["pypy-3.8.16-7.3.11--linux-64bit--x86_64"]]
+name = "pep517"
+version = "0.13.0"
+digests = [
+    "sha256:4ba4446d80aed5b5eac6509ade100bff3e7943a8489de249654a5ae9b33ee35b",
+    "sha256:ae69927c5c172be1add9203726d4b84cf3ebad1edcd5f71fcdc746e66e829f59",
+]
+
+[["pypy-3.8.16-7.3.11--linux-64bit--x86_64"]]
 name = "pkginfo"
 version = "1.9.6"
 digests = [
@@ -8269,10 +8309,10 @@ digests = [
 
 [["pypy-3.8.16-7.3.11--linux-64bit--x86_64"]]
 name = "shellingham"
-version = "1.5.0.post1"
+version = "1.5.0"
 digests = [
-    "sha256:368bf8c00754fd4f55afb7bbb86e272df77e4dc76ac29dbcbb81a59e9fc15744",
-    "sha256:823bc5fb5c34d60f285b624e7264f4dda254bc803a3774a147bf99c0e3004a28",
+    "sha256:a8f02ba61b69baaa13facdba62908ca8690a94b8119b69f5ec5873ea85f7391b",
+    "sha256:72fb7f5c63103ca2cb91b23dee0c71fe8ad6fbfd46418ef17dbe40db51592dad",
 ]
 
 [["pypy-3.8.16-7.3.11--linux-64bit--x86_64"]]
@@ -9442,6 +9482,14 @@ digests = [
 ]
 
 [["pypy-3.9.16-7.3.11--linux-64bit--x86_64"]]
+name = "pep517"
+version = "0.13.0"
+digests = [
+    "sha256:4ba4446d80aed5b5eac6509ade100bff3e7943a8489de249654a5ae9b33ee35b",
+    "sha256:ae69927c5c172be1add9203726d4b84cf3ebad1edcd5f71fcdc746e66e829f59",
+]
+
+[["pypy-3.9.16-7.3.11--linux-64bit--x86_64"]]
 name = "pkginfo"
 version = "1.9.6"
 digests = [
@@ -9694,10 +9742,10 @@ digests = [
 
 [["pypy-3.9.16-7.3.11--linux-64bit--x86_64"]]
 name = "shellingham"
-version = "1.5.0.post1"
+version = "1.5.0"
 digests = [
-    "sha256:368bf8c00754fd4f55afb7bbb86e272df77e4dc76ac29dbcbb81a59e9fc15744",
-    "sha256:823bc5fb5c34d60f285b624e7264f4dda254bc803a3774a147bf99c0e3004a28",
+    "sha256:a8f02ba61b69baaa13facdba62908ca8690a94b8119b69f5ec5873ea85f7391b",
+    "sha256:72fb7f5c63103ca2cb91b23dee0c71fe8ad6fbfd46418ef17dbe40db51592dad",
 ]
 
 [["pypy-3.9.16-7.3.11--linux-64bit--x86_64"]]
