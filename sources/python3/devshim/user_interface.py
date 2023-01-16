@@ -31,25 +31,78 @@ def render_boxed_title( title, supplement = None ):
     __.eprint( format_boxed_title( specific_title ) )
 
 
-def format_boxed_title( title ):
+def format_boxed_title( title, gravity = 2 ):
     ''' Formats box around title as string. '''
     columns_count = int( __.current_process_environment.get( 'COLUMNS', 79 ) )
     icolumns_count = columns_count - 2
-    content_template = (
-        '\N{BOX DRAWINGS DOUBLE VERTICAL}{fill}'
-        '\N{BOX DRAWINGS DOUBLE VERTICAL}' )
+    table = _acquire_rectangle_construction_characters( gravity )
+    content_template = '{vertical}{fill}{vertical}'
     return '\n'.join( (
         '',
-        '\N{BOX DRAWINGS DOUBLE DOWN AND RIGHT}{fill}'
-        '\N{BOX DRAWINGS DOUBLE DOWN AND LEFT}'.format(
-            fill = '\N{BOX DRAWINGS DOUBLE HORIZONTAL}' * icolumns_count ),
-        content_template.format( fill = ' ' * icolumns_count ),
-        content_template.format( fill = title.center( icolumns_count ) ),
-        content_template.format( fill = ' ' * icolumns_count ),
-        '\N{BOX DRAWINGS DOUBLE UP AND RIGHT}{fill}'
-        '\N{BOX DRAWINGS DOUBLE UP AND LEFT}'.format(
-            fill = '\N{BOX DRAWINGS DOUBLE HORIZONTAL}' * icolumns_count ),
+        '{suprasinistral}{fill}{supradextral}'.format(
+            fill = table[ 'horizontal' ] * icolumns_count, **table ),
+        content_template.format( fill = ' ' * icolumns_count, **table ),
+        content_template.format(
+            fill = title.center( icolumns_count ), **table ),
+        content_template.format( fill = ' ' * icolumns_count, **table ),
+        '{infrasinistral}{fill}{infradextral}'.format(
+            fill = table[ 'horizontal' ] * icolumns_count, **table ),
         '', ) )
+
+
+_ascii_rectangular_elements_single = __.DictionaryProxy( dict(
+    horizontal      = '-',
+    vertical        = '|',
+    infrasinistral  = '+',
+    infradextral    = '+',
+    suprasinistral  = '+',
+    supradextral    = '+',
+) )
+_ascii_rectangular_elements_double = __.DictionaryProxy( dict(
+    horizontal      = '=',
+    vertical        = '|',
+    infrasinistral  = '+',
+    infradextral    = '+',
+    suprasinistral  = '+',
+    supradextral    = '+',
+) )
+_unicode_rectangular_elements_single = __.DictionaryProxy( dict(
+    horizontal      = '\N{BOX DRAWINGS LIGHT HORIZONTAL}',
+    vertical        = '\N{BOX DRAWINGS LIGHT VERTICAL}',
+    infrasinistral  = '\N{BOX DRAWINGS LIGHT UP AND RIGHT}',
+    infradextral    = '\N{BOX DRAWINGS LIGHT UP AND LEFT}',
+    suprasinistral  = '\N{BOX DRAWINGS LIGHT DOWN AND RIGHT}',
+    supradextral    = '\N{BOX DRAWINGS LIGHT DOWN AND LEFT}',
+) )
+_unicode_rectangular_elements_double = __.DictionaryProxy( dict(
+    horizontal      = '\N{BOX DRAWINGS DOUBLE HORIZONTAL}',
+    vertical        = '\N{BOX DRAWINGS DOUBLE VERTICAL}',
+    infrasinistral  = '\N{BOX DRAWINGS DOUBLE UP AND RIGHT}',
+    infradextral    = '\N{BOX DRAWINGS DOUBLE UP AND LEFT}',
+    suprasinistral  = '\N{BOX DRAWINGS DOUBLE DOWN AND RIGHT}',
+    supradextral    = '\N{BOX DRAWINGS DOUBLE DOWN AND LEFT}',
+) )
+
+
+def _acquire_rectangle_construction_characters( gravity ):
+    ''' Returns dictionary of characters for rectangle construction. '''
+    # TODO: Validate gravity argument. Should maybe be an enumeration.
+    from os import name as os_class
+    # Detecting whether a terminal can support and properly render Unicode code
+    # points that have been encoded as UTF-8 is a mess on Windows. For example,
+    # see these Winpty issues:
+    #   https://github.com/rprichard/winpty/issues/38
+    #   https://github.com/rprichard/winpty/issues/105
+    # So, we always default to ASCII facsimiles, assuming that we do not wish
+    # to try using Windows code page 850 (or similar), as that is likely not
+    # the assigned character set.
+    # TODO: Detect other cases, such as 'LC_' variables which indicate an
+    #       encoding other than UTF-8.
+    if 'nt' == os_class:
+        if 1 == gravity: return _ascii_rectangular_elements_single
+        return _ascii_rectangular_elements_double
+    if 1 == gravity: return _unicode_rectangular_elements_single
+    return _unicode_rectangular_elements_double
 
 
 def generate_cli_functions( shell_name, function_name, with_completions ):

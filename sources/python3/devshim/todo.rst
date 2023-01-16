@@ -11,10 +11,11 @@ Fixes and Minor Improvements
 * Pull from https://github.com/indygreg/python-build-standalone/releases/latest
   for multiple platforms.
 
-* Fix rendering of Unicode box segment characters on terminals that do not
-  support the UTF-8 encoding properly.
-  - https://github.com/rprichard/winpty/issues/38
-  - https://github.com/rprichard/winpty/issues/105
+* Replace ``build`` with ``pyproject-hooks`` for use in both :file:`develop.py`
+  and for building sdists and wheels from the package. Removes an additional
+  subprocess layer caused by calling ``build`` or ``pip`` and will allow us to
+  get around Pip's build tracking when building wheels from source in the build
+  support side cache for the CPython TRACEREFS case.
 
 Virtual Environments Improvements
 ================================================================================
