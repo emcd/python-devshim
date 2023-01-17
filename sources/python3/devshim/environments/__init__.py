@@ -44,25 +44,12 @@
 #       and therefore also a non-starter.
 
 
-# Latent Dependencies:
-#   environments -> packages -> environments
-# pylint: disable=cyclic-import
-
-
-from . import base as __
-
-
-def _probe_our_python_environment( ):
-    ''' Is execution within Python environment created by this package? '''
-    from os import environ as current_process_environment
-    return 'OUR_VENV_NAME' in current_process_environment
-
-in_our_python_environment = _probe_our_python_environment( )
+from .. import base as __
 
 
 def build_python_venv( version, overwrite = False ):
     ''' Creates virtual environment for requested Python version. '''
-    from .languages.python import Language
+    from ..languages.python import Language
     descriptor = Language.produce_descriptor( version )
     try: python_path = descriptor.infer_executables_location( name = 'python' )
     except Exception: # pylint: disable=broad-except
@@ -71,19 +58,19 @@ def build_python_venv( version, overwrite = False ):
         __.scribe.info( f"Reinstalling Python {version!r}." )
         descriptor.install( force = True )
         python_path = descriptor.infer_executables_location( name = 'python' )
-    from .fs_utilities import ensure_directory
+    from ..fs_utilities import ensure_directory
     venv_path = ensure_directory( derive_venv_path( version, python_path ) )
     venv_options = [ ]
     if overwrite: venv_options.append( '--clear' )
-    from .base import execute_external
-    execute_external( (
+    from ..base import execute_subprocess
+    execute_subprocess( (
         python_path, '-m', 'virtualenv', *venv_options, venv_path ) )
     _install_packages_into_venv( version, venv_path )
 
 
 def _install_packages_into_venv( version, venv_path ):
     process_environment = derive_venv_variables( venv_path = venv_path )
-    from .packages import (
+    from ..packages import (
         calculate_python_packages_fixtures,
         install_python_packages,
         record_python_packages_fixtures,
@@ -91,7 +78,7 @@ def _install_packages_into_venv( version, venv_path ):
     install_python_packages( process_environment )
     fixtures = calculate_python_packages_fixtures( process_environment )
     # TODO: Get PEP 508 platform identity from language descriptor.
-    from .platforms import pep508_identify_python
+    from ..platforms import pep508_identify_python
     identifier = pep508_identify_python( version = version )
     record_python_packages_fixtures( identifier, fixtures )
 
@@ -114,7 +101,7 @@ def test_package_executable(
     if not proper_package_name:
         proper_package_name = executable_name.capitalize( )
     # TODO: Use logging instead of eprint.
-    from .base import eprint
+    from ..base import eprint
     eprint( f"{proper_package_name} not available. Skipping." )
     return False
 
@@ -126,7 +113,7 @@ def is_executable_in_venv( name, venv_path = None, version = None ):
         pick up shims, such as Asdf uses. '''
     from os import F_OK, R_OK, X_OK, access as test_fs_access
     from pathlib import Path
-    from .fs_utilities import (
+    from ..fs_utilities import (
         determine_executable_name_extensions,
         determine_executables_location_part,
     )
@@ -146,7 +133,7 @@ def generate_venv_executable_location(
 ):
     ''' Generates expected location of executable in virtual environment. '''
     from pathlib import Path
-    from .fs_utilities import determine_executables_location_part
+    from ..fs_utilities import determine_executables_location_part
     executables_part = determine_executables_location_part( )
     venv_path = Path( venv_path or derive_venv_path( version = version ) )
     return venv_path / executables_part / name
@@ -161,8 +148,8 @@ def venv_execute_external(
     process_environment = derive_venv_variables(
         **( { } if venv_specification is None else venv_specification ) )
     # TODO: Consider if environment is already being passed.
-    from .base import execute_external
-    return execute_external(
+    from ..base import execute_subprocess
+    return execute_subprocess(
         command_specification, env = process_environment, **nomargs )
 
 
@@ -172,7 +159,7 @@ def derive_venv_variables(
     ''' Derives environment variables from Python virtual environment path. '''
     from os import environ as current_process_environment, pathsep
     from pathlib import Path
-    from .fs_utilities import determine_executables_location_part
+    from ..fs_utilities import determine_executables_location_part
     executables_part = determine_executables_location_part( )
     venv_path = Path( venv_path or derive_venv_path( version = version ) )
     variables = ( variables or current_process_environment ).copy( )
@@ -196,14 +183,14 @@ def derive_venv_path( version = None, python_path = None ):
             venv_path = Path( cpe[ 'VIRTUAL_ENV' ] )
             if venv_path.name == cpe[ 'OUR_VENV_NAME' ]: return venv_path
     if None is python_path:
-        from .languages.python import Language
+        from ..languages.python import Language
         python_path = (
             Language.produce_descriptor( version )
             .infer_executables_location( name = 'python' ) )
-    from .platforms import identify_python
+    from ..platforms import identify_python
     abi_label = identify_python(
         'bdist-compatibility', python_path = python_path )
-    from .data import paths
+    from ..data import paths
     return ( paths.environments / abi_label ).resolve( )
 
 

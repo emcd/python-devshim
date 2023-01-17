@@ -11,11 +11,19 @@ Fixes and Minor Improvements
 * Pull from https://github.com/indygreg/python-build-standalone/releases/latest
   for multiple platforms.
 
-* Replace ``build`` with ``pyproject-hooks`` for use in both :file:`develop.py`
+* Replace ``build`` with `pyproject-hooks
+  <https://github.com/pypa/pyproject-hooks>` for use in both :file:`develop.py`
   and for building sdists and wheels from the package. Removes an additional
   subprocess layer caused by calling ``build`` or ``pip`` and will allow us to
   get around Pip's build tracking when building wheels from source in the build
   support side cache for the CPython TRACEREFS case.
+
+* Add `icecream <https://github.com/gruns/icecream>`_ to development
+  dependencies for easier debugging.
+
+* Add `releases <https://github.com/bitprophet/releases>`_ or `towncrier
+  <https://github.com/twisted/towncrier>`_ to development dependencies for
+  easier changelog management.
 
 Virtual Environments Improvements
 ================================================================================
@@ -23,12 +31,44 @@ Virtual Environments Improvements
 * Language Specifiers -> Virtual Environments
 
 * Virtual environments are next layer above language manifestations. May need
-  to be aware of some language features during virtual environment
+  to be aware of some language installation features during virtual environment
   construction.
 
 * Virtual environments are constructed from language manifestation tools.
   Anything installed in virtual environments must be installed by virtual
   environment tools.
+
+Brain-Finding Improvements
+===============================================================================
+
+* Add brain-finder with stealth imports as main entrypoint for package. Will
+  use package itself if not detected as current repository or submodule
+  thereof. Otherwise, will use the source code. Having more brain-finding logic
+  in package will reduce code duplication between ``develop.py`` and the
+  package and make ``develop.py`` less intimidating to drop into projects.
+
+* Package as zipapp. Then, carve ``develop.py`` down to just find the zipapp,
+  downloading it into a cache if necessary, and run it.
+
+* Paves the way for creating standalone executables and ``get-devshim.py``
+  scripts (or an alternative ``develop.py`` with a payload, though that is
+  probably not SCM-friendly without something like Git LFS enabled).
+
+Restructure Package Dependencies Format
+===============================================================================
+
+* Devshim should probe which options have been installed to generate list of
+  available commands for direct consumption and for what the metacommands
+  (``freshen``, ``lint``, etc...) execute.
+
+* Could consider treating development dependencies as optional installation
+  dependencies, as is the practice in parts of the Python community, and could
+  then fold into a PEP 621-/PEP 631-compliant :file:`pyproject.toml`. However,
+  we would lose the ability to treat comments as TOML lists, as we do now, and
+  would not be able to use alternative local paths (from Git submodules, for
+  example) for editable package "installation". (Rust's Cargo has the ability
+  to get packages from local paths, by preference, and fall back to an index,
+  such as crates.io, otherwise. This is very useful and what we want here too.)
 
 More Linters
 ===============================================================================
@@ -44,22 +84,6 @@ More Linters
 * `Sourcery <https://sourcery.ai/>`_
 
 * `Tryceratops <https://github.com/guilatrova/tryceratops>`_
-
-Restructure Package Dependencies Format
-===============================================================================
-
-* Devshim should probe which options have been installed to generate list of
-  available commands for direct consumption and for what the metacommands
-  (``freshen``, ``lint``, etc...) execute.
-
-* Could consider treating development dependencies as optional installation
-  dependencies, as is the practice in parts of the Python community, and could
-  then fold into a PEP 621-/PEP 31-compliant :file:`pyproject.toml`. However,
-  we would lose the ability to treat comments as TOML lists, as we do now, and
-  would not be able to use alternative local paths (from Git submodules, for
-  example) for editable package "installation". (Rust's Cargo has the ability
-  to get packages from local paths, by preference, and fall back to an index,
-  such as crates.io, otherwise. This is very useful and what we want here too.)
 
 Remove Dependency on ``bump2version``
 ===============================================================================

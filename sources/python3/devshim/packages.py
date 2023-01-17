@@ -250,8 +250,7 @@ def _ensure_python_packages( requirements ):
     ''' Ensures availability of packages to active Python. '''
     # If in virtual environment that we allegedly created,
     # then assume necessary packages are installed.
-    from .environments import in_our_python_environment
-    if in_our_python_environment: return
+    if __.virtual_environment_name: return
     # If 'pip' module is not available, then assume PEP 517 build in progress,
     # which should have already ensured packages from 'build-requires'.
     try: import pip # pylint: disable=unused-import

@@ -680,6 +680,8 @@ def _configure_base_scribe( ):
 
 def _derive_environment_variable_name( *parts ):
     ''' Derives environment variable name from parts and package name. '''
+    # NOTE: Similar implementation exists in package.
+    #       Improvements should be reflected in both places.
     return '_'.join( map( str.upper, ( package_name, *parts ) ) )
 
 
