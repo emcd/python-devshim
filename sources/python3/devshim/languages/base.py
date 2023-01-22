@@ -30,10 +30,6 @@ from types import MappingProxyType as DictionaryProxy
 from lockup import reclassify_module
 
 from .. import base as __
-from ..base import (
-    create_immutable_namespace,
-    produce_accretive_cacher,
-)
 from ..exceptions import (
     create_abstract_invocation_error,
     create_argument_validation_error,
@@ -573,10 +569,10 @@ def _validate_provider_class( class_ ):
 
 
 def _create_registration_interface( ): # pylint: disable=too-complex
-    from ..base import produce_accretive_dictionary
-    languages = produce_accretive_dictionary( _validate_language )
-    feature_classes = produce_accretive_dictionary( lambda object_: object_ )
-    provider_classes = produce_accretive_dictionary( lambda object_: object_ )
+    from ..base import create_accretive_dictionary
+    languages = create_accretive_dictionary( _validate_language )
+    feature_classes = create_accretive_dictionary( lambda object_: object_ )
+    provider_classes = create_accretive_dictionary( lambda object_: object_ )
 
     def register_feature_class_( feature_class ):
         ''' Registers language installation feature class. '''
@@ -599,9 +595,9 @@ def _create_registration_interface( ): # pylint: disable=too-complex
         #       safety.
         name = _validate_language( language ).name
         languages[ name ] = language
-        feature_classes[ name ] = produce_accretive_dictionary(
+        feature_classes[ name ] = create_accretive_dictionary(
             feature_class_validator )
-        provider_classes[ name ] = produce_accretive_dictionary(
+        provider_classes[ name ] = create_accretive_dictionary(
             provider_class_validator )
 
     def register_provider_class_( provider_class ):
@@ -617,16 +613,16 @@ def _create_registration_interface( ): # pylint: disable=too-complex
     def survey_feature_classes_( language ):
         ''' Returns immutable view upon features registry for language. '''
         if issubclass( language, Language ): language = language.name
-        return feature_classes[ language ].survey( )
+        return feature_classes[ language ]
 
     def survey_languages_( ):
         ''' Returns immutable view upon languages registry. '''
-        return languages.survey( )
+        return languages
 
     def survey_provider_classes_( language ):
         ''' Returns immutable view upon providers registry for language. '''
         if issubclass( language, Language ): language = language.name
-        return provider_classes[ language ].survey( )
+        return provider_classes[ language ]
 
     return (
         register_language_,
@@ -641,7 +637,7 @@ def _create_registration_interface( ): # pylint: disable=too-complex
 
 def _calculate_locations( ):
     from ..data import locations as base_locations
-    return create_immutable_namespace( dict(
+    return __.create_immutable_namespace( dict(
         configuration = base_locations.configuration.DEV.SELF / 'languages',
         data = base_locations.data.DEV.SELF / 'languages',
     ) )
@@ -657,15 +653,11 @@ def _summon_definitions( name ):
     return DictionaryProxy( document.get( 'descriptors', { } ) )
 
 
-def _provide_calculators( ):
-    from ..base import produce_semelfactive_dictionary
-    return dict(
-        definitions = (
-            lambda: produce_semelfactive_dictionary( _summon_definitions ) ),
-        locations = _calculate_locations,
-    )
-
-_data = __.produce_accretive_cacher( _provide_calculators )
+_data = __.create_semelfactive_namespace( __.create_invocable_dictionary(
+    definitions = (
+        lambda: __.create_semelfactive_dictionary( _summon_definitions ) ),
+    locations = _calculate_locations,
+) )
 __getattr__ = _data.__getattr__
 
 

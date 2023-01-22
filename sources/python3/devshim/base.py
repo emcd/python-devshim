@@ -23,6 +23,7 @@
 
 # pylint: disable=unused-import
 from collections.abc import (
+    Iterable as AbstractIterable,
     Mapping as AbstractDictionary,
     Sequence as AbstractSequence,
 )
@@ -46,7 +47,46 @@ epprint: _typ.Callable
 scribe: _typ.Any
 
 
-# TODO: Rename to 'produce_immutable_namespace'.
+def create_accretive_dictionary( validator ):
+    ''' Creates dictionary which can only add entries.
+
+        Existing entries cannot be updated or deleted.
+
+        Useful for immutable registries. '''
+    # TODO: Use exception factory.
+    if not callable( validator ): # TODO: Assert unary invocable.
+        raise ValueError(
+            f"Cannot create accretive dictionary "
+            f"which has noninvocable validator. " )
+    dictionary = { }
+
+    # TODO: Immutable class.
+    class AccretiveDictionary( AbstractDictionary ):
+        ''' Adds entries which thereafter cannot be updated or deleted. '''
+
+        __slots__ = ( )
+
+        def __getitem__( self, name ): return dictionary[ name ]
+
+        def __iter__( self ): return iter( dictionary )
+
+        def __len__( self ): return len( dictionary )
+
+        def __setitem__( self, name, value ):
+            if name in dictionary:
+                # TODO: Use exception factory.
+                raise ValueError(
+                    f"Cannot replace existing entry {name!r} "
+                    f"in accretive dictionary." )
+            dictionary[ name ] = validator( value )
+
+        def items( self ): return dictionary.items( )
+
+        def values( self ): return dictionary.values( )
+
+    return AccretiveDictionary( )
+
+
 def create_immutable_namespace( source ):
     ''' Creates immutable namespace from dictionary or simple namespace. '''
     from inspect import isfunction as is_function
@@ -63,6 +103,141 @@ def create_immutable_namespace( source ):
     namespace[ '__slots__' ] = ( )
     class_ = type( 'Namespace', ( ), namespace )
     return class_( )
+
+
+def create_invocable_dictionary( *iterables, **dictionary_nomargs ): # pylint: disable=too-complex
+    ''' Creates dictionary whose values can be invoked by name.
+
+        Each value must be invocable. '''
+    dictionary = { }
+    normalized_iterables = [ ]
+    for iterable in iterables:
+        if not isinstance( iterable, AbstractIterable ):
+            # TODO: Use exception factory.
+            raise ValueError(
+                f"Cannot create dictionary from noniterable source." )
+        if not isinstance( iterable, AbstractDictionary ):
+            try: normalized_iterables.append( dict( iterable ) )
+            except TypeError as exc:
+                raise ValueError(
+                    f"Cannot create dictionary from incompatible iterable."
+                ) from exc
+        else: normalized_iterables.append( iterable )
+    from itertools import chain
+    for index, value in chain( *map(
+        lambda it: it.items( ), ( *normalized_iterables, dictionary_nomargs )
+    ) ):
+        if not callable( value ):
+            # TODO: Use exception factory.
+            raise ValueError(
+                f"Cannot create invocable dictionary from noninvocable value "
+                f"associated with index {index!r}." )
+        dictionary[ index ] = value
+
+    # TODO: Immutable class.
+    class InvocableDictionary( AbstractDictionary ):
+        ''' Dictionary with invocable entries. '''
+
+        __slots__ = ( )
+
+        # TODO: Python 3.8: Make 'name' positional-only argument.
+        def __call__( self, name, *posargs, **nomargs ):
+            return dictionary[ name ]( *posargs, **nomargs )
+
+        def __getitem__( self, name ): return dictionary[ name ]
+
+        def __iter__( self ): return iter( dictionary )
+
+        def __len__( self ): return len( dictionary )
+
+        def items( self ): return dictionary.items( )
+
+        def values( self ): return dictionary.values( )
+
+    return InvocableDictionary( )
+
+
+def create_semelfactive_dictionary( factory ):
+    ''' Create dictionary which produces and retains values on access.
+
+        A value is produced exactly once, upon initial access. Thereafter, the
+        value remains in cache and is immutable.
+
+        The factory must take one argument, the name of the entry, and use that
+        to produce a value. '''
+    if not callable( factory ): # TODO: Assert unary invocable.
+        # TODO: Use exception factory.
+        raise ValueError(
+            f"Cannot create semelfactive dictionary "
+            f"which has noninvocable factory." )
+    dictionary = { }
+
+    # TODO: Class immutability.
+    class SemelfactiveDictionary( AbstractDictionary ):
+        ''' Produces values on access and retains them. '''
+
+        def __getitem__( self, name ):
+            if name not in dictionary:
+                try: dictionary[ name ] = factory( name )
+                except Exception as exc:
+                    # TODO: Use exception factory.
+                    raise KeyError(
+                        f"Cannot produce entry for {name!r}." ) from exc
+            return dictionary[ name ]
+
+        def __iter__( self ): return iter( dictionary )
+
+        def __len__( self ): return len( dictionary )
+
+        def items( self ): return dictionary.items( )
+
+        def values( self ): return dictionary.values( )
+
+    return SemelfactiveDictionary( )
+
+
+def create_semelfactive_namespace( factory ):
+    ''' Creates namespace which produces and retains values on access.
+
+        A value is produced exactly once, upon initial access. Thereafter, the
+        value remains in cache and is immutable.
+
+        The factory must take one argument, the name of the entry, and use that
+        to produce a value. '''
+    # NOTE: Similar implementation exists in 'develop.py'.
+    #       Improvements should be reflected in both places.
+    if not callable( factory ): # TODO: Assert unary invocable.
+        # TODO: Use exception factory.
+        raise ValueError(
+            f"Cannot create semelfactive namespace "
+            f"which has noninvocable factory." )
+    cache = { }
+
+    # TODO: Class immutability.
+    class SemelfactiveNamespace:
+        ''' Produces values on access and retains them. '''
+
+        __slots__ = ( )
+
+        def __getattr__( self, name ):
+            if name not in cache:
+                try: cache[ name ] = factory( name )
+                except Exception as exc:
+                    raise AttributeError(
+                        f"Cannot produce attribute for {name!r}." ) from exc
+            return cache[ name ]
+
+        def __setattr__( self, name, value ):
+            # TODO: Use exception factory.
+            raise AttributeError(
+                "Cannot assign attribute to semelfactive namespace." )
+
+        def __delattr__( self, name ):
+            # TODO: Use exception factory.
+            raise AttributeError(
+                "Cannot remove attribute from semelfactive namespace." )
+
+    return SemelfactiveNamespace( )
 
 
 def derive_class_fqname( class_ ):
@@ -128,134 +303,6 @@ def _normalize_command_specification( command_specification ):
     # TODO: Use exception factory.
     raise ValueError(
         f"Invalid command specification {command_specification!r}" )
-
-
-# TODO: Rename to 'produce_semelfactive_namespace'.
-def produce_accretive_cacher( calculators_provider ):
-    ''' Produces object which computes and caches values.
-
-        The ``calculators_provider`` argument must return a dictionary of cache
-        entry names with nullary invocables as the correspondent values. Each
-        invocable is a calculator which produces a value to populate the cache.
-        Any attribute name not in the dictionary results in an
-        :py:exc:`AttributeError`. '''
-    # NOTE: Similar implementation exists in 'develop.py'.
-    #       Improvements should be reflected in both places.
-    cache = { }
-    _validate_cache_calculators_provider( calculators_provider )
-    calculators = DictionaryProxy( calculators_provider( ) )
-
-    # TODO: Class immutability.
-    class AccretiveCacher:
-        ''' Computes values on demand and caches them. '''
-
-        __slots__ = ( )
-
-        def __getattr__( self, name ):
-            if name not in calculators: raise AttributeError
-            if name not in cache: cache[ name ] = calculators[ name ]( )
-            return cache[ name ]
-
-        def __setattr__( self, name, value ):
-            # TODO: Use exception factory.
-            raise AttributeError(
-                "Cannot assign attributes to cacher object." )
-
-        def __delattr__( self, name ):
-            # TODO: Use exception factory.
-            raise AttributeError(
-                "Cannot remove attributes from cacher object." )
-
-    return AccretiveCacher( )
-
-def _validate_cache_calculators_provider( provider ):
-    ''' Validates provider of calculators for accretive cacher. '''
-    # NOTE: Similar implementation exists in 'develop.py'.
-    #       Improvements should be reflected in both places.
-    if not callable( provider ):
-        # TODO: Use exception factory.
-        raise ValueError(
-            f"Calculators provider for accretive cache must be invocable." )
-    # TODO: Further validate calculators provider.
-    return provider
-
-
-def produce_accretive_dictionary( validator ):
-    ''' Produces dictionary which can only add entries.
-
-        Existing entries cannot be updated or deleted.
-
-        Useful for the creation of immutable registries. '''
-    # TODO: Validate validator.
-    cache = { }
-
-    # TODO: Immutable class.
-    class AccretiveDictionary( AbstractDictionary ):
-        ''' Adds entries which cannot be updated or deleted. '''
-
-        __slots__ = ( 'visor', )
-
-        def __getitem__( self, name ): return cache[ name ]
-
-        def __init__( self ): self.visor = DictionaryProxy( cache )
-
-        def __iter__( self ): return iter( self.visor )
-
-        def __len__( self ): return len( cache )
-
-        def __setitem__( self, name, value ):
-            if name in cache:
-                # TODO: Properly handle error case.
-                raise ValueError
-            cache[ name ] = validator( value )
-
-        def items( self ): return self.visor.items( )
-
-        def survey( self ):
-            ''' Returns immutable view upon registry. '''
-            return self.visor
-
-        def values( self ): return self.visor.values( )
-
-    return AccretiveDictionary( )
-
-
-def produce_semelfactive_dictionary( factory ):
-    ''' Produces dictionary which produces and caches values on access.
-
-        A value is produced exactly once, upon cache miss. Thereafter, the
-        value remains in cache and is immutable.
-
-        The factory must take one argument, the name of the entry, and use that
-        to produce a value. '''
-    cache = { }
-    # TODO: Validate factory.
-
-    # TODO: Class immutability.
-    class SemelfactiveDictionary( AbstractDictionary ):
-        ''' Produces values on access and caches them. '''
-
-        __slots__ = ( 'visor', )
-
-        def __getitem__( self, name ):
-            if name not in cache: cache[ name ] = factory( name )
-            return cache[ name ]
-
-        def __init__( self ): self.visor = DictionaryProxy( cache )
-
-        def __iter__( self ): return iter( self.visor )
-
-        def __len__( self ): return len( cache )
-
-        def items( self ): return self.visor.items( )
-
-        def survey( self ):
-            ''' Returns immutable view upon cache. '''
-            return self.visor
-
-        def values( self ): return self.visor.values( )
-
-    return SemelfactiveDictionary( )
 
 
 def split_command( command_specification ):
@@ -389,21 +436,17 @@ def _select_narration_target( ):
     return stderr
 
 
-def _provide_calculators( ):
-    return dict(
-        ci_environment = _detect_ci_environment,
-        configuration = _configure,
-        epprint = _provide_structural_narrative_function,
-        eprint = _provide_simple_narrative_function,
-        main_module_compatibility = _check_main_module_compatibility,
-        narration_target = _select_narration_target,
-        on_tty = _probe_tty,
-        scribe = _create_scribe,
-        virtual_environment_name = _discover_virtual_environment_name,
-    )
-
-
-_data = produce_accretive_cacher( _provide_calculators )
+_data = create_semelfactive_namespace( create_invocable_dictionary(
+    ci_environment = _detect_ci_environment,
+    configuration = _configure,
+    epprint = _provide_structural_narrative_function,
+    eprint = _provide_simple_narrative_function,
+    main_module_compatibility = _check_main_module_compatibility,
+    narration_target = _select_narration_target,
+    on_tty = _probe_tty,
+    scribe = _create_scribe,
+    virtual_environment_name = _discover_virtual_environment_name,
+) )
 __getattr__ = _data.__getattr__
 
 

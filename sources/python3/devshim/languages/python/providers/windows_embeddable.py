@@ -215,16 +215,15 @@ def _calculate_locations( ):
         version_records = base_location / 'versions.toml',
     ) )
 
+
 def _prepare_supportable_base_version( ):
     return __.Language.derive_actual_version( '3.7' )
 
-def _produce_calculators( ):
-    return dict(
-        locations = _calculate_locations,
-        supportable_base_version = _prepare_supportable_base_version,
-    )
 
-_data = __.produce_accretive_cacher( _produce_calculators )
+_data = __.create_semelfactive_namespace( __.create_invocable_dictionary(
+    locations = _calculate_locations,
+    supportable_base_version = _prepare_supportable_base_version,
+) )
 __getattr__ = _data.__getattr__
 
 

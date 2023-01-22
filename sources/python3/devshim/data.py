@@ -34,17 +34,6 @@ project_name: str
 user_directories: _typ.Any
 
 
-def _provide_calculators( ):
-    return dict(
-        locations = __.partial_function( _invoke, '.locations.assemble' ),
-        paths = lambda: __getattr__( 'locations' ),
-        project_name = __.partial_function(
-            _invoke, '.project.discover_name' ),
-        user_directories = __.partial_function(
-            _invoke, '.locations.calculate_user_directories' )
-    )
-
-
 def _invoke( name ):
     ''' Imports and executes invocable. '''
     module_name, invocable_name = name.rsplit( sep = '.', maxsplit = 1 )
@@ -54,7 +43,15 @@ def _invoke( name ):
     return getattr( module, invocable_name )( )
 
 
-_data = __.produce_accretive_cacher( _provide_calculators )
+_data: _typ.Any = (
+    __.create_semelfactive_namespace( __.create_invocable_dictionary(
+        locations = __.partial_function( _invoke, '.locations.assemble' ),
+        paths = lambda: _data.locations,
+        project_name = __.partial_function(
+            _invoke, '.project.discover_name' ),
+        user_directories = __.partial_function(
+            _invoke, '.locations.calculate_user_directories' ),
+    ) ) )
 __getattr__ = _data.__getattr__
 
 

@@ -208,7 +208,9 @@ def _produce_calculators( ):
         supportable_base_version = _prepare_supportable_base_version,
     )
 
-_data = __.produce_accretive_cacher( _produce_calculators )
+_data = __.create_semelfactive_namespace( __.create_invocable_dictionary(
+    _produce_calculators( )
+) )
 __getattr__ = _data.__getattr__
 
 

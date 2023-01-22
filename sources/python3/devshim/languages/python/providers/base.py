@@ -28,7 +28,11 @@ from types import MappingProxyType as DictionaryProxy
 
 from lockup import reclassify_module
 
-from ....base import execute_external, produce_accretive_cacher
+from ....base import (
+    create_invocable_dictionary,
+    create_semelfactive_namespace,
+    execute_external,
+)
 from ....http_utilities import retrieve_url as http_retrieve_url
 from ...base import LanguageProvider, register_provider_class
 from ..base import Language
