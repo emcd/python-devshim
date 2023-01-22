@@ -46,6 +46,8 @@
 
 from .. import base as __
 
+from .base import survey_descriptors
+
 
 def build_python_venv( version, overwrite = False ):
     ''' Creates virtual environment for requested Python version. '''

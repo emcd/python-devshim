@@ -856,6 +856,14 @@ def show_python( all_versions = False ):
     else: print( Language.detect_default_descriptor( ).name )
 
 
+@__.task( )
+def show_environments( ):
+    ''' Lists names of available environments. '''
+    # TODO? With Rich and 'detail' flag, show panels with details.
+    from ..environments import survey_descriptors
+    for descriptor in survey_descriptors( ).keys( ): print( descriptor )
+
+
 # For use by Invoke's module loader. Must be called 'namespace' (or 'ns').
 namespace = __.TaskCollection( )
 namespace.add_task( bootstrap )
@@ -933,6 +941,7 @@ namespace.add_collection( __.TaskCollection(
 ) )
 namespace.add_collection( __.TaskCollection(
     'show',
+    environments = show_environments,
     python = show_python,
 ) )
 namespace.add_collection( __.TaskCollection(

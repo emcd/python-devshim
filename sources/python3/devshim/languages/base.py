@@ -30,6 +30,12 @@ from types import MappingProxyType as DictionaryProxy
 from lockup import reclassify_module
 
 from .. import base as __
+from ..base import (
+    create_immutable_namespace,
+    create_invocable_dictionary,
+    create_semelfactive_dictionary,
+    create_semelfactive_namespace,
+)
 from ..exceptions import (
     create_abstract_invocation_error,
     create_argument_validation_error,
@@ -45,6 +51,7 @@ from ..platforms.identity import calculate_platform_identifier
 locations: _typ.Any
 
 
+# TODO: Class immutability.
 class Language( metaclass = ABCFactory ):
     ''' Abstract base for languages. '''
     # Note: The 'Language' class is effectively a singleton. We would use a
@@ -52,6 +59,13 @@ class Language( metaclass = ABCFactory ):
     #       to guarantee a common interface and provide some standard behaviors
     #       behind portions of that interface. Only class-level attributes
     #       should appear on this class and its descendants.
+    # TODO: Either prevent instantiation or else use the Borg pattern.
+    #       Alternatively, make the various languages be instances, since
+    #       initialization of this class is IO-free and otherwise cheap.
+    #       The descriptor class provider and version deriver would need to be
+    #       arguments to the initializer in this case. An advantage would be
+    #       that the instance could automatically register itself, which is
+    #       better encapsulation.
 
     name: str
     title: str
@@ -124,8 +138,6 @@ class Language( metaclass = ABCFactory ):
                 'descriptor', class_.validate_descriptor,
                 f"defined {class_.title} descriptor" )
         return descriptor
-
-    # TODO: Either prevent instantiation or else use the Borg pattern.
 
 
 # TODO: Class immutability.
@@ -244,8 +256,7 @@ class LanguageDescriptor( metaclass = ABCFactory ):
 
     def __init__( self, name ):
         # TODO: Validate name against definition keys.
-        self.name = validate_argument_class(
-            name, str, 'name', self.__init__ )
+        self.name = validate_argument_class( name, str, 'name', self.__init__ )
         self.definition = self._summon_definition( )
         self.record = self._summon_record( )
         self.features = self._instantiate_features( )
@@ -637,7 +648,7 @@ def _create_registration_interface( ): # pylint: disable=too-complex
 
 def _calculate_locations( ):
     from ..data import locations as base_locations
-    return __.create_immutable_namespace( dict(
+    return create_immutable_namespace( dict(
         configuration = base_locations.configuration.DEV.SELF / 'languages',
         data = base_locations.data.DEV.SELF / 'languages',
     ) )
@@ -653,9 +664,9 @@ def _summon_definitions( name ):
     return DictionaryProxy( document.get( 'descriptors', { } ) )
 
 
-_data = __.create_semelfactive_namespace( __.create_invocable_dictionary(
+_data = create_semelfactive_namespace( create_invocable_dictionary(
     definitions = (
-        lambda: __.create_semelfactive_dictionary( _summon_definitions ) ),
+        lambda: create_semelfactive_dictionary( _summon_definitions ) ),
     locations = _calculate_locations,
 ) )
 __getattr__ = _data.__getattr__
