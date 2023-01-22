@@ -103,7 +103,7 @@ class Language( metaclass = ABCFactory ):
     def survey_descriptors( class_ ):
         ''' Returns language descriptors which have relevant definitions. '''
         descriptor_class = class_.provide_descriptor_class( )
-        definitions = descriptor_class.summon_definitions( )
+        definitions = _data.definitions[ class_.name ]
         from os import environ as current_process_environment
         descriptor = current_process_environment.get(
             class_.calculate_descriptor_variable_name( ) )
@@ -134,14 +134,14 @@ class Language( metaclass = ABCFactory ):
 
 # TODO: Class immutability.
 class LanguageDescriptor( metaclass = ABCFactory ):
-    ''' Abstract base for language manifestation descriptors. '''
+    ''' Abstract base for language descriptors. '''
 
     language: _typ.Type[ Language ]
 
     @classmethod
     def create_record( class_, name ):
         ''' Creates language descriptor record and persists it. '''
-        definition = class_.summon_definitions( )[ name ]
+        definition = _data.definitions[ class_.language.name ][ name ]
         location = class_.infer_records_location( name )
         if not location.exists( ): records = { }
         else: records = dict( class_.summon_records( name ) )
@@ -159,7 +159,7 @@ class LanguageDescriptor( metaclass = ABCFactory ):
 
             If descriptor is provided, then name of descriptor-specific
             file is appended to directory location. '''
-        location = __getattr__( 'locations' ).data.joinpath(
+        location = _data.locations.data.joinpath(
             f"{class_.language.name}/descriptors" )
         if None is not descriptor: return location / f"{descriptor}.toml"
         return location
@@ -200,7 +200,7 @@ class LanguageDescriptor( metaclass = ABCFactory ):
         if isinstance( descriptor, LanguageDescriptor ):
             return descriptor.definition
         if isinstance( descriptor, str ):
-            return class_.summon_definitions( )[ descriptor ]
+            return _data.definitions[ class_.language.name ][ descriptor ]
         return descriptor # TODO: Sanity-check definition.
 
     @classmethod
@@ -212,13 +212,6 @@ class LanguageDescriptor( metaclass = ABCFactory ):
     def provide_provider_classes( class_ ):
         ''' Provides language installation provider classes. '''
         return survey_provider_classes( class_.language )
-
-    # TODO: Implement with a registry using language as key.
-    @classmethod
-    @abstract
-    def summon_definitions( class_ ):
-        ''' Summons definitions for language descriptors. '''
-        raise create_abstract_invocation_error( class_.summon_definitions )
 
     @classmethod
     def summon_records( class_, name ):
@@ -281,7 +274,7 @@ class LanguageDescriptor( metaclass = ABCFactory ):
         raise LookupError
 
     def infer_installation_location( self ):
-        ''' Infers installation location of language manifestation. '''
+        ''' Infers installation location by provider. '''
         for provider in self.providers.values( ):
             location = provider.installation_location
             if not location.exists( ):
@@ -294,7 +287,7 @@ class LanguageDescriptor( metaclass = ABCFactory ):
         raise LookupError
 
     def install( self, force = False ):
-        ''' Installs language manifestation with provider of record. '''
+        ''' Installs with provider of record. '''
         provider = self.providers[ self.record[ 'provider' ] ]
         provider.install( force = force )
 
@@ -306,7 +299,7 @@ class LanguageDescriptor( metaclass = ABCFactory ):
             feature.labels for feature in self.features.values( ) ) )
 
     def update( self, install = True ):
-        ''' Attempts to update manifestation with most relevant provider. '''
+        ''' Attempts to update with most relevant provider. '''
         status_quo = self.record[ 'implementation-version' ]
         for provider in self.providers.values( ):
             offer = provider.discover_current_version( self.definition )
@@ -350,7 +343,8 @@ class LanguageDescriptor( metaclass = ABCFactory ):
         return DictionaryProxy( providers )
 
     def _summon_definition( self ):
-        return DictionaryProxy( self.summon_definitions( )[ self.name ] )
+        return DictionaryProxy(
+            _data.definitions[ self.language.name ][ self.name ] )
 
     def _summon_record( self ):
         records = self.summon_records( self.name )
@@ -375,7 +369,7 @@ class LanguageFeature( metaclass = ABCFactory ):
 
     @classmethod
     def check_descriptor_support( class_, descriptor, platform = None ):
-        ''' Does feature support language manifestation descriptor? '''
+        ''' Does feature support language descriptor? '''
         definition = (
             class_.language.provide_descriptor_class( )
             .provide_definition( descriptor ) )
@@ -440,7 +434,7 @@ class LanguageProvider( metaclass = ABCFactory ):
 
     @classmethod
     def check_descriptor_support( class_, descriptor, platform = None ):
-        ''' Does provider support language manifestation descriptor? '''
+        ''' Does provider support language descriptor? '''
         definition = (
             class_.language.provide_descriptor_class( )
             .provide_definition( descriptor ) )
@@ -579,10 +573,10 @@ def _validate_provider_class( class_ ):
 
 
 def _create_registration_interface( ): # pylint: disable=too-complex
-    from ..base import create_registrar
-    languages = create_registrar( _validate_language )
-    feature_classes = create_registrar( lambda object_: object_ )
-    provider_classes = create_registrar( lambda object_: object_ )
+    from ..base import produce_accretive_dictionary
+    languages = produce_accretive_dictionary( _validate_language )
+    feature_classes = produce_accretive_dictionary( lambda object_: object_ )
+    provider_classes = produce_accretive_dictionary( lambda object_: object_ )
 
     def register_feature_class_( feature_class ):
         ''' Registers language installation feature class. '''
@@ -605,8 +599,10 @@ def _create_registration_interface( ): # pylint: disable=too-complex
         #       safety.
         name = _validate_language( language ).name
         languages[ name ] = language
-        feature_classes[ name ] = create_registrar( feature_class_validator )
-        provider_classes[ name ] = create_registrar( provider_class_validator )
+        feature_classes[ name ] = produce_accretive_dictionary(
+            feature_class_validator )
+        provider_classes[ name ] = produce_accretive_dictionary(
+            provider_class_validator )
 
     def register_provider_class_( provider_class ):
         ''' Registers language installation provider class. '''
@@ -621,16 +617,16 @@ def _create_registration_interface( ): # pylint: disable=too-complex
     def survey_feature_classes_( language ):
         ''' Returns immutable view upon features registry for language. '''
         if issubclass( language, Language ): language = language.name
-        return feature_classes[ language ].survey_registry( )
+        return feature_classes[ language ].survey( )
 
     def survey_languages_( ):
         ''' Returns immutable view upon languages registry. '''
-        return languages.survey_registry( )
+        return languages.survey( )
 
     def survey_provider_classes_( language ):
         ''' Returns immutable view upon providers registry for language. '''
         if issubclass( language, Language ): language = language.name
-        return provider_classes[ language ].survey_registry( )
+        return provider_classes[ language ].survey( )
 
     return (
         register_language_,
@@ -651,8 +647,21 @@ def _calculate_locations( ):
     ) )
 
 
+def _summon_definitions( name ):
+    ''' Summons definitions for language descriptors. '''
+    # TODO? Use 'importlib-resources' to access default definitions.
+    location = _data.locations.configuration / f"{name}.toml"
+    from tomli import load as summon
+    with location.open( 'rb' ) as file: document = summon( file )
+    # TODO: Check format version and dispatch accordingly.
+    return DictionaryProxy( document.get( 'descriptors', { } ) )
+
+
 def _provide_calculators( ):
+    from ..base import produce_semelfactive_dictionary
     return dict(
+        definitions = (
+            lambda: produce_semelfactive_dictionary( _summon_definitions ) ),
         locations = _calculate_locations,
     )
 

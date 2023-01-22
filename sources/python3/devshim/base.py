@@ -46,6 +46,7 @@ epprint: _typ.Callable
 scribe: _typ.Any
 
 
+# TODO: Rename to 'produce_immutable_namespace'.
 def create_immutable_namespace( source ):
     ''' Creates immutable namespace from dictionary or simple namespace. '''
     from inspect import isfunction as is_function
@@ -62,36 +63,6 @@ def create_immutable_namespace( source ):
     namespace[ '__slots__' ] = ( )
     class_ = type( 'Namespace', ( ), namespace )
     return class_( )
-
-
-def create_registrar( validator ):
-    ''' Creates registar for functionality extensions. '''
-    # TODO: Validate validator.
-    registry = { }
-
-    # TODO: Immutable class.
-    class Registrar( AbstractDictionary ):
-        ''' Registrar for functionality extensions. '''
-
-        def __getitem__( self, name ): return registry[ name ]
-
-        def __init__( self ): self.visor = DictionaryProxy( registry )
-
-        def __iter__( self ): return iter( self.visor )
-
-        def __len__( self ): return len( registry )
-
-        def __setitem__( self, name, value ):
-            if name in registry:
-                # TODO: Properly handle error case.
-                raise ValueError
-            registry[ name ] = validator( value )
-
-        def survey_registry( self ):
-            ''' Returns immutable view upon registry. '''
-            return self.visor
-
-    return Registrar( )
 
 
 def derive_class_fqname( class_ ):
@@ -159,6 +130,7 @@ def _normalize_command_specification( command_specification ):
         f"Invalid command specification {command_specification!r}" )
 
 
+# TODO: Rename to 'produce_semelfactive_namespace'.
 def produce_accretive_cacher( calculators_provider ):
     ''' Produces object which computes and caches values.
 
@@ -206,6 +178,84 @@ def _validate_cache_calculators_provider( provider ):
             f"Calculators provider for accretive cache must be invocable." )
     # TODO: Further validate calculators provider.
     return provider
+
+
+def produce_accretive_dictionary( validator ):
+    ''' Produces dictionary which can only add entries.
+
+        Existing entries cannot be updated or deleted.
+
+        Useful for the creation of immutable registries. '''
+    # TODO: Validate validator.
+    cache = { }
+
+    # TODO: Immutable class.
+    class AccretiveDictionary( AbstractDictionary ):
+        ''' Adds entries which cannot be updated or deleted. '''
+
+        __slots__ = ( 'visor', )
+
+        def __getitem__( self, name ): return cache[ name ]
+
+        def __init__( self ): self.visor = DictionaryProxy( cache )
+
+        def __iter__( self ): return iter( self.visor )
+
+        def __len__( self ): return len( cache )
+
+        def __setitem__( self, name, value ):
+            if name in cache:
+                # TODO: Properly handle error case.
+                raise ValueError
+            cache[ name ] = validator( value )
+
+        def items( self ): return self.visor.items( )
+
+        def survey( self ):
+            ''' Returns immutable view upon registry. '''
+            return self.visor
+
+        def values( self ): return self.visor.values( )
+
+    return AccretiveDictionary( )
+
+
+def produce_semelfactive_dictionary( factory ):
+    ''' Produces dictionary which produces and caches values on access.
+
+        A value is produced exactly once, upon cache miss. Thereafter, the
+        value remains in cache and is immutable.
+
+        The factory must take one argument, the name of the entry, and use that
+        to produce a value. '''
+    cache = { }
+    # TODO: Validate factory.
+
+    # TODO: Class immutability.
+    class SemelfactiveDictionary( AbstractDictionary ):
+        ''' Produces values on access and caches them. '''
+
+        __slots__ = ( 'visor', )
+
+        def __getitem__( self, name ):
+            if name not in cache: cache[ name ] = factory( name )
+            return cache[ name ]
+
+        def __init__( self ): self.visor = DictionaryProxy( cache )
+
+        def __iter__( self ): return iter( self.visor )
+
+        def __len__( self ): return len( cache )
+
+        def items( self ): return self.visor.items( )
+
+        def survey( self ):
+            ''' Returns immutable view upon cache. '''
+            return self.visor
+
+        def values( self ): return self.visor.values( )
+
+    return SemelfactiveDictionary( )
 
 
 def split_command( command_specification ):

@@ -23,11 +23,8 @@
 
 import typing as _typ
 
-from types import MappingProxyType as DictionaryProxy
-
 from lockup import reclassify_module
 
-from ...base import produce_accretive_cacher
 from .. import base as __
 
 
@@ -57,32 +54,9 @@ __.register_language( Language )
 
 
 class LanguageDescriptor( __.LanguageDescriptor ):
-    ''' Python language manifestation descriptor. '''
+    ''' Python language descriptor. '''
 
     language = Language
-
-    # TODO: Roll up into base class.
-    @classmethod
-    def summon_definitions( class_ ):
-        return __getattr__( 'version_definitions' )
-
-
-def _summon_version_definitions( ):
-    # TODO? Use 'importlib-resources' to access default definitions.
-    from tomli import load as summon
-    with ( __.locations.configuration / 'python.toml' ).open( 'rb' ) as file:
-        document = summon( file )
-    # TODO: Check format version and dispatch accordingly.
-    return DictionaryProxy( document.get( 'versions', { } ) )
-
-
-def _provide_calculators( ):
-    return dict(
-        version_definitions = _summon_version_definitions,
-    )
-
-_data = produce_accretive_cacher( _provide_calculators )
-__getattr__ = _data.__getattr__
 
 
 reclassify_module( __name__ )
