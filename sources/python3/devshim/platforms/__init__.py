@@ -36,9 +36,9 @@ active_python_abi_label = identify_active_python( 'bdist-compatibility' )
 
 def pep508_identify_python( version = None ):
     ''' Calculates PEP 508 identifier for Python version. '''
-    from ..languages.python import Language
+    from ..languages.python import language
     python_path = (
-        Language.produce_descriptor( version )
+        language.produce_descriptor( version )
         .infer_executables_location( name = 'python' ) )
     return identify_python( 'pep508-environment', python_path = python_path )
 

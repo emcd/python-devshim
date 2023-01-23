@@ -64,8 +64,8 @@ def install_python( version ):
     ''' Installs requested Python version.
 
         This task requires Internet access and may take some time. '''
-    from ..languages.python import Language
-    Language.produce_descriptor( version ).install( )
+    from ..languages.python import language
+    language.produce_descriptor( version ).install( )
 
 
 @__.task(
@@ -184,9 +184,9 @@ def check_security_issues( version = None ):
 
         This task requires Internet access and may take some time. '''
     # Ruamel binary package requires standard ABI.
-    from ..languages.python import Language
+    from ..languages.python import language
     if (
-        Language.produce_descriptor( version )
+        language.produce_descriptor( version )
         .probe_feature_labels( 'abi-incompatible' )
     ): return
     __.project_execute_external(
@@ -201,8 +201,8 @@ def freshen_python( version = None, install = True ):
     ''' Updates requested Python version, if newer one available.
 
         This task requires Internet access and may take some time. '''
-    from ..languages.python import Language
-    Language.produce_descriptor( version ).update( install = install )
+    from ..languages.python import language
+    language.produce_descriptor( version ).update( install = install )
     ## Erase packages fixtures for versions which are no longer extant.
     #from ..packages import delete_python_packages_fixtures
     #delete_python_packages_fixtures( obsolete_identifiers )
@@ -281,9 +281,9 @@ def freshen( ):
 def lint_bandit( version = None ):
     ''' Security checks the source code with Bandit. '''
     # Cyaml binary package requires standard ABI.
-    from ..languages.python import Language
+    from ..languages.python import language
     if (
-        Language.produce_descriptor( version )
+        language.produce_descriptor( version )
         .probe_feature_labels( 'abi-incompatible' )
     ): return
     files = _lint_targets_default
@@ -305,9 +305,9 @@ def lint_bandit( version = None ):
 def lint_mypy( packages, modules, files, version = None ):
     ''' Lints the source code with Mypy. '''
     # Mypy binary package requires standard ABI.
-    from ..languages.python import Language
+    from ..languages.python import language
     if (
-        Language.produce_descriptor( version )
+        language.produce_descriptor( version )
         .probe_feature_labels( 'abi-incompatible' )
     ): return
     process_environment = __.derive_venv_variables( version = version )
@@ -359,9 +359,9 @@ def lint_pylint( targets, checks, report = False, version = None ):
 def lint_semgrep( version = None ):
     ''' Lints the source code with Semgrep. '''
     # Ruamel binary package requires standard ABI.
-    from ..languages.python import Language
+    from ..languages.python import language
     if (
-        Language.produce_descriptor( version )
+        language.produce_descriptor( version )
         .probe_feature_labels( 'abi-incompatible' )
     ): return
     process_environment = __.derive_venv_variables( version = version )
@@ -418,9 +418,9 @@ def test( ensure_sanity = True, version = None ):
     from ..user_interface import render_boxed_title
     render_boxed_title( 'Test: Unit + Code Coverage', supplement = version )
     # Cyaml binary package requires standard ABI.
-    from ..languages.python import Language
+    from ..languages.python import language
     if (
-        Language.produce_descriptor( version )
+        language.produce_descriptor( version )
         .probe_feature_labels( 'abi-incompatible' )
     ): return
     process_environment = __.derive_venv_variables( version = version )
@@ -850,10 +850,10 @@ def run( command, version = None ):
 def show_python( all_versions = False ):
     ''' Lists names of default supported Python version. '''
     # TODO? With Rich and 'detail' flag, show panels with details.
-    from ..languages.python import Language
+    from ..languages.python import language
     if all_versions:
-        for version in Language.survey_descriptors( ).keys( ): print( version )
-    else: print( Language.detect_default_descriptor( ).name )
+        for version in language.survey_descriptors( ).keys( ): print( version )
+    else: print( language.detect_default_descriptor( ).name )
 
 
 @__.task( )

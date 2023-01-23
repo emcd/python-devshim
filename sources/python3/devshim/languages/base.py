@@ -52,91 +52,69 @@ locations: _typ.Any
 
 
 # TODO: Class immutability.
-class Language( metaclass = ABCFactory ):
-    ''' Abstract base for languages. '''
-    # Note: The 'Language' class is effectively a singleton. We would use a
-    #       module rather than a class, except for the fact that we want
-    #       to guarantee a common interface and provide some standard behaviors
-    #       behind portions of that interface. Only class-level attributes
-    #       should appear on this class and its descendants.
-    # TODO: Either prevent instantiation or else use the Borg pattern.
-    #       Alternatively, make the various languages be instances, since
-    #       initialization of this class is IO-free and otherwise cheap.
-    #       The descriptor class provider and version deriver would need to be
-    #       arguments to the initializer in this case. An advantage would be
-    #       that the instance could automatically register itself, which is
-    #       better encapsulation.
+class Language:
+    ''' Model for language. '''
 
-    name: str
-    title: str
+    __slots__ = ( 'name', 'title', 'descriptor_class', 'version_parser', )
 
-    @classmethod
-    def calculate_descriptor_variable_name( class_ ):
-        ''' Calculates environment variable name for language descriptor. '''
-        return "{package_name}_{language_name}_DESCRIPTOR".format(
-            package_name = __.__package__.upper( ),
-            language_name = class_.name.upper( ) )
+    def __init__( self, name, title, version_parser ):
+        # TODO: Validate arguments.
+        self.name = name
+        self.title = title
+        self.version_parser = version_parser
+        self.descriptor_class = type(
+            'LanguageDescriptor',
+            ( LanguageDescriptor, ),
+            dict( language = self ) )
+        register_language( self )
 
-    @classmethod
-    @abstract
-    def derive_actual_version( class_, version ):
+    def derive_actual_version( self, version ):
         ''' Derives comparable object for actual language version.
 
             The result is a comparable representation of a language version
             according to the standard scheme for versions of the language. '''
-        raise create_abstract_invocation_error( class_.derive_actual_version )
+        return self.version_parser( version )
 
-    @classmethod
-    def detect_default_descriptor( class_ ):
+    def detect_default_descriptor( self ):
         ''' Detects default language descriptor.
 
             If in a virtual environment, then the language descriptor for that
             environment is returned. Else, the first available language
             descriptor from the project descriptors is returned. '''
         # TODO: Detect if in relevant virtual environment and infer descriptor.
-        return next( iter( class_.survey_descriptors( ).values( ) ) )
+        return next( iter( self.survey_descriptors( ).values( ) ) )
 
-    @classmethod
-    def produce_descriptor( class_, descriptor = None ):
+    def produce_descriptor( self, descriptor = None ):
         ''' Produces instance of language descriptor. '''
-        if None is descriptor: return class_.detect_default_descriptor( )
-        return class_.provide_descriptor_class( )( descriptor )
+        if None is descriptor: return self.detect_default_descriptor( )
+        return self.descriptor_class( descriptor )
 
-    @classmethod
-    @abstract
-    def provide_descriptor_class( class_ ):
-        ''' Provides descriptor class associated with language. '''
-        raise create_abstract_invocation_error(
-            class_.provide_descriptor_class )
-
-    @classmethod
-    def survey_descriptors( class_ ):
+    def survey_descriptors( self ):
         ''' Returns language descriptors which have relevant definitions. '''
-        descriptor_class = class_.provide_descriptor_class( )
-        definitions = _data.definitions[ class_.name ]
+        descriptor_class = self.descriptor_class
+        definitions = _data.definitions[ self.name ]
         from os import environ as current_process_environment
         descriptor = current_process_environment.get(
-            class_.calculate_descriptor_variable_name( ) )
+            __.derive_environment_variable_name( self.name, 'descriptor' ) )
         if None is not descriptor:
             if descriptor in definitions:
                 definitions = { descriptor: definitions[ descriptor ] }
             else:
                 raise create_data_validation_error(
                     f"No descriptor {descriptor!r} in definitions "
-                    f"for language {class_.title}." )
+                    f"for language {self.title}." )
         descriptors = { }
         for descriptor, definition in definitions.items( ):
             if not descriptor_class.is_supportable( definition ): continue
             descriptors[ descriptor ] = descriptor_class( descriptor )
         return DictionaryProxy( descriptors )
 
-    @classmethod
-    def validate_descriptor( class_, descriptor ):
+    def validate_descriptor( self, descriptor ):
         ''' Validates descriptor against available language descriptors. '''
-        if descriptor not in class_.survey_descriptors( ):
+        if descriptor not in self.survey_descriptors( ):
             raise create_argument_validation_error(
-                'descriptor', class_.validate_descriptor,
-                f"defined {class_.title} descriptor" )
+                'descriptor', self.validate_descriptor,
+                f"defined {self.title} descriptor" )
         return descriptor
 
 
@@ -144,7 +122,7 @@ class Language( metaclass = ABCFactory ):
 class LanguageDescriptor( metaclass = ABCFactory ):
     ''' Abstract base for language descriptors. '''
 
-    language: _typ.Type[ Language ]
+    language: Language
 
     @classmethod
     def create_record( class_, name ):
@@ -234,7 +212,7 @@ class LanguageDescriptor( metaclass = ABCFactory ):
         records = {
             platform_name: DictionaryProxy( {
                 'implementation-version':
-                    class_.language.derive_actual_version(
+                    class_.language.version_parser(
                         record[ 'implementation-version' ] ),
                 'provider': record[ 'provider' ],
             } ) for platform_name, record in records.items( )
@@ -370,7 +348,7 @@ class LanguageFeature( metaclass = ABCFactory ):
     ''' Abstract base for language installation features. '''
 
     labels: _typ.FrozenSet[ str ]
-    language: _typ.Type[ Language ]
+    language: Language
     mutex_labels: _typ.FrozenSet[ str ]
     name: str
 
@@ -378,8 +356,7 @@ class LanguageFeature( metaclass = ABCFactory ):
     def check_descriptor_support( class_, descriptor, platform = None ):
         ''' Does feature support language descriptor? '''
         definition = (
-            class_.language.provide_descriptor_class( )
-            .provide_definition( descriptor ) )
+            class_.language.descriptor_class.provide_definition( descriptor ) )
         if not class_.is_supportable_platform( platform = platform ):
             return False
         if not class_.is_supportable_base_version(
@@ -436,15 +413,14 @@ class LanguageFeature( metaclass = ABCFactory ):
 class LanguageProvider( metaclass = ABCFactory ):
     ''' Abstract base for language installation providers. '''
 
-    language: _typ.Type[ Language ]
+    language: Language
     name: str
 
     @classmethod
     def check_descriptor_support( class_, descriptor, platform = None ):
         ''' Does provider support language descriptor? '''
         definition = (
-            class_.language.provide_descriptor_class( )
-            .provide_definition( descriptor ) )
+            class_.language.descriptor_class.provide_definition( descriptor ) )
         if not class_.is_supportable_platform( platform = platform ):
             return False
         if not class_.is_supportable_base_version(
@@ -470,8 +446,7 @@ class LanguageProvider( metaclass = ABCFactory ):
     def form_version_record( class_, descriptor, version = None ): # pylint: disable=unused-argument
         ''' Forms version record. '''
         definition = (
-            class_.language.provide_descriptor_class( )
-            .provide_definition( descriptor ) )
+            class_.language.descriptor_class.provide_definition( descriptor ) )
         # TODO: Handle version argument.
         return {
             'implementation-version':
@@ -562,11 +537,9 @@ def _validate_feature_class( class_ ):
 
 
 def _validate_language( language ):
-    from inspect import isclass as is_class
-    if not is_class( language ) or not issubclass( language, Language ):
+    if not isinstance( language, Language ):
         raise create_argument_validation_error(
-            'language', _validate_language,
-            "subclass of class 'Language'" )
+            'language', _validate_language, "instance of class 'Language'" )
     return language
 
 
@@ -623,7 +596,7 @@ def _create_registration_interface( ): # pylint: disable=too-complex
 
     def survey_feature_classes_( language ):
         ''' Returns immutable view upon features registry for language. '''
-        if issubclass( language, Language ): language = language.name
+        if isinstance( language, Language ): language = language.name
         return feature_classes[ language ]
 
     def survey_languages_( ):
@@ -632,7 +605,7 @@ def _create_registration_interface( ): # pylint: disable=too-complex
 
     def survey_provider_classes_( language ):
         ''' Returns immutable view upon providers registry for language. '''
-        if issubclass( language, Language ): language = language.name
+        if isinstance( language, Language ): language = language.name
         return provider_classes[ language ]
 
     return (

@@ -51,8 +51,8 @@ from .base import survey_descriptors
 
 def build_python_venv( version, overwrite = False ):
     ''' Creates virtual environment for requested Python version. '''
-    from ..languages.python import Language
-    descriptor = Language.produce_descriptor( version )
+    from ..languages.python import language
+    descriptor = language.produce_descriptor( version )
     try: python_path = descriptor.infer_executables_location( name = 'python' )
     except Exception: # pylint: disable=broad-except
         __.scribe.error(
@@ -185,9 +185,9 @@ def derive_venv_path( version = None, python_path = None ):
             venv_path = Path( cpe[ 'VIRTUAL_ENV' ] )
             if venv_path.name == cpe[ 'OUR_VENV_NAME' ]: return venv_path
     if None is python_path:
-        from ..languages.python import Language
+        from ..languages.python import language
         python_path = (
-            Language.produce_descriptor( version )
+            language.produce_descriptor( version )
             .infer_executables_location( name = 'python' ) )
     from ..platforms import identify_python
     abi_label = identify_python(

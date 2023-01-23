@@ -21,42 +21,20 @@
 ''' Utilties for management of Python language installations. '''
 
 
-import typing as _typ
-
 from lockup import reclassify_module
 
 from .. import base as __
 
 
-# Note: Need to explicitly declare __getattr__-synthesized module attributes
-#       to avoid issues with MyPy and Pylint.
-version_definitions: _typ.Any
+def _parse_version( version ):
+    # TODO: Validate version argument.
+    # PEP 440 package versions also seem to hold for Python versions,
+    # so we use a package version representation for language versions.
+    from packaging.version import Version
+    return Version( version )
 
 
-class Language( __.Language ):
-    ''' Manager for Python language. '''
-
-    name = 'python'
-    title = 'Python'
-
-    @classmethod
-    def derive_actual_version( class_, version ):
-        # TODO: Validate version argument.
-        # PEP 440 package versions also seem to hold for Python versions,
-        # so we use a package version representation for language versions.
-        from packaging.version import Version
-        return Version( version )
-
-    @classmethod
-    def provide_descriptor_class( class_ ): return LanguageDescriptor
-
-__.register_language( Language )
-
-
-class LanguageDescriptor( __.LanguageDescriptor ):
-    ''' Python language descriptor. '''
-
-    language = Language
+language = __.Language( 'python', 'Python', _parse_version )
 
 
 reclassify_module( __name__ )

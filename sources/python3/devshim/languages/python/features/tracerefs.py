@@ -35,7 +35,7 @@ class TraceRefs( __.LanguageFeature ):
         For CPython, enables compilation with the 'TRACEREFS' macro. '''
 
     labels = frozenset( ( 'abi-incompatible', 'requires-compilation', ) )
-    language = __.Language
+    language = __.language
     mutex_labels = frozenset( ( 'modifies-interpreter', ) )
     name = 'tracerefs'
 

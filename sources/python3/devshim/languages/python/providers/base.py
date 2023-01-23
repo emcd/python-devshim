@@ -35,7 +35,7 @@ from ....base import (
 )
 from ....http_utilities import retrieve_url as http_retrieve_url
 from ...base import LanguageProvider, register_provider_class
-from ..base import Language
+from ..base import language
 # pylint: enable=unused-import
 
 

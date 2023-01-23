@@ -31,7 +31,7 @@ supportable_platforms = ( 'posix', )
 class LanguageProvider( __.LanguageProvider ):
     ''' Uses ``python-build`` program from Pyenv to manage installations. '''
 
-    language = __.Language
+    language = __.language
     name = 'python-build'
 
     @classmethod
@@ -52,12 +52,12 @@ class LanguageProvider( __.LanguageProvider ):
             # TODO: Use exception factory.
             raise RuntimeError
         pb_definition_name = pb_definition_name_candidates[ -1 ]
-        return class_.language.derive_actual_version(
+        return class_.language.version_parser(
             _parse_implementation_version( pb_definition_name ) )
 
     @classmethod
     def is_supportable_base_version( class_, version ):
-        version = class_.language.derive_actual_version( version )
+        version = class_.language.version_parser( version )
         return _data.supportable_base_version <= version
 
     @classmethod
@@ -191,7 +191,7 @@ def _parse_implementation_version( pb_definition_name ):
 
 
 def _prepare_supportable_base_version( ):
-    return __.Language.derive_actual_version( '3.7' )
+    return __.language.version_parser( '3.7' )
 
 def _produce_calculators( ):
     def calculate_pbil( ):

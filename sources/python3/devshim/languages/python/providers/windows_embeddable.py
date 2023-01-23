@@ -35,14 +35,14 @@ class LanguageProvider( __.LanguageProvider ):
         * https://www.python.org/downloads/windows/
         * https://www.python.org/ftp/python/ '''
 
-    language = __.Language
+    language = __.language
     name = 'windows-embeddable'
 
     @classmethod
     def discover_current_version( class_, definition ):
         # TODO: Validate version definition.
         versions = _summon_versions( )
-        base_version = class_.language.derive_actual_version(
+        base_version = class_.language.version_parser(
             definition [ 'base-version' ] )
         from ....platforms.identity import extract_cpu_identifier
         cpu = extract_cpu_identifier( )
@@ -59,7 +59,7 @@ class LanguageProvider( __.LanguageProvider ):
 
     @classmethod
     def is_supportable_base_version( class_, version ):
-        version = class_.language.derive_actual_version( version )
+        version = class_.language.version_parser( version )
         return _data.supportable_base_version <= version
 
     @classmethod
@@ -161,7 +161,7 @@ def _discover_versions( ):
         if not href.startswith( 'https://www.python.org/ftp/python' ): continue
         if '-embed-' not in href: continue
         _, version, _, cpu = href.rsplit( '/' )[ -1 ].split( '-' )
-        version = __.Language.derive_actual_version( version )
+        version = __.language.version_parser( version )
         if _data.supportable_base_version > version: continue
         cpu = cpu[ : -4 ].lower( )
         cpu = 'x86' if 'win32' == cpu else cpu
@@ -201,7 +201,7 @@ def _summon_versions( ):
         # TODO: Check format version and update records format, if necessary.
         records = summon( file )[ 'versions' ]
     return __.DictionaryProxy( {
-        __.Language.derive_actual_version( version ): data
+        __.language.version_parser( version ): data
         for version, data in records.items( ) } )
 
 
@@ -217,7 +217,7 @@ def _calculate_locations( ):
 
 
 def _prepare_supportable_base_version( ):
-    return __.Language.derive_actual_version( '3.7' )
+    return __.language.version_parser( '3.7' )
 
 
 _data = __.create_semelfactive_namespace( __.create_invocable_dictionary(

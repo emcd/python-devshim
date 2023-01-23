@@ -25,7 +25,7 @@ from . import base
 from . import features
 from . import providers
 
-from .base import Language
+from .base import language
 
 
 base.reclassify_module( __name__ )

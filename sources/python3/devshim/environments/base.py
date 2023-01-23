@@ -52,8 +52,7 @@ class Environment:
         for language_name, descriptor_name in descriptors.items( ):
             # TODO: Handle case of absent language.
             language = languages[ language_name ]
-            descriptor_class = language.provide_descriptor_class( )
-            if not descriptor_class.is_supportable(
+            if not language.descriptor_class.is_supportable(
                 descriptor_name, platform = platform
             ): return False
         return True

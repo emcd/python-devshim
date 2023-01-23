@@ -143,12 +143,12 @@ class PythonVersionMultiplexer( ArgumentMultiplexer ):
         binder = scan_signature( invocable ).bind( *posargs, **nomargs )
         binder.apply_defaults( )
         argument = binder.arguments[ self.argument_name ]
-        from ..languages.python import Language
+        from ..languages.python import language
         if None is argument and self.enable_default:
-            versions = ( Language.detect_default_descriptor( ).name, )
+            versions = ( language.detect_default_descriptor( ).name, )
         elif 'ALL' == argument:
-            versions = Language.survey_descriptors( ).keys( )
-        else: versions = ( Language.validate_descriptor( argument ), )
+            versions = language.survey_descriptors( ).keys( )
+        else: versions = ( language.validate_descriptor( argument ), )
         for version in versions:
             binder.arguments.update( { self.argument_name: version } )
             yield version, binder.args, binder.kwargs

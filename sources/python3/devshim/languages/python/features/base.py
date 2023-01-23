@@ -25,7 +25,7 @@ from lockup import reclassify_module
 
 # pylint: disable=unused-import
 from ...base import LanguageFeature, register_feature_class
-from ..base import Language
+from ..base import language
 # pylint: enable=unused-import
 
 
