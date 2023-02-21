@@ -21,6 +21,13 @@
 ''' Fundamental constants and utilities for development support. '''
 
 
+# RULES:
+# * Nothing in this module may depend on any module that is not part of the
+#   Python standard library for the baseline version of Python.
+# * Nothing in this module may depend on any other module in this package.
+
+
+
 # pylint: disable=unused-import
 from collections.abc import (
     Iterable as AbstractIterable,
@@ -35,16 +42,32 @@ from types import (
     MappingProxyType as DictionaryProxy,
     SimpleNamespace,
 )
-
-from lockup import Class, reclassify_module
 # pylint: enable=unused-import
 
-
 import typing as _typ
+
+
+version = '1.0a202301141418'
+
 
 eprint: _typ.Callable
 epprint: _typ.Callable
 scribe: _typ.Any
+
+
+# TODO: Register exception class to be made immutable.
+class Omniexception( BaseException ):
+    ''' Base for all exceptions in the package. '''
+
+    def __init__( self, *posargs, exception_labels = None, **nomargs ):
+        exception_labels = exception_labels or { }
+        if not isinstance( exception_labels, AbstractDictionary ):
+            raise fuse_exception_classes( ( TypeError, ValueError, ) )(
+                "Invalid argument 'exception_labels' to initializer "
+                f"for instance of class '{__package__}.Omniexception'; "
+                "must be dictionary." )
+        self.exception_labels = DictionaryProxy( exception_labels )
+        super( ).__init__( *posargs, **nomargs )
 
 
 def create_accretive_dictionary( validator ):
@@ -85,6 +108,29 @@ def create_accretive_dictionary( validator ):
         def values( self ): return dictionary.values( )
 
     return AccretiveDictionary( )
+
+
+def create_class_fuser( primary_class ):
+    ''' Creates class fuser with cache of classes. '''
+    # TODO: Validate primary class.
+    cache = { }
+
+    def fuse_classes( classes ):
+        ''' Fuses additional classes to primary class. '''
+        # TODO: Validate classes.
+        cache_index = "{primary_class_name}.{classes_names}".format(
+            primary_class_name = primary_class.__qualname__,
+            classes_names = '__'.join( map(
+                lambda class_: '_'.join( (
+                    class_.__module__.replace( '.', '_' ),
+                    class_.__qualname__.replace( '.', '_' ) ) ), classes ) ) )
+        if cache_index not in cache:
+            base_classes = ( primary_class, *classes )
+            # TODO? Create with different class factory.
+            cache[ cache_index ] = type( cache_index, base_classes, { } )
+        return cache[ cache_index ]
+
+    return fuse_classes
 
 
 def create_immutable_namespace( source ):
@@ -252,33 +298,38 @@ def derive_class_fqname( class_ ):
     return '.'.join( ( class_.__module__, class_.__qualname__ ) )
 
 
-def derive_environment_variable_name( *parts ):
-    ''' Derives environment variable name from parts and package name. '''
-    # NOTE: Similar implementation exists in 'develop.py'.
-    #       Improvements should be reflected in both places.
-    # TODO: Validate parts with 'str.isalnum'.
+def derive_environment_entry_name( *parts ):
+    ''' Derives environment entry name from package name and parts. '''
+    for part in parts:
+        if not isinstance( part, str ):
+            raise fuse_exception_classes( ( TypeError, ValueError, ) )(
+                f"Name part {part!r} cannot be used to derive "
+                "environment variable name." )
+        if not part.isascii( ) or not part.isalnum( ):
+            raise fuse_exception_classes( ( TypeError, ValueError, ) )(
+                f"Name part '{part}' must be ASCII and alphanumeric to derive "
+                "environment variable name from it." )
     return '_'.join( map( str.upper, ( __package__, *parts ) ) )
 
 
-# TODO: Absorb improvements from 'develop.py'.
 def execute_subprocess( command_specification, **nomargs ):
     ''' Executes command in subprocess.
 
         Raises exception on non-zero exit code. '''
-    # NOTE: Similar implementation exists in 'develop.py'.
-    #       Improvements should be reflected in both places.
-    command_specification = _normalize_command_specification(
-        command_specification )
-    options = dict( text = True )
+    command_specification = (
+        normalize_command_specification( command_specification ) )
     from subprocess import run # nosec B404
     from sys import stdout, stderr
+    options = dict( text = True )
     options.update( nomargs )
+    # Sanitize options.
+    for option in ( 'check', ): nomargs.pop( option, None )
     if not options.get( 'capture_output', False ):
-        if stdout is _data.narration_target: options[ 'stderr' ] = stdout
-        else: options[ 'stdout' ] = stderr
+        if stdout is _data.narration_target:
+            options.setdefault( 'stderr', stdout )
+        else: options.setdefault( 'stdout', stderr )
     if { 'stdout', 'stderr' } & options.keys( ):
         options.pop( 'capture_output', None )
-    options.pop( 'check', None )
     # TODO? Handle pseudo-TTY requests with 'ptyprocess.PtyProcess'.
     # TODO? Intercept 'subprocess.SubprocessError'.
     _data.scribe.debug(
@@ -289,9 +340,16 @@ def execute_subprocess( command_specification, **nomargs ):
 # TODO: Remove this alias and use thereof.
 execute_external = execute_subprocess
 
-def _normalize_command_specification( command_specification ):
-    # NOTE: Similar implementation exists in 'develop.py'.
-    #       Improvements should be reflected in both places.
+
+fuse_exception_classes = create_class_fuser( Omniexception )
+
+
+def normalize_command_specification( command_specification ):
+    ''' Normalizes command specification for subprocess execution.
+
+        Strings are split into argument vectors according to platform-specific
+        rules (POSIX or Windows). All elements of argument vectors are
+        converted into strings. '''
     if isinstance( command_specification, str ):
         return split_command( command_specification )
     # Ensure strings are being passed as arguments.
@@ -300,15 +358,12 @@ def _normalize_command_specification( command_specification ):
     # need to be converted to strings. So, we always convert.
     if isinstance( command_specification, AbstractSequence ):
         return tuple( map( str, command_specification ) )
-    # TODO: Use exception factory.
-    raise ValueError(
+    raise fuse_exception_classes( ( ValueError, ) )(
         f"Invalid command specification {command_specification!r}" )
 
 
 def split_command( command_specification ):
     ''' Splits command-line string into arguments in platform-aware manner. '''
-    # NOTE: Similar implementation exists in 'develop.py'.
-    #       Improvements should be reflected in both places.
     # https://github.com/python/cpython/issues/44990
     if 'nt' == os_class: return _windows_split_command( command_specification )
     from shlex import split as posix_split_command
@@ -316,8 +371,6 @@ def split_command( command_specification ):
 
 def _windows_split_command( command_specification ):
     ''' Splits command-line string into arguments by Windows rules. '''
-    # NOTE: Similar implementation exists in 'develop.py'.
-    #       Improvements should be reflected in both places.
     # https://stackoverflow.com/a/35900070/14833542
     # https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-commandlinetoargvw
     import ctypes
@@ -328,8 +381,9 @@ def _windows_split_command( command_specification ):
         ctypes.windll.shell32.CommandLineToArgvW(
             command_specification, ctypes.byref( arguments_count ) ) )
     arguments = [ lpargs[ i ] for i in range( arguments_count.value ) ]
-    # TODO: Use exception factory.
-    if ctypes.windll.kernel32.LocalFree( lpargs ): raise AssertionError
+    if ctypes.windll.kernel32.LocalFree( lpargs ):
+        raise fuse_exception_classes( ( RuntimeError, ) )(
+            "Could not free command arguments buffer from Windows." )
     return arguments
 
 
@@ -343,27 +397,36 @@ def springy_chdir( new_path ):
     chdir( old_path )
 
 
+def view_environment_entry( parts, default = None ):
+    ''' Views entry in current process environment.
+
+        Entry name is derived from package name and supplied parts. '''
+    name = derive_environment_entry_name( *parts )
+    return current_process_environment.get( name, default )
+
+
+# TODO: Rework to get rid of auxiliary path.
 def _configure( ):
     ''' Configures development support. '''
     auxiliary_path = Path( __file__ ).parent.parent.parent.parent.resolve( )
     configuration = DictionaryProxy( dict(
         auxiliary_path = auxiliary_path,
-        project_path = Path( current_process_environment.get(
-            derive_environment_variable_name( 'project', 'location' ),
-            auxiliary_path ) ).resolve( ),
+        project_path = (
+            Path( view_environment_entry(
+                ( 'project', 'location' ), auxiliary_path ) )
+            .resolve( strict = True ) )
     ) )
     return configuration
 
 
 def _create_scribe( ):
     ''' Initializes logger for package. '''
-    if _data.main_module_compatibility: _enhance_ultimate_scribe( )
+    #if _data.main_module_compatibility: _enhance_ultimate_scribe( )
     from logging import INFO, NullHandler, getLogger as acquire_scribe
     scribe = acquire_scribe( __package__ ) # pylint: disable=redefined-outer-name
     # https://docs.python.org/3/howto/logging.html#configuring-logging-for-a-library
     scribe.addHandler( NullHandler( ) )
-    scribe.setLevel( current_process_environment.get(
-        derive_environment_variable_name( 'record', 'level' ), INFO ) )
+    scribe.setLevel( view_environment_entry( ( 'record', 'level' ), INFO ) )
     return scribe
 
 def _enhance_ultimate_scribe( ):
@@ -405,8 +468,7 @@ def _discover_virtual_environment_name( ):
     ''' Is execution within virtual environment of our creation?
 
         If yes, returns name of environment. Else, returns empty string. '''
-    return current_process_environment.get(
-        derive_environment_variable_name( 'venv', 'name' ), '' )
+    return view_environment_entry( ( 'venv', 'name' ), '' )
 
 
 def _probe_tty( ):
@@ -448,6 +510,3 @@ _data = create_semelfactive_namespace( create_invocable_dictionary(
     virtual_environment_name = _discover_virtual_environment_name,
 ) )
 __getattr__ = _data.__getattr__
-
-
-reclassify_module( __name__ )

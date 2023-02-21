@@ -60,6 +60,3 @@ class TraceRefs( __.LanguageFeature ):
         return self
 
 __.register_feature_class( TraceRefs )
-
-
-__.reclassify_module( __name__ )

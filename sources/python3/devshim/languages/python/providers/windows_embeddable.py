@@ -225,6 +225,3 @@ _data = __.create_semelfactive_namespace( __.create_invocable_dictionary(
     supportable_base_version = _prepare_supportable_base_version,
 ) )
 __getattr__ = _data.__getattr__
-
-
-__.reclassify_module( __name__ )

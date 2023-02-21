@@ -8,25 +8,32 @@
 """
 
 
-def _configure( ):
+def _prepare( ):
     from pathlib import Path
-    project_path = Path( __file__ ).parent.parent.parent
+    project_location = Path( __file__ ).parent.parent.parent
     from importlib.util import module_from_spec, spec_from_file_location
     module_spec = spec_from_file_location(
-        '_develop', project_path / 'develop.py' )
+        '_develop', project_location / 'develop.py' )
     module = module_from_spec( module_spec )
     module_spec.loader.exec_module( module )
-    module.prepare( project_path )
+    package_discovery_manager, packages_cache_manager = (
+        module.ensure_sanity( ) )
     from os import environ as current_process_environment
-    if 'True' != current_process_environment.get( 'READTHEDOCS', 'False' ):
-        return
-    # Hack to install documentation requirements for ReadTheDocs builder.
-    # (Better than maintaining a separate 'requirements.txt'.)
-    from devshim.packages import ensure_python_packages
-    ensure_python_packages(
-        domain = 'development.documentation', excludes = ( 'sphinx', ) )
+    from contextlib import ExitStack as CMStack
+    with CMStack( ) as contexts:
+        contexts.enter_context( packages_cache_manager )
+        contexts.enter_context( package_discovery_manager )
+        if 'True' == current_process_environment.get( 'READTHEDOCS', 'False' ):
+            # Hack to install requirements for ReadTheDocs builder.
+            # (Better than maintaining a separate 'requirements.txt'.)
+            from devshim.packages import ensure_python_packages
+            ensure_python_packages(
+                domain = 'development.documentation',
+                excludes = ( 'sphinx', ) )
+        from devshim.project import discover_information
+        return discover_information( )
 
-_configure( )
+_information = _prepare( )
 
 
 # -- Project information -----------------------------------------------------
@@ -39,10 +46,6 @@ def _calculate_copyright_notice( information, author_ ):
     else: year_range = str( first_year )
     return f"{year_range}, {author_}"
 
-from devshim.project import (
-    discover_information as discover_project_information,
-)
-_information = discover_project_information( )
 project = _information[ 'name' ]
 release = _information[ 'version' ]
 author = _information[ 'authors' ][ 0 ][ 'name' ]

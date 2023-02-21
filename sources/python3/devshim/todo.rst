@@ -41,12 +41,6 @@ Virtual Environments Improvements
 Brain-Finding Improvements
 ===============================================================================
 
-* Add brain-finder with stealth imports as main entrypoint for package. Will
-  use package itself if not detected as current repository or submodule
-  thereof. Otherwise, will use the source code. Having more brain-finding logic
-  in package will reduce code duplication between ``develop.py`` and the
-  package and make ``develop.py`` less intimidating to drop into projects.
-
 * Package as zipapp. Then, carve ``develop.py`` down to just find the zipapp,
   downloading it into a cache if necessary, and run it.
 
@@ -78,6 +72,8 @@ More Linters
 * `Fixit <https://github.com/Instagram/Fixit>`_
 
 * `Pylint Utilities <https://github.com/jackdewinter/pylint_utils>`_
+
+* `Pytype <https://github.com/google/pytype>`_
 
 * `Ruff <https://github.com/charliermarsh/ruff>`_
 
@@ -117,6 +113,17 @@ Remove Dependency on ``invoke``
 * Possibly use `Typer <https://typer.tiangolo.com/>`_ as partial replacement.
 
 * Async execution fanout. (Nice to have. Limited use cases actually.)
+
+Runtime Argument Validation
+===============================================================================
+
+* `beartype <https://github.com/beartype/beartype>`_
+
+* `pydantic <https://docs.pydantic.dev/>`_
+
+* `typeguard <https://github.com/agronholm/typeguard>`_
+
+* `typical <https://github.com/seandstewart/typical>`_
 
 Github Actions
 ===============================================================================

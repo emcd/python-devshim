@@ -18,42 +18,26 @@
 #============================================================================#
 
 
-''' Classes of exceptions emitted by the functionality of this package. '''
-# TODO? Merge into 'base' module.
+''' Exception factories and data validators. '''
 
 
-from lockup import reclassify_module as _reclassify_module
+from lockup import validators as _standard_validators
+from lockup.exceptionality import our_factories as _standard_factories
 
-
-# TODO: Class immutability (after Mypy bug is fixed).
-class Omniexception( BaseException ):
-    ''' Base for all exceptions in the package. '''
-
-    # TODO: Inject functionality from refactored 'lockup.exceptionality'.
-    #       Possibly via class factory class.
-
-    def __init__( self, *posargs, exception_labels = None, **nomargs ):
-        from collections.abc import Mapping as AbstractDictionary
-        from types import MappingProxyType as DictionaryProxy
-        exception_labels = exception_labels or { }
-        if not isinstance( exception_labels, AbstractDictionary ):
-            raise provide_exception_factory( 'argument validation' )(
-                'exception_labels', Omniexception.__init__, 'dictionary' )
-        self.exception_labels = DictionaryProxy( exception_labels )
-        super( ).__init__( *posargs, **nomargs )
+from . import base as __
 
 
 def provide_exception_class( name ):
     ''' Provides exception class by name.
 
         Used by exception factories in :py:mod:`lockup.exceptionality`. '''
-    if 'Omniexception' == name: return Omniexception
+    if 'Omniexception' == name: return __.Omniexception
     specifier = _class_fusion_specifiers.get( name )
     if None is specifier:
         raise provide_exception_factory( 'inaccessible entity' )(
             name, 'name of available exception class' )
     # TODO: Replace when exception factories can create fusion classes.
-    return _fuse_exception_classes( specifier )
+    return __.fuse_exception_classes( specifier )
 
 
 def provide_exception_factory( name ):
@@ -83,52 +67,38 @@ def create_abstract_invocation_error( invocable, extra_data = None ):
     from lockup.nomenclature import calculate_invocable_label
     message = "Cannot invoke abstract {label}.".format(
         label = calculate_invocable_label( invocable ) )
-    return _produce_exception( sui, 'InvalidOperation', message, extra_data )
+    return _produce_exception( sui, ( Exception, ), message, extra_data )
 
 
-def create_argument_validation_error(
-    name, invocable, expectation, extra_data = None
-):
-    ''' Creates error with context about invalid argument. '''
-    sui = create_argument_validation_error
-    validate_argument_class( name, str, 'name', sui )
-    validate_argument_invocability( invocable, 'invocable', sui )
-    validate_argument_class( expectation, str, 'expectation', sui )
-    from lockup.nomenclature import (
-        calculate_argument_label, calculate_invocable_label, )
-    message = (
-        "Invalid {argument_label} to {invocable_label}; "
-        "expected {expectation}.".format(
-            argument_label = calculate_argument_label( name, invocable ),
-            invocable_label = calculate_invocable_label( invocable ),
-            expectation = expectation ) )
-    return _produce_exception( sui, 'IncorrectData', message, extra_data )
+create_argument_validation_error = __.partial_function(
+    _standard_factories.create_argument_validation_exception,
+    provide_exception_class )
 
 
 def create_data_validation_error( message, extra_data = None ):
-    ''' Creates error about invalid data. '''
+    ''' Creates general error about invalid data. '''
     sui = create_data_validation_error
     validate_argument_class( message, str, 'message', sui )
-    return _produce_exception( sui, 'IncorrectData', message, extra_data )
+    return _produce_exception(
+        sui, ( TypeError, ValueError, ), message, extra_data )
 
 
-def validate_argument_invocability( argument, argument_name, invocable ):
-    ''' Validates invocability of argument to invocable. '''
-    import lockup.validators
-    lockup.validators.validate_argument_invocability(
-        provide_exception_factory, argument, argument_name, invocable )
+create_inaccessible_entity_error = __.partial_function(
+    _standard_factories.create_inaccessible_entity_exception,
+    provide_exception_class )
 
 
-def validate_argument_class(
-    argument, argument_classes, argument_name, invocable
-):
-    ''' Validates class of argument to invocable. '''
-    import lockup.validators
-    return lockup.validators.validate_argument_class(
-        provide_exception_factory,
-        argument, argument_classes, argument_name, invocable )
+validate_argument_class = __.partial_function(
+    _standard_validators.validate_argument_class,
+    provide_exception_factory )
 
 
+validate_argument_invocability = __.partial_function(
+    _standard_validators.validate_argument_invocability,
+    provide_exception_factory )
+
+
+# TODO: Remove after switch to omniexception package with fused class support.
 def _create_class_fusion_specifiers( ):
     from types import MappingProxyType as DictionaryProxy
     return DictionaryProxy( dict(
@@ -144,38 +114,16 @@ def _create_class_fusion_specifiers( ):
 _class_fusion_specifiers = _create_class_fusion_specifiers( )
 
 
-def _create_exception_class_fuser( ):
-    ''' Creates exception class fuser with cache of classes. '''
-    cache = { }
-
-    def fuse_exception_classes( classes ):
-        ''' Fuses exceptions from outside of package with Omniexception. '''
-        # TODO: Validate classes.
-        cache_index = "{package_class_name}.{classes_names}".format(
-            package_class_name = Omniexception.__name__,
-            classes_names = '__'.join( map(
-                lambda class_: '_'.join( (
-                    class_.__module__.replace( '.', '_' ),
-                    class_.__qualname__.replace( '.', '_' ) ) ), classes ) ) )
-        if cache_index not in cache:
-            base_classes = ( Omniexception, *classes )
-            # TODO? Create with different class factory.
-            cache[ cache_index ] = type( cache_index, base_classes, { } )
-        return cache[ cache_index ]
-
-    return fuse_exception_classes
-
-_fuse_exception_classes = _create_exception_class_fuser( )
-
-
-def _produce_exception( invocation, name, message, extra_data ):
+def _produce_exception( invocation, fusion_classes, message, extra_data ):
     ''' Produces exception by provider with message and failure class. '''
     # TODO: Use generalized 'produce_exception' when it is available.
     from lockup.exceptionality.our_factories import ExtraData
     if None is extra_data: extra_data = ExtraData( )
     validate_argument_class( extra_data, ExtraData, 'extra_data', invocation )
     failure_class = ' '.join( invocation.__name__.split( '_' )[ 1 : -1 ] )
-    return provide_exception_class( name )(
+    if not fusion_classes: class_ = __.Omniexception
+    else: class_ = __.fuse_exception_classes( fusion_classes )
+    return class_(
         message,
         *extra_data.positional_arguments,
         **_inject_exception_labels(
@@ -196,6 +144,3 @@ def _inject_exception_labels( extra_data, exception_labels ):
     extra_arguments[ 'exception_labels' ] = exception_labels
     extra_arguments[ 'exception_labels' ].update( extra_data.exception_labels )
     return extra_arguments
-
-
-_reclassify_module( __name__ )

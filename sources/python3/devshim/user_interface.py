@@ -161,6 +161,3 @@ completion_code_table = __.DictionaryProxy( {
 
 # TODO? direnv configuration snippets to allow devshim to operate
 #       in any supported directory.
-
-
-__.reclassify_module( __name__ )

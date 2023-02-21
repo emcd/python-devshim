@@ -27,8 +27,6 @@ import typing as _typ
 from abc import ABCMeta as ABCFactory, abstractmethod as abstract
 from types import MappingProxyType as DictionaryProxy
 
-from lockup import reclassify_module
-
 from .. import base as __
 from ..base import (
     create_immutable_namespace,
@@ -36,7 +34,7 @@ from ..base import (
     create_semelfactive_dictionary,
     create_semelfactive_namespace,
 )
-from ..exceptions import (
+from ..exceptionality import (
     create_abstract_invocation_error,
     create_argument_validation_error,
     create_data_validation_error,
@@ -95,7 +93,7 @@ class Language:
         definitions = _data.definitions[ self.name ]
         from os import environ as current_process_environment
         descriptor = current_process_environment.get(
-            __.derive_environment_variable_name( self.name, 'descriptor' ) )
+            __.derive_environment_entry_name( self.name, 'descriptor' ) )
         if None is not descriptor:
             if descriptor in definitions:
                 definitions = { descriptor: definitions[ descriptor ] }
@@ -643,6 +641,3 @@ _data = create_semelfactive_namespace( create_invocable_dictionary(
     locations = _calculate_locations,
 ) )
 __getattr__ = _data.__getattr__
-
-
-reclassify_module( __name__ )

@@ -26,8 +26,6 @@ import re
 
 from types import MappingProxyType as DictionaryProxy
 
-from lockup import reclassify_module
-
 from ....base import (
     create_invocable_dictionary,
     create_semelfactive_namespace,
@@ -60,6 +58,3 @@ def retrieve_pip_installer( installation_location ):
     http_retrieve_url(
         'https://bootstrap.pypa.io/get-pip.py', installer_location )
     return installer_location
-
-
-reclassify_module( __name__ )

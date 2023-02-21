@@ -24,14 +24,12 @@
 from os import environ as current_process_environment
 from types import MappingProxyType as DictionaryProxy
 
-from lockup import reclassify_module
-
 from ..base import (
     create_immutable_namespace,
     create_invocable_dictionary,
     create_semelfactive_namespace,
 )
-from ..exceptions import (
+from ..exceptionality import (
     create_data_validation_error,
     validate_argument_class,
 )
@@ -71,9 +69,9 @@ class Environment:
 def survey_descriptors( ):
     ''' Returns environment descriptors which have relevant definitions. '''
     definitions = _data.definitions
-    from ..base import derive_environment_variable_name
+    from ..base import derive_environment_entry_name
     descriptor = current_process_environment.get(
-        derive_environment_variable_name( 'environment', 'descriptor' ) )
+        derive_environment_entry_name( 'environment', 'descriptor' ) )
     if None is not descriptor:
         if descriptor in definitions:
             definitions = { descriptor: definitions[ descriptor ] }
@@ -110,6 +108,3 @@ _data = create_semelfactive_namespace( create_invocable_dictionary(
     locations = _calculate_locations,
 ) )
 __getattr__ = _data.__getattr__
-
-
-reclassify_module( __name__ )

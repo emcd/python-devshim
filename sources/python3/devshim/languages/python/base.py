@@ -21,8 +21,6 @@
 ''' Utilties for management of Python language installations. '''
 
 
-from lockup import reclassify_module
-
 from .. import base as __
 
 
@@ -35,6 +33,3 @@ def _parse_version( version ):
 
 
 language = __.Language( 'python', 'Python', _parse_version )
-
-
-reclassify_module( __name__ )

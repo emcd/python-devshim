@@ -37,6 +37,3 @@ def assert_gpg_tty( ):
     raise RuntimeError(
         "ERROR: Environment variable 'GPG_TTY' is not set. "
         "Task cannot prompt for GPG secret key passphrase." )
-
-
-__.reclassify_module( __name__ )

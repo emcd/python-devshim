@@ -202,6 +202,3 @@ def _setup_python_search_paths( ):
 
 
 if '__main__' == __name__: main( )
-else:
-    from lockup import reclassify_module as _reclassify_module
-    _reclassify_module( __name__ )

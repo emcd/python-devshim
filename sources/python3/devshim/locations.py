@@ -94,6 +94,7 @@ def _calculate_caches_locations( locations ):
     return __.SimpleNamespace(
         SELF = caches_path,
         DEV = __.SimpleNamespace(
+            SELF = caches_path / f"{__package__}",
             repositories = caches_path / f"{__package__}/repositories",
         ),
         hypothesis = caches_path / 'hypothesis',
@@ -179,6 +180,3 @@ def _calculate_tests_locations( locations ):
             python3 = project_path / 'python3',
         ),
     )
-
-
-__.reclassify_module( __name__ )

@@ -94,16 +94,16 @@ def extract_tarfile( source, destination, selector = None ):
 
 def is_older_than( path, then ):
     ''' Is file system entity older than delta time from now? '''
-    # NOTE: Similar implementation exists in 'develop.py'.
-    #       Improvements should be reflected in both places.
     from datetime import (
         datetime as DateTime, timedelta as TimeDelta, timezone as TimeZone, )
     if isinstance( then, DateTime ): when = then.timestamp( )
     elif isinstance( then, TimeDelta ):
         when = ( DateTime.now( TimeZone.utc ) - then ).timestamp( )
     else:
-        # TODO: Use exception factory.
-        raise ValueError
+        __.fuse_exception_classes( ( TypeError, ValueError, ) )(
+            "Argument 'then' to function 'is_older_than' "
+            "must be a datetime or time delta instance "
+            "from module 'datetime'." )
     # Windows apparently does not track file metadata change time (ctime);
     # instead file birth time is substituted for ctime on that platform.
     # Therefore, we rely on file content modification time (mtime).
@@ -128,6 +128,3 @@ def unlink_recursively( path ):
             continue
         child_path.unlink( )
     while dirs_stack: dirs_stack.pop( ).rmdir( )
-
-
-__.reclassify_module( __name__ )
