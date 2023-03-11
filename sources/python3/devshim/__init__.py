@@ -21,24 +21,41 @@
 ''' Development support modules. '''
 
 
-from . import (
-    base,
-    data,
-    environments,
-    exceptions,
-    file_utilities,
-    fs_utilities,
-    languages,
-    locations,
-    packages,
-    platforms,
-    project,
-    scm_utilities,
-    tasks,
-    user_interface,
-)
-
 __version__ = '1.0a202301141418'
 
 
-base.reclassify_module( __name__ )
+# If bootstrapping, then need access to isolated packages cache.
+from . import pre
+with pre.imports_from_cache( ):
+    from . import (
+        __main__ as entrypoint,
+        base,
+        data,
+        environments,
+        exceptionality,
+        file_utilities,
+        fs_utilities,
+        languages,
+        locations,
+        packages,
+        platforms,
+        project,
+        scm_utilities,
+        tasks,
+        user_interface,
+    )
+
+
+# TODO: Backport this function to 'lockup' package.
+def _reclassify_modules_by_package_name( *package_names ):
+    from sys import modules
+    with pre.imports_from_cache( ):
+        from lockup import reclassify_module
+    prefixes = tuple( f"{package_name}." for package_name in package_names )
+    for module_name, module in modules.items( ):
+        if module_name in package_names or module_name.startswith( prefixes ):
+            reclassify_module( module )
+
+_reclassify_modules_by_package_name( __package__ )
+
+# TODO: Make registered classes immutable.

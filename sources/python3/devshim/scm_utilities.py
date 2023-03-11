@@ -21,9 +21,6 @@
 ''' Utilities for source code management (SCM). '''
 
 
-from . import base as __
-
-
 def github_retrieve_tarball( repository_qname, git_ref, destination ):
     ''' Retrieves tarball for Git repository and ref into destination.
 
@@ -41,6 +38,3 @@ def github_retrieve_tarball( repository_qname, git_ref, destination ):
         f"refs/heads/{git_ref}",
         destination,
         headers = { 'Accept': 'application/vnd.github+json' } )
-
-
-__.reclassify_module( __name__ )

@@ -53,6 +53,3 @@ def identify_python( mode, python_path ):
     return execute_external(
         ( python_path, detector_path, '--mode', mode ),
         capture_output = True ).stdout.strip( )
-
-
-__.reclassify_module( __name__ )

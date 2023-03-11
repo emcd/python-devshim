@@ -23,6 +23,3 @@
 
 from . import base
 from . import semgrep
-
-
-base.reclassify_module( __name__ )

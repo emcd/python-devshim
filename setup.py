@@ -31,23 +31,16 @@ def _prepare( ):
         '_develop', project_location / 'develop.py' )
     module = module_from_spec( module_spec )
     module_spec.loader.exec_module( module )
-    # Only want to ensure our dependencies. Cannot invoke a full preparation as
-    # that would lead to a cycle from trying to install an editable wheel of
-    # ourself while trying to build a wheel of ourself.
-    module.ensure_main_packages( project_location / 'pyproject.toml' )
-    from sys import path as modules_locations
-    sources_location = project_location / 'sources/python3'
+    package_discovery_manager, packages_cache_manager = (
+        module.ensure_sanity( ) )
     # Only want our main cache and our sources on the modules search path long
     # enough to ensure successful import of our own sources to assist in build
     # preparation. Do not want to see ourself or our dependencies during actual
     # build of package or anytime afterwards (such as virtual environment
     # construction) as this can lead to conflicts.
-    modules_locations.insert( 0, str( sources_location ) )
-    with module.imports_from_cache(
-        module.ensure_packages_cache( 'main' )
-    ):
-        from devshim.data import paths
-    modules_locations.remove( str( sources_location ) )
+    with packages_cache_manager:
+        with package_discovery_manager:
+            from devshim.data import paths
     return paths
 
 _paths = _prepare( )

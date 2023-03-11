@@ -465,6 +465,3 @@ class Version:
             return Version_( 'a', major, minor + 1, timestamp )
         # TODO: Use exception factory.
         raise ValueError( f"Unknown kind of piece: {piece}" )
-
-
-__.reclassify_module( __name__ )

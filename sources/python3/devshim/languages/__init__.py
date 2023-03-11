@@ -33,6 +33,3 @@ from .base import (
     survey_languages,
     survey_provider_classes,
 )
-
-
-base.reclassify_module( __name__ )

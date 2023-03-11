@@ -53,6 +53,3 @@ _data: _typ.Any = (
             _invoke, '.locations.calculate_user_directories' ),
     ) ) )
 __getattr__ = _data.__getattr__
-
-
-__.reclassify_module( __name__ )

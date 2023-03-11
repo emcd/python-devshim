@@ -56,7 +56,3 @@ def extract_task_invocable( task ):
     while hasattr( invocable, '__wrapped__' ):
         invocable = invocable.__wrapped__
     return invocable
-
-
-from lockup import reclassify_module as _reclassify_module
-_reclassify_module( __name__ )

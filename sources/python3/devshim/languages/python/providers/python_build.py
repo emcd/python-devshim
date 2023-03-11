@@ -212,6 +212,3 @@ _data = __.create_semelfactive_namespace( __.create_invocable_dictionary(
     _produce_calculators( )
 ) )
 __getattr__ = _data.__getattr__
-
-
-__.reclassify_module( __name__ )

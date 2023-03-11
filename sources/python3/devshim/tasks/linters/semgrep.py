@@ -21,9 +21,6 @@
 ''' Task for R2C Semgrep Linter: https://r2c.dev/#semgrep '''
 
 
-from . import base as __
-
-
 def update_rules( ):
     ''' Update local copy of Semgrep Rules repository, if necessary. '''
     from datetime import timedelta as TimeDelta
@@ -51,6 +48,3 @@ def update_rules( ):
         if installation_location.exists( ): rmtree( installation_location )
         move( source_location, installation_location )
     return installation_location
-
-
-__.reclassify_module( __name__ )

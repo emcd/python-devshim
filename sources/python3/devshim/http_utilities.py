@@ -33,7 +33,6 @@ def retrieve_url( url, destination = None, headers = None ): # pylint: disable=t
         context stack that ensures proper resource cleanup. '''
     # NOTE: Similar implementation exists in 'develop.py'.
     #       Improvements should be reflected in both places.
-    from http import HTTPStatus as HttpStatus
     from random import random
     from time import sleep
     from urllib.error import HTTPError as HttpError
@@ -48,16 +47,14 @@ def retrieve_url( url, destination = None, headers = None ): # pylint: disable=t
             __.scribe.error( f"Failed to retrieve data from {url!r}." )
             # Exponential backoff with collision-breaking jitter.
             backoff_time = 2 ** attempts_count + 2 * random( ) # nosec: B311
-            if HttpStatus.TEMPORARY_REDIRECT.value == exc.code:
-                url = exc.headers[ 'Location' ]
-                __.scribe.debug( f"Temporary redirect to {url!r}." )
-                return retrieve_url( url, destination, headers )
-            if HttpStatus.PERMANENT_REDIRECT.value == exc.code:
-                url = exc.headers[ 'Location' ]
-                __.scribe.warning( f"Permanent redirect to {url!r}." )
-                return retrieve_url( url, destination, headers )
-            if HttpStatus.NOT_FOUND.value == exc.code: raise
-            if HttpStatus.TOO_MANY_REQUESTS.value == exc.code:
+            # https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+            if exc.code in ( 301, 302, 307, 308 ):  # Redirects
+                if 'Location' in exc.headers:
+                    url = exc.headers[ 'Location' ]
+                    return retrieve_url( url, destination, headers )
+                raise
+            if 404 == exc.code: raise               # Not Found
+            if 429 == exc.code:                     # Too Many Requests
                 backoff_time = float(
                     exc.headers.get( 'Retry-After', backoff_time ) )
                 if 120 < backoff_time: raise # Do not wait too long.
@@ -66,8 +63,8 @@ def retrieve_url( url, destination = None, headers = None ): # pylint: disable=t
                 f"Will attempt retrieval from {url!r} again "
                 f"in {backoff_time} seconds." )
             sleep( backoff_time )
-    # TODO: Use exception factory.
-    raise RuntimeError
+    raise __.fuse_exception_classes( ( RuntimeError, ) )(
+        'Wut? Unexpectedly fell out of HTTP retrieval retry loop.' )
 
 def _retrieve_url( request, destination ):
     # NOTE: Similar implementation exists in 'develop.py'.
@@ -89,8 +86,6 @@ def _retrieve_url( request, destination ):
 
 
 def _normalize_retrieval_destination( destination ):
-    # NOTE: Similar implementation exists in 'develop.py'.
-    #       Improvements should be reflected in both places.
     if isinstance( destination, str ): destination = __.Path( destination )
     if isinstance( destination, __.Path ) and not destination.exists( ):
         destination.parent.mkdir( exist_ok = True, parents = True )
@@ -100,8 +95,7 @@ def _normalize_retrieval_destination( destination ):
         callable( getattr( destination, 'write', None ) ),
         callable( destination )
     ) ):
-        # TODO: Use exception factory.
-        raise ValueError(
+        __.fuse_exception_classes( ( ValueError, ) )(
             "Cannot use instance of {class_name!r} "
             "as retrieval destination.".format(
                 class_name = __.derive_class_fqname( type( destination ) ) ) )

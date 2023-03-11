@@ -27,7 +27,6 @@ from abc import (
 )
 
 from invoke import Collection as TaskCollection, call
-from lockup import reclassify_module
 
 from ..base import execute_external, scribe
 from ..data import paths, project_name
@@ -168,6 +167,3 @@ def _invoke_task_invocable( invocable, posargs, nomargs ):
         excc = type( exc )
         __.scribe.error( f"{excc.__module__}.{excc.__qualname__}: {exc}" )
         raise SystemExit( exc.returncode ) from exc
-
-
-__.reclassify_module( __name__ )

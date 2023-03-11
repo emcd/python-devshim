@@ -116,6 +116,7 @@ def clean_tool_caches( ):
     from itertools import chain
     anchors = __.paths.caches.SELF.glob( '*' )
     ignorable_paths = set( __.paths.caches.SELF.glob( '*/.gitignore' ) )
+    ignorable_paths.update( __.paths.caches.DEV.SELF.rglob( '*' ) )
     dirs_stack = [ ]
     for path in chain.from_iterable( map(
         lambda anchor: anchor.rglob( '*' ), anchors
@@ -947,6 +948,3 @@ namespace.add_collection( __.TaskCollection(
 namespace.add_collection( __.TaskCollection(
     'xp',
 ) )
-
-
-__.reclassify_module( __name__ )

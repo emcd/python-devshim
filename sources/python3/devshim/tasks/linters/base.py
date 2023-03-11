@@ -19,9 +19,3 @@
 
 
 ''' Common utilities for linting tasks. '''
-
-
-from lockup import reclassify_module
-
-
-reclassify_module( __name__ )

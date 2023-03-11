@@ -25,6 +25,3 @@ from . import base
 
 from .python_build import LanguageProvider as PythonBuild
 from .windows_embeddable import LanguageProvider as WindowsEmbeddable
-
-
-base.reclassify_module( __name__ )
