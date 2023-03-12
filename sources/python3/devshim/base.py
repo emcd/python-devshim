@@ -29,6 +29,7 @@
 
 
 # pylint: disable=unused-import
+from abc import ABCMeta as ABCFactory
 from collections.abc import (
     Iterable as AbstractIterable,
     Mapping as AbstractDictionary,
@@ -56,14 +57,38 @@ narration_target: _typ.Any
 scribe: _typ.Any
 
 
-# TODO: Register exception class to be made immutable.
-class Omniexception( BaseException ):
+tv_error = ( TypeError, ValueError )
+
+
+class Class( ABCFactory ):
+    ''' Factory for all classes in the package.
+
+        Ensures class attributes are immutable and indelible.
+
+        Compatible with classes produced by :py:class:`abc.ABCMeta`. '''
+
+    __slots__ = ( )
+
+    def __setattr__( class_, name, value ):
+        if '__abstractmethods__' == name or name.startswith( '_abc_' ):
+            return super( ).__setattr__( name, value )
+        raise fuse_exception_classes( ( AttributeError, ) )(
+            "Cannot assign attribute to immutable class '{name}'.".format(
+                name = derive_class_fqname( class_ ) ) )
+
+    def __delattr__( class_, name ):
+        raise fuse_exception_classes( ( AttributeError, ) )(
+            "Cannot remove attribute from immutable class '{name}'.".format(
+                name = derive_class_fqname( class_ ) ) )
+
+
+class Omniexception( BaseException, metaclass = Class ):
     ''' Base for all exceptions in the package. '''
 
     def __init__( self, *posargs, exception_labels = None, **nomargs ):
         exception_labels = exception_labels or { }
         if not isinstance( exception_labels, AbstractDictionary ):
-            raise fuse_exception_classes( ( TypeError, ValueError, ) )(
+            raise fuse_exception_classes( tv_error )(
                 "Invalid argument 'exception_labels' to initializer "
                 f"for instance of class '{__package__}.Omniexception'; "
                 "must be dictionary." )
@@ -77,15 +102,13 @@ def create_accretive_dictionary( validator ):
         Existing entries cannot be updated or deleted.
 
         Useful for immutable registries. '''
-    # TODO: Use exception factory.
     if not callable( validator ): # TODO: Assert unary invocable.
-        raise ValueError(
-            f"Cannot create accretive dictionary "
-            f"which has noninvocable validator. " )
+        raise fuse_exception_classes( tv_error )(
+            "Cannot create accretive dictionary "
+            "which has noninvocable validator." )
     dictionary = { }
 
-    # TODO: Immutable class.
-    class AccretiveDictionary( AbstractDictionary ):
+    class AccretiveDictionary( AbstractDictionary, metaclass = Class ):
         ''' Adds entries which thereafter cannot be updated or deleted. '''
 
         __slots__ = ( )
@@ -98,10 +121,9 @@ def create_accretive_dictionary( validator ):
 
         def __setitem__( self, name, value ):
             if name in dictionary:
-                # TODO: Use exception factory.
-                raise ValueError(
+                raise fuse_exception_classes( ( ValueError, ) )(
                     f"Cannot replace existing entry {name!r} "
-                    f"in accretive dictionary." )
+                    "in accretive dictionary." )
             dictionary[ name ] = validator( value )
 
         def items( self ): return dictionary.items( )
@@ -113,12 +135,19 @@ def create_accretive_dictionary( validator ):
 
 def create_class_fuser( primary_class ):
     ''' Creates class fuser with cache of classes. '''
-    # TODO: Validate primary class.
+    from inspect import isclass as is_class
+    if not is_class( primary_class ):
+        raise fuse_exception_classes( tv_error )(
+            f"Primary class cannot be {primary_class!r}; must be a class." )
     cache = { }
 
     def fuse_classes( classes ):
         ''' Fuses additional classes to primary class. '''
-        # TODO: Validate classes.
+        for class_ in classes:
+            if not is_class( class_ ):
+                raise fuse_exception_classes( tv_error )(
+                    f"Additional base class cannot be {class_!r}; "
+                    "must be a class." )
         cache_index = "{primary_class_name}.{classes_names}".format(
             primary_class_name = primary_class.__qualname__,
             classes_names = '__'.join( map(
@@ -127,8 +156,10 @@ def create_class_fuser( primary_class ):
                     class_.__qualname__.replace( '.', '_' ) ) ), classes ) ) )
         if cache_index not in cache:
             base_classes = ( primary_class, *classes )
-            # TODO? Create with different class factory.
-            cache[ cache_index ] = type( cache_index, base_classes, { } )
+            # pylint: disable=undefined-variable
+            cache[ cache_index ] = Class.__new__(
+                Class, cache_index, base_classes, { } )
+            # pylint: enable=undefined-variable
         return cache[ cache_index ]
 
     return fuse_classes
@@ -137,11 +168,16 @@ def create_class_fuser( primary_class ):
 def create_immutable_namespace( source ):
     ''' Creates immutable namespace from dictionary or simple namespace. '''
     from inspect import isfunction as is_function
-    # TODO: Validate source.
     if isinstance( source, SimpleNamespace ): source = source.__dict__
+    if not isinstance( source, AbstractDictionary ):
+        raise fuse_exception_classes( tv_error )(
+            "Namespace source must be dictionary or 'types.SimpleNamespace'." )
     namespace = { }
     for name, value in source.items( ):
-        # TODO: Assert valid Python public identifiers.
+        if not probe_valid_public_identifier( name ):
+            raise fuse_exception_classes( tv_error )(
+                f"Invalid namespace source key {name!r}. "
+                "Must be strings which is valid Python public identifier." )
         if is_function( value ):
             namespace[ name ] = staticmethod( value )
         elif isinstance( value, ( AbstractDictionary, SimpleNamespace, ) ):
@@ -160,14 +196,14 @@ def create_invocable_dictionary( *iterables, **dictionary_nomargs ): # pylint: d
     normalized_iterables = [ ]
     for iterable in iterables:
         if not isinstance( iterable, AbstractIterable ):
-            # TODO: Use exception factory.
-            raise ValueError(
-                f"Cannot create dictionary from noniterable source." )
+            raise fuse_exception_classes( tv_error )(
+                "Cannot create dictionary from noniterable source "
+                f"{iterable!r}." )
         if not isinstance( iterable, AbstractDictionary ):
             try: normalized_iterables.append( dict( iterable ) )
             except TypeError as exc:
-                raise ValueError(
-                    f"Cannot create dictionary from incompatible iterable."
+                raise fuse_exception_classes( tv_error )(
+                    "Cannot create dictionary from incompatible iterable."
                 ) from exc
         else: normalized_iterables.append( iterable )
     from itertools import chain
@@ -175,14 +211,12 @@ def create_invocable_dictionary( *iterables, **dictionary_nomargs ): # pylint: d
         lambda it: it.items( ), ( *normalized_iterables, dictionary_nomargs )
     ) ):
         if not callable( value ):
-            # TODO: Use exception factory.
-            raise ValueError(
-                f"Cannot create invocable dictionary from noninvocable value "
+            raise fuse_exception_classes( tv_error )(
+                "Cannot create invocable dictionary from noninvocable value "
                 f"associated with index {index!r}." )
         dictionary[ index ] = value
 
-    # TODO: Immutable class.
-    class InvocableDictionary( AbstractDictionary ):
+    class InvocableDictionary( AbstractDictionary, metaclass = Class ):
         ''' Dictionary with invocable entries. '''
 
         __slots__ = ( )
@@ -213,22 +247,19 @@ def create_semelfactive_dictionary( factory ):
         The factory must take one argument, the name of the entry, and use that
         to produce a value. '''
     if not callable( factory ): # TODO: Assert unary invocable.
-        # TODO: Use exception factory.
-        raise ValueError(
-            f"Cannot create semelfactive dictionary "
-            f"which has noninvocable factory." )
+        raise fuse_exception_classes( tv_error )(
+            "Cannot create semelfactive dictionary "
+            f"which has noninvocable factory {factory!r}." )
     dictionary = { }
 
-    # TODO: Class immutability.
-    class SemelfactiveDictionary( AbstractDictionary ):
+    class SemelfactiveDictionary( AbstractDictionary, metaclass = Class ):
         ''' Produces values on access and retains them. '''
 
         def __getitem__( self, name ):
             if name not in dictionary:
                 try: dictionary[ name ] = factory( name )
                 except Exception as exc:
-                    # TODO: Use exception factory.
-                    raise KeyError(
+                    raise fuse_exception_classes( KeyError, )(
                         f"Cannot produce entry for {name!r}." ) from exc
             return dictionary[ name ]
 
@@ -254,14 +285,12 @@ def create_semelfactive_namespace( factory ):
     # NOTE: Similar implementation exists in 'develop.py'.
     #       Improvements should be reflected in both places.
     if not callable( factory ): # TODO: Assert unary invocable.
-        # TODO: Use exception factory.
-        raise ValueError(
-            f"Cannot create semelfactive namespace "
-            f"which has noninvocable factory." )
+        raise fuse_exception_classes( tv_error )(
+            "Cannot create semelfactive namespace "
+            f"which has noninvocable factory {factory!r}." )
     cache = { }
 
-    # TODO: Class immutability.
-    class SemelfactiveNamespace:
+    class SemelfactiveNamespace( metaclass = Class ):
         ''' Produces values on access and retains them. '''
 
         __slots__ = ( )
@@ -270,18 +299,16 @@ def create_semelfactive_namespace( factory ):
             if name not in cache:
                 try: cache[ name ] = factory( name )
                 except Exception as exc:
-                    raise AttributeError(
+                    raise fuse_exception_classes( ( AttributeError, ) )(
                         f"Cannot produce attribute for {name!r}." ) from exc
             return cache[ name ]
 
         def __setattr__( self, name, value ):
-            # TODO: Use exception factory.
-            raise AttributeError(
+            raise fuse_exception_classes( ( AttributeError, ) )(
                 "Cannot assign attribute to semelfactive namespace." )
 
         def __delattr__( self, name ):
-            # TODO: Use exception factory.
-            raise AttributeError(
+            raise fuse_exception_classes( ( AttributeError, ) )(
                 "Cannot remove attribute from semelfactive namespace." )
 
     return SemelfactiveNamespace( )
@@ -289,27 +316,23 @@ def create_semelfactive_namespace( factory ):
 
 def derive_class_fqname( class_ ):
     ''' Derives fully-qualified class name from class object. '''
-    # NOTE: Similar implementation exists in 'develop.py'.
-    #       Improvements should be reflected in both places.
     from inspect import isclass as is_class
     if not is_class( class_ ):
-        # TODO: Use exception factory.
-        raise ValueError(
-            f"Cannot fully-qualified class name for non-class {class_!r}." )
+        raise fuse_exception_classes( tv_error )(
+            "Cannot derive fully-qualified class name "
+            f"for non-class {class_!r}." )
     return '.'.join( ( class_.__module__, class_.__qualname__ ) )
 
 
 def derive_environment_entry_name( *parts ):
     ''' Derives environment entry name from package name and parts. '''
     for part in parts:
-        if not isinstance( part, str ):
-            raise fuse_exception_classes( ( TypeError, ValueError, ) )(
-                f"Name part {part!r} cannot be used to derive "
-                "environment variable name." )
-        if not part.isascii( ) or not part.isalnum( ):
-            raise fuse_exception_classes( ( TypeError, ValueError, ) )(
-                f"Name part '{part}' must be ASCII and alphanumeric to derive "
-                "environment variable name from it." )
+        if not (
+            isinstance( part, str ) and part.isascii( ) and part.isalnum( )
+        ):
+            raise fuse_exception_classes( tv_error )(
+                f"Name part {part!r} must be an ASCII, alphanumeric string "
+                "to derive environment variable name." )
     return '_'.join( map( str.upper, ( __package__, *parts ) ) )
 
 
@@ -361,6 +384,16 @@ def normalize_command_specification( command_specification ):
         return tuple( map( str, command_specification ) )
     raise fuse_exception_classes( ( ValueError, ) )(
         f"Invalid command specification {command_specification!r}" )
+
+
+def probe_valid_public_identifier( object_ ):
+    ''' Checks if object is valid Python public identifier. '''
+    from keyword import iskeyword
+    return (
+        isinstance( object_, str )
+        and not object_.startswith( '_' )
+        and object_.isidentifier( )
+        and not iskeyword( object_ ) )
 
 
 def split_command( command_specification ):
