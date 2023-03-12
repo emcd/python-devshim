@@ -89,16 +89,14 @@ def ensure_sanity( project_location = None ):
 
 def main( project_location = None ):
     ''' Entrypoint for development activity. '''
-    ensure_sanity( project_location = project_location )
+    package_discovery_manager, packages_cache_manager = (
+        ensure_sanity( project_location = project_location ) )
     from contextlib import ExitStack as CMStack
     with CMStack( ) as contexts:
-        contexts.enter_context( imports_from_cache(
-            ascertain_package_discovery_location( ) ) )
-        from .pre import ensure_python_packages_cache
-        contexts.enter_context( imports_from_cache(
-            ensure_python_packages_cache( __package__ ) ) )
-        from .user_interface import enhance_ultimate_scribe
-        enhance_ultimate_scribe( )
+        contexts.enter_context( package_discovery_manager )
+        contexts.enter_context( packages_cache_manager )
+        from .user_interface import enhance
+        enhance( )
         from invoke import Collection, Program
         from . import tasks
         Program( namespace = Collection.from_module( tasks ) ).run( )

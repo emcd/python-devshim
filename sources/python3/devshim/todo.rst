@@ -18,9 +18,6 @@ Fixes and Minor Improvements
   get around Pip's build tracking when building wheels from source in the build
   support side cache for the CPython TRACEREFS case.
 
-* Add `icecream <https://github.com/gruns/icecream>`_ to development
-  dependencies for easier debugging.
-
 * Add `releases <https://github.com/bitprophet/releases>`_ or `towncrier
   <https://github.com/twisted/towncrier>`_ to development dependencies for
   easier changelog management.
@@ -63,6 +60,9 @@ Restructure Package Dependencies Format
   example) for editable package "installation". (Rust's Cargo has the ability
   to get packages from local paths, by preference, and fall back to an index,
   such as crates.io, otherwise. This is very useful and what we want here too.)
+
+* Replace generation of Devshim dependencies by Pip Tools with internal Pip
+  hashes generator.
 
 More Linters
 ===============================================================================

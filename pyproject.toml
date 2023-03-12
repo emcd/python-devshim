@@ -33,6 +33,7 @@ classifiers = [ # https://pypi.org/classifiers
 requires-python = '>= 3.7'
 dependencies = [
   'beautifulsoup4',
+  'icecream',
   'invoke < 2', # TODO: Make compatible with version 2.
   'lockup',
   'packaging',

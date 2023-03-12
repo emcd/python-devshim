@@ -24,8 +24,25 @@
 from . import base as __
 
 
+def configure_object_inspector( ):
+    ''' Enhances object inspector. '''
+    from icecream import ic, install # pylint: disable=import-error
+    from rich.pretty import pretty_repr
+    ic.configureOutput(
+        argToStringFunction = pretty_repr,
+        includeContext = True,
+        prefix = 'DEBUG| ', )
+    install( )
+
+
+def enhance( ):
+    ''' Enhances root logger and object inspector. '''
+    enhance_ultimate_scribe( )
+    configure_object_inspector( )
+
+
 def enhance_ultimate_scribe( ):
-    ''' Enhances root logger as desired. '''
+    ''' Enhances root logger. '''
     from logging import getLogger as acquire_scribe
     from sys import stderr
     from rich.console import Console
