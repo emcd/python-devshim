@@ -38,7 +38,7 @@ Virtual Environments Improvements
   Anything installed in virtual environments must be installed by virtual
   environment tools.
 
-Brain-Finding Improvements
+Distribution Options
 ===============================================================================
 
 * Package as zipapp. Then, carve ``develop.py`` down to just find the zipapp,

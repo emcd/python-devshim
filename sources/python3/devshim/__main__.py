@@ -19,86 +19,13 @@
 
 ''' Executable entrypoint for package.
 
-    Detects whether it should use an in-tree implementation of its package,
-    either from a clone of the source code repository for the package project
-    or a Git submodule with such a clone. In-tree implementations are useful
-    for development upon the package project itself, either for use on itself
-    or another project. Also, making the package executable via the ``-m`` flag
-    of the Python interpreter gives users another alternative to running
-    ``develop.py``, should they desire. And, lastly, it enables the use of the
-    :py:mod:`runpy` from the standard library to be used on the package. '''
+    Ensures that package dependencies are available.
 
+    By default, presents list of available tasks.
 
-# An ideal goal is to use our own package to detect whether to use an in-tree
-# or remotely-sourced version of itself. This implies that we would need to
-# maintain two sets of dependencies, possibly at different versions, in
-# conjunction with isolated package caches. (Such package caches can be
-# produced by Pip installs into target directories, for example.) Two sets of
-# dependencies at different versions further implies a need for import
-# isolation into separate registries rather than the global 'sys.modules'
-# registry. Regardless of the project at hand, this is a useful capability to
-# have, in general. However, there are a number of obstacles to actualizing
-# this goal, no matter how one attempts to reach it.
-#
-# Python provides several override mechanisms for its import machinery. For
-# example, one can create new module finders and register them on
-# 'sys.meta_path', per https://docs.python.org/3/reference/import.html#.
-# These hooks can produce module specs
-# (https://docs.python.org/3/library/importlib.html#importlib.machinery.ModuleSpec)
-# that reference module loaders which can load modules from isolated package
-# caches into isolated module registries instead of 'sys.modules'. However, the
-# finders and loaders are invoked by the import system driver, the '__import__'
-# function, which is registered as a Python builtin and called by the Python
-# language runtime
-# (https://github.com/python/cpython/blob/v3.11.2/Python/import.c#L1736-L1737).
-# This default import hook makes an assumption that 'sys.modules' is the sole
-# module registry and does not provide a way to use an alternative registry.
-# One can replace this hook with a customized one, but that, in effect, implies
-# reimplementation of the bulk of
-# https://github.com/python/cpython/blob/v3.11.2/Lib/importlib/_bootstrap.py,
-# which is rather impractical for the return on investment.
-#
-# Given that the use of import hooks to reach our goal is, in essence, a dead
-# end, without a very significant investment, another alternative to consider
-# is whether we can wrap the existing import hook and divert any modules that
-# it produces into an isolated registry. This is doable, but we must still
-# provide our own resolution of module names for relative imports, which
-# involves the duplication and adaptation of a few functions from the default
-# import driver to support resolution of relative imports, for example. I.e.,
-# the arguments to '__import__' are not enough to tell us whether we already
-# have a module in an isolated registry or not.
-#
-# Another approach is to avoid 'import' statements and use a direct module
-# loader of our own devising. We do something similar to trigger installation
-# of our package dependencies via the 'develop.py' module for a project from
-# callers, such as Sphinx 'conf.py' running on Read The Docs to avoid
-# maintaining a separate dependencies manifest. However, this only works well
-# for modules which have no transitive imports. Transitive imports, coming from
-# the 'import' statement or 'importlib.import_module', will use the registered
-# import hook and thus not be placed in an isolated registry.
-#
-# A simpler solution is to challenge our stated goal. If we, instead, accept
-# that a project maintainer can configure 'develop.py' to point at either an
-# in-tree version of our package or a remotely-sourced version of our package,
-# then the above considerations disappear. Does this make 'develop.py' less
-# portable? Yes. Does this make 'develop.py' less upgradable? Not necessarily.
-# We can load 'develop.py' as a module and read the maintainer-supplied
-# configuration to generate an upgraded 'develop.py'.
-#
-# So, for now, we accept that this entrypoint is for the only implementation of
-# its package that matters to a project maintainer and that the maintainer has
-# made a conscious decision to use this implementation. This is simpler than
-# messing around with import machinery and gives the maintainer more
-# flexibility about the source of this package at a small cost of 'develop.py'
-# portability.
-
-
-# devshim.__main__:
-#   * module cache management
-#   * must have no standard imports of other parts of devshim;
-#     must use cache management instead
-#   * must have no standard imports of third-party dependencies;
-#     must use cache management instead
+    Enables the use of the :py:mod:`runpy` module from the standard library
+    with this package. By extension, this also means that the package supports
+    the '-m' flag to the Python interpreter. '''
 
 
 def assert_minimum_python_version( ):
@@ -163,14 +90,18 @@ def ensure_sanity( project_location = None ):
 def main( project_location = None ):
     ''' Entrypoint for development activity. '''
     ensure_sanity( project_location = project_location )
-    with imports_from_cache( ascertain_package_discovery_location( ) ):
+    from contextlib import ExitStack as CMStack
+    with CMStack( ) as contexts:
+        contexts.enter_context( imports_from_cache(
+            ascertain_package_discovery_location( ) ) )
         from .pre import ensure_python_packages_cache
-        with imports_from_cache( ensure_python_packages_cache( __package__ ) ):
-            # pylint: disable=import-error
-            from invoke import Collection, Program
-            from devshim import tasks
-            # pylint: enable=import-error
-            Program( namespace = Collection.from_module( tasks ) ).run( )
+        contexts.enter_context( imports_from_cache(
+            ensure_python_packages_cache( __package__ ) ) )
+        from .user_interface import enhance_ultimate_scribe
+        enhance_ultimate_scribe( )
+        from invoke import Collection, Program
+        from . import tasks
+        Program( namespace = Collection.from_module( tasks ) ).run( )
 
 
 @_context_manager

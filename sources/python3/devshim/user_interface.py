@@ -24,6 +24,25 @@
 from . import base as __
 
 
+def enhance_ultimate_scribe( ):
+    ''' Enhances root logger as desired. '''
+    from logging import getLogger as acquire_scribe
+    from sys import stderr
+    from rich.console import Console
+    from rich.logging import RichHandler
+    from .base import narration_target
+    scribe = acquire_scribe( )
+    for handler in scribe.handlers: scribe.removeHandler( handler )
+    # TODO: Alter log format.
+    scribe.addHandler( RichHandler(
+        console = Console( stderr = stderr == narration_target ),
+        rich_tracebacks = True,
+        show_time = False ) )
+    scribe.debug(
+        "Rich logging enabled. "
+        "Toto, I've a feeling we're not in Kansas anymore." )
+
+
 def render_boxed_title( title, supplement = None ):
     ''' Renders box around title to diagnostic stream. '''
     if None is supplement: specific_title = title

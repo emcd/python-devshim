@@ -52,6 +52,7 @@ version = '1.0a202301141418'
 
 eprint: _typ.Callable
 epprint: _typ.Callable
+narration_target: _typ.Any
 scribe: _typ.Any
 
 
@@ -421,37 +422,12 @@ def _configure( ):
 
 def _create_scribe( ):
     ''' Initializes logger for package. '''
-    #if _data.main_module_compatibility: _enhance_ultimate_scribe( )
-    from logging import INFO, NullHandler, getLogger as acquire_scribe
+    from logging import NullHandler, getLogger as acquire_scribe
     scribe = acquire_scribe( __package__ ) # pylint: disable=redefined-outer-name
     # https://docs.python.org/3/howto/logging.html#configuring-logging-for-a-library
     scribe.addHandler( NullHandler( ) )
-    scribe.setLevel( view_environment_entry( ( 'record', 'level' ), INFO ) )
+    scribe.setLevel( view_environment_entry( ( 'record', 'level' ), 'INFO' ) )
     return scribe
-
-def _enhance_ultimate_scribe( ):
-    ''' Enhances root logger as desired. '''
-    from logging import getLogger as acquire_scribe
-    from sys import stderr
-    from rich.console import Console
-    from rich.logging import RichHandler
-    scribe = acquire_scribe( ) # pylint: disable=redefined-outer-name
-    for handler in scribe.handlers: scribe.removeHandler( handler )
-    # TODO: Alter log format.
-    scribe.addHandler( RichHandler(
-        console = Console( stderr = stderr == _data.narration_target ),
-        rich_tracebacks = True,
-        show_time = False ) )
-    scribe.debug( "Rich logging enabled. We're not in Kansas anymore." )
-
-
-def _check_main_module_compatibility( ):
-    from sys import modules
-    if '__main__' in modules:
-        module = modules[ '__main__' ]
-        # TODO? Check version compatibility.
-        return __package__ == getattr( module, 'package_name', None )
-    return False
 
 
 def _detect_ci_environment( ):
@@ -503,7 +479,6 @@ _data = create_semelfactive_namespace( create_invocable_dictionary(
     configuration = _configure,
     epprint = _provide_structural_narrative_function,
     eprint = _provide_simple_narrative_function,
-    main_module_compatibility = _check_main_module_compatibility,
     narration_target = _select_narration_target,
     on_tty = _probe_tty,
     scribe = _create_scribe,
