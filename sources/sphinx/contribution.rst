@@ -82,4 +82,7 @@ Development
 .. toctree::
    :maxdepth: 3
 
+   development/environment
    development/design
+   development/common-tasks
+   development/practices

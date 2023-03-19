@@ -1,0 +1,15 @@
+name: publisher
+on:
+  workflow_dispatch: {}
+  workflow_run:
+    workflows: ['tester']
+    branches: ['master']
+    types: ['completed']
+jobs:
+  initialize:
+    uses: ./.github/workflows/reusable--initializer.yaml
+  publish:
+    needs: initialize
+    uses: ./.github/workflows/reusable--publisher.yaml
+    with:
+      signing-key: '${{ secrets.GHA_COMMIT_SIGNING_KEY }}'

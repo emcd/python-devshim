@@ -16,6 +16,49 @@
    |                                                                          |
    +--------------------------------------------------------------------------+
 
+`invoke <https://www.pyinvoke.org>`_
+===============================================================================
+
+Many common development tasks, such as running tests, pushing new commit tags,
+uploading a new release, etc... can be automated. We use invoke_ to run such
+automations. It has various nice features, such as the ability to tee standard
+output streams, run commands in a pseudo-TTY, manage dependencies between
+tasks, to name a few.
+
+Contrasts to Alternatives
+-------------------------------------------------------------------------------
+
+`make <https://www.gnu.org/software/make>`_
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The Makefile language, while generally elegant and well-suited to
+  deterministic workflows, such as software maintenance automation, is an
+  additional language which must be remembered.
+
+* While GNU Make is essentially ubiquitous in the Unix world, it is not
+  available by default on Windows.  Moreover, Microsoft Nmake does not have
+  entirely compatible syntax.  Dual maintenance of DOS/Windows batch files or
+  Powershell scripts is also undesirable.
+
+* As Python is a prerequisite for this project and we have the infrastructure
+  to guarantee a particular software environment, we can ensure a specific
+  version of :command:`invoke` is available.  We would have no similar
+  assurance with a system-provided :command:`make` and cannot provide this
+  command via the Python package ecosystem.
+
+* We can avoid the use of commands, such as :command:`find`, which have
+  platform-specific variations, and instead use equivalent standardized
+  functions.  An additional benefit is that function invocations are within the
+  same Python interpreter session, whereas command invocations have fork-exec
+  overhead.
+
+* Separate options can be passed for each of multiple targets to
+  :command:`invoke`, whereas :command:`make` only consumes global options and
+  variables.
+
+* A summary of all available targets/subcommands along with brief descriptions
+  can be listed by :command:`invoke`, whereas :command:`make` does not provide
+  such a facility.
 
 Detection of Self
 ===============================================================================
