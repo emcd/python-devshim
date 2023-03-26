@@ -21,7 +21,7 @@
 ''' Project maintenance tasks. '''
 
 
-from . import _base as __
+from . import base as __
 from . import linters
 
 
