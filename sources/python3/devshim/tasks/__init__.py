@@ -791,45 +791,6 @@ def _get_pypi_credentials( repository_name ):
         'TWINE_PASSWORD': table[ 'password' ], }
 
 
-# Inspiration: https://stackoverflow.com/a/58993849/14833542
-@__.task(
-    'Publish: Github Pages',
-    task_nomargs = dict( pre = ( test, make_html, ), ),
-)
-def upload_github_pages( ):
-    ''' Publishes Sphinx HTML output to Github Pages for project. '''
-    # Use relative path, since 'git subtree' needs it.
-    html_path = __.paths.artifacts.sphinx_html.relative_to( __.paths.project )
-    nojekyll_path = html_path / '.nojekyll'
-    target_branch = 'documentation'
-    from contextlib import ExitStack as ContextStack
-    from subprocess import SubprocessError # nosec B404
-    from ..base import springy_chdir
-    with ContextStack( ) as contexts:
-        # Work from project root, since 'git subtree' requires relative paths.
-        contexts.enter_context( springy_chdir( __.paths.project ) )
-        saved_branch = __.execute_external(
-            'git branch --show-current',
-            capture_output = True ).stdout.strip( )
-        try:
-            __.execute_external( f"git branch -D local-{target_branch}" )
-        except SubprocessError: pass
-        __.execute_external( f"git checkout -b local-{target_branch}" )
-        def restore( *exc_info ): # pylint: disable=unused-argument
-            __.execute_external( f"git checkout {saved_branch}" )
-        contexts.push( restore )
-        nojekyll_path.touch( exist_ok = True )
-        # Override .gitignore to pickup artifacts.
-        __.execute_external( f"git add --force {html_path}" )
-        __.execute_external( 'git commit -m "Update documentation."' )
-        subtree_id = __.execute_external(
-            f"git subtree split --prefix {html_path}",
-            capture_output = True ).stdout.strip( )
-        __.execute_external(
-            "git push --force origin "
-            f"{subtree_id}:refs/heads/{target_branch}" )
-
-
 @__.task( task_nomargs = dict( pre = ( bump_patch, push, upload_pypi, ), ), )
 def release_new_patch( ):
     ''' Unleashes a new patch upon the world. '''
@@ -936,7 +897,6 @@ namespace.add_collection( __.TaskCollection(
     'publish',
     new_patch = release_new_patch,
     new_stage = release_new_stage,
-    github_pages = upload_github_pages,
     pypi = upload_pypi,
     test_pypi = upload_test_pypi,
 ) )

@@ -11,5 +11,3 @@ jobs:
   publish:
     needs: initialize
     uses: ./.github/workflows/reusable--publisher.yaml
-    secrets:
-      GHA_COMMIT_SIGNING_KEY: '${{ secrets.GHA_COMMIT_SIGNING_KEY }}'
