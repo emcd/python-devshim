@@ -48,7 +48,7 @@ from types import (
 import typing as _typ
 
 
-version = '1.0a202301141418'
+version = '1.0a202403031735'
 
 
 eprint: _typ.Callable

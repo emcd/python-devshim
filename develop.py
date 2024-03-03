@@ -75,7 +75,7 @@ assert_minimum_python_version( )
 from pathlib import Path
 
 
-__version__ = '1.0a202301141418'
+__version__ = '1.0a202403031735'
 package_name = 'devshim'
 
 

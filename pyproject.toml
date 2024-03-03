@@ -12,7 +12,7 @@ build-backend = 'setuptools.build_meta'
 # https://packaging.python.org/en/latest/specifications/declaring-project-metadata
 dynamic = [ 'readme' ]
 name = 'devshim'
-version = '1.0a202301141418' # TODO: should be dynamic
+version = '1.0a202403031735' # TODO: should be dynamic
 description = 'Non-intrusive, portable development support shim.'
 license = { text = 'Apache-2.0' }
 keywords = [ 'development', 'non-intrusive', 'portable', 'shim', 'tasks' ]
