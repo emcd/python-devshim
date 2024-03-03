@@ -179,7 +179,7 @@ def _install_installer_archive( archive ):
 
 _pb_definition_regex = __.re.compile(
     r'''^(?P<implementation_name>\w+)'''
-    r'''(?P<base_version>\d\.\d)?-'''
+    r'''(?P<base_version>\d\.\d+)?-'''
     r'''(?P<implementation_version>.*)$''' )
 
 def _parse_implementation_version( pb_definition_name ):
