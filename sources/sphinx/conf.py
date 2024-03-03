@@ -104,6 +104,10 @@ linkcheck_ignore = [
     # Circular dependency between building HTML and publishing it.
     # Ideally, we want to warn on failure rather than ignore.
     fr'https://emcd\.github\.io/.*{project}.*/.*',
+    # Stack Exchange is being pouty about AI training,
+    # and is now giving 403 responses to bots, like link checkers.
+    r'https://.*\.stackexchange\.com/.*',
+    r'https://stackoverflow\.com/.*',
 ]
 
 # -- Options for HTML output -------------------------------------------------
