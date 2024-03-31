@@ -14,10 +14,11 @@ jobs:
       - name: Prepare Python Virtual Environment
         uses: emcd/python-devshim/.github/actions/python-venv@master
       - name: Restore Coverage Results
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: coverage-results-${{ github.run_id }}
+          pattern: coverage-results-*--${{ github.run_id }}
           path: .local/caches/pytest
+          merge-multiple: true
       - name: Report Coverage
         run: python3 develop.py make.coverage
         shell: bash
