@@ -33,7 +33,7 @@ runs:
       shell: bash
     - name: Access Cache for Python and Virtual Environment
       id: python-cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         key: python--${{ env.DEVSHIM_PYTHON_DESCRIPTOR }}--${{ runner.os }}--${{ hashFiles('.local/configuration/pypackages.fixtures.toml') }}
         path: |
