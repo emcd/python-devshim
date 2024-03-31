@@ -191,7 +191,7 @@ def _parse_implementation_version( pb_definition_name ):
 
 
 def _prepare_supportable_base_version( ):
-    return __.language.version_parser( '3.7' )
+    return __.language.version_parser( '3.8' )
 
 def _produce_calculators( ):
     def calculate_pbil( ):
