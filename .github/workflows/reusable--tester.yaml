@@ -17,7 +17,7 @@ jobs:
         run: /usr/bin/python3 develop.py test
         shell: bash
       - name: Preserve Coverage Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: coverage-results-${{ github.run_id }}
+          name: coverage-results-${{ inputs.python-version }}--${{ github.run_id }}
           path: .local/caches/pytest/coverage.sqlite3.*
