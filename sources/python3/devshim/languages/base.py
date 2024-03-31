@@ -254,7 +254,8 @@ class LanguageDescriptor( metaclass = ABCFactory ):
                 continue
             return location
         # TODO: Use exception factory.
-        raise LookupError
+        raise LookupError(
+            f"Could not locate executables for {self} by any provider." )
 
     def infer_installation_location( self ):
         ''' Infers installation location by provider. '''
@@ -267,7 +268,8 @@ class LanguageDescriptor( metaclass = ABCFactory ):
                 continue
             return location
         # TODO: Use exception factory.
-        raise LookupError
+        raise LookupError(
+            f"Could not locate installation of {self} by any provider." )
 
     def install( self, force = False ):
         ''' Installs with provider of record. '''
