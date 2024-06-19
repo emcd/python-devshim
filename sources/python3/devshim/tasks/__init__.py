@@ -177,24 +177,6 @@ def clean( version = None ):
 
 
 @__.task(
-    'Check: Python Package Security',
-    multiplexer = __.PythonVersionMultiplexer( ),
-)
-def check_security_issues( version = None ):
-    ''' Checks for security issues in installed Python packages.
-
-        This task requires Internet access and may take some time. '''
-    # Ruamel binary package requires standard ABI.
-    from ..languages.python import language
-    if (
-        language.produce_descriptor( version )
-        .probe_feature_labels( 'abi-incompatible' )
-    ): return
-    __.project_execute_external(
-        f"safety check", venv_specification = dict( version = version ) )
-
-
-@__.task(
     'Freshen: Python Version',
     multiplexer = __.PythonVersionMultiplexer( ),
 )
@@ -236,7 +218,6 @@ def freshen_python_packages( version = None ):
     install_python_packages( process_environment )
     fixtures = calculate_python_packages_fixtures( process_environment )
     record_python_packages_fixtures( identifier, fixtures )
-    __.invoke_task( check_security_issues, version = version )
     __.invoke_task( test, version = version )
 
 
@@ -849,7 +830,6 @@ namespace.add_collection( __.TaskCollection(
     pip_install = check_pip_install,
     pypi_integrity = check_pypi_integrity,
     pypi_readme = check_readme,
-    pypackages = check_security_issues,
     sphinx_urls = check_urls,
 ) )
 namespace.add_collection( __.TaskCollection(
