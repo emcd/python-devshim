@@ -90,7 +90,6 @@ def task( # pylint: disable=too-complex
             else:
                 if title: render_boxed_title( title )
                 _invoke_task_invocable( invocable, posargs, nomargs )
-                return
 
         return Task( invoker, **( task_nomargs or { } ) )
 

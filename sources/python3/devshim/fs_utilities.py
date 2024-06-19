@@ -100,6 +100,7 @@ def is_older_than( path, then ):
     elif isinstance( then, TimeDelta ):
         when = ( DateTime.now( TimeZone.utc ) - then ).timestamp( )
     else:
+        when = None
         __.fuse_exception_classes( ( TypeError, ValueError, ) )(
             "Argument 'then' to function 'is_older_than' "
             "must be a datetime or time delta instance "
