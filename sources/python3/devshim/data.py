@@ -46,8 +46,7 @@ def _invoke( name ):
 _data: _typ.Any = (
     __.create_semelfactive_namespace( __.create_invocable_dictionary(
         locations = __.partial_function( _invoke, '.locations.assemble' ),
-        # nosemgrep: python.lang.maintainability.return-not-in-function
-        paths = lambda: _data.locations,
+        paths = lambda: _data.locations, # nosemgrep
         project_name = __.partial_function(
             _invoke, '.project.discover_name' ),
         user_directories = __.partial_function(

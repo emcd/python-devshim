@@ -639,7 +639,7 @@ def _summon_definitions( name ):
 
 _data = create_semelfactive_namespace( create_invocable_dictionary(
     definitions = (
-        # nosemgrep: python.lang.maintainability.return-not-in-function
+        # nosemgrep
         lambda: create_semelfactive_dictionary( _summon_definitions ) ),
     locations = _calculate_locations,
 ) )

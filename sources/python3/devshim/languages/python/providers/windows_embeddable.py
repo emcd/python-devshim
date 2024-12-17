@@ -217,7 +217,7 @@ def _calculate_locations( ):
 
 
 def _prepare_supportable_base_version( ):
-    return __.language.version_parser( '3.8' )
+    return __.language.version_parser( '3.10' )
 
 
 _data = __.create_semelfactive_namespace( __.create_invocable_dictionary(
