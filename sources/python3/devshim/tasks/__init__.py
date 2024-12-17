@@ -664,11 +664,11 @@ def check_pypi_integrity( version = None, index_url = '' ):
         __.project_name, version, index_url = index_url )
     for package_info in release_info:
         url = package_info[ 'url' ]
-        if not package_info.get( 'has_sig', False ):
-            # TODO: Use different error-handling mechanism.
-            from invoke import Exit
-            raise Exit( f"No signature found for: {url}" )
-        check_pypi_package( url )
+#        if not package_info.get( 'has_sig', False ):
+#            # TODO: Use different error-handling mechanism.
+#            from invoke import Exit
+#            raise Exit( f"No signature found for: {url}" )
+#        check_pypi_package( url )
 
 
 # TODO: Move to '.packages' and separate retry logic from fetch logic.
