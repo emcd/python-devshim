@@ -8,9 +8,13 @@ title = 'Python 3.10'
 language-descriptors = { python = 'cpython-3.11' }
 title = 'Python 3.11'
 
-#[descriptors.'cpython-3.12']
-#language-descriptors = { python = 'cpython-3.12' }
-#title = 'Python 3.12'
+[descriptors.'cpython-3.12']
+language-descriptors = { python = 'cpython-3.12' }
+title = 'Python 3.12'
+
+#[descriptors.'cpython-3.13']
+#language-descriptors = { python = 'cpython-3.13' }
+#title = 'Python 3.13'
 
 [descriptors.'pypy-3.10']
 language-descriptors = { python = 'pypy-3.10' }

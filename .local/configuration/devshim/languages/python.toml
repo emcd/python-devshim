@@ -12,21 +12,26 @@ implementation = 'cpython'
 providers = [ 'windows-embeddable', 'python-build', ]
 title = 'Python 3.11'
 
-# TODO: Enable after issue with 'invoke' is fixed.
-#[descriptors.'cpython-3.12']
-#base-version = '3.12'
+[descriptors.'cpython-3.12']
+base-version = '3.12'
+implementation = 'cpython'
+providers = [ 'windows-embeddable', 'python-build', ]
+title = 'Python 3.12'
+
+#[descriptors.'cpython-3.13']
+#base-version = '3.13'
 #implementation = 'cpython'
 #providers = [ 'windows-embeddable', 'python-build', ]
-#title = 'Python 3.12'
+#title = 'Python 3.13'
 
 # TODO: Enable after issues with no-binary installations with Pip have
 #       been resolved.
-#[descriptors.'cpython-3.8--tracerefs']
-#base-version = '3.8'
+#[descriptors.'cpython-3.10--tracerefs']
+#base-version = '3.10'
 #features = [ 'tracerefs', ]
 #implementation = 'cpython'
 #providers = [ 'python-build', ]
-#title = 'Python 3.8 +TRACEREFS'
+#title = 'Python 3.10 +TRACEREFS'
 
 [descriptors.'pypy-3.10']
 base-version = '3.10'
